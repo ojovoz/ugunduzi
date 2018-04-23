@@ -80,4 +80,7 @@
     <string name="opManagePlotRecords">Plot records</string>
     <string name="opEnterData">Enter data</string>
     <string name="pictureSoundNotSavedText">Picture and sound have not been saved. Do you really want to exit?</string>
+    <string name="soundButtonRecordingLabel">Recording - press to stop</string>
+    <string name="soundRecordedMessage">Sound recorded</string>
+    <string name="soundButtonLabelAgain">Record sound again</string>
 </resources>
