@@ -45,7 +45,7 @@ public class oLog {
         context=c;
     }
 
-    public ArrayList<oLog> createLog(){
+    public ArrayList<oLog> createLog(int mode){
         ArrayList<oLog> ret = new ArrayList<>();
         csvFileManager log;
 
@@ -62,22 +62,44 @@ public class oLog {
                 l.date = dH.stringToDate(record[3]);
                 oDataItem di = new oDataItem(context);
                 l.dataItem = di.getDataItemFromId(Integer.parseInt(record[4]));
-                l.value = Float.parseFloat(record[5]);
-                oUnit u = new oUnit(context);
-                l.units = u.getUnitFromId(Integer.parseInt(record[6]));
-                oCrop c = new oCrop(context);
-                l.crop = c.getCropFromId(Integer.parseInt(record[7]));
-                oTreatment t = new oTreatment(context);
-                l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
-                l.picture = record[9];
-                l.sound = record[10];
-                ret.add(l);
+                switch(mode){
+                    case 0:
+                        if(l.dataItem!=null){
+                            l.value = Float.parseFloat(record[5]);
+                            oUnit u = new oUnit(context);
+                            l.units = u.getUnitFromId(Integer.parseInt(record[6]));
+                            oCrop c = new oCrop(context);
+                            l.crop = c.getCropFromId(Integer.parseInt(record[7]));
+                            oTreatment t = new oTreatment(context);
+                            l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
+                            ret.add(l);
+                        }
+                        break;
+                    case 1:
+                        if(!record[9].isEmpty()){
+                            l.picture = record[9];
+                            l.sound = record[10];
+                            ret.add(l);
+                        }
+                        break;
+                    case 2:
+                        l.value = Float.parseFloat(record[5]);
+                        oUnit u = new oUnit(context);
+                        l.units = u.getUnitFromId(Integer.parseInt(record[6]));
+                        oCrop c = new oCrop(context);
+                        l.crop = c.getCropFromId(Integer.parseInt(record[7]));
+                        oTreatment t = new oTreatment(context);
+                        l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
+                        l.picture = record[9];
+                        l.sound = record[10];
+                        ret.add(l);
+                }
             }
         }
         return ret;
     }
 
-    public ArrayList<oLog> createLog(String fName, int userId){
+    public ArrayList<oLog> createLog(String fName, int userId, int mode){
         ArrayList<oLog> ret = new ArrayList<>();
         csvFileManager log;
 
@@ -95,23 +117,48 @@ public class oLog {
                     l.date = dH.stringToDate(record[3]);
                     oDataItem di = new oDataItem(context);
                     l.dataItem = di.getDataItemFromId(Integer.parseInt(record[4]));
-                    l.value = Float.parseFloat(record[5]);
-                    oUnit u = new oUnit(context);
-                    l.units = u.getUnitFromId(Integer.parseInt(record[6]));
-                    oCrop c = new oCrop(context);
-                    l.crop = c.getCropFromId(Integer.parseInt(record[7]));
-                    oTreatment t = new oTreatment(context);
-                    l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
-                    l.picture = record[9];
-                    l.sound = record[10];
-                    ret.add(l);
+                    switch(mode){
+                        case 0:
+                            if(l.dataItem!=null){
+                                l.value = Float.parseFloat(record[5]);
+                                oUnit u = new oUnit(context);
+                                l.units = u.getUnitFromId(Integer.parseInt(record[6]));
+                                oCrop c = new oCrop(context);
+                                l.crop = c.getCropFromId(Integer.parseInt(record[7]));
+                                oTreatment t = new oTreatment(context);
+                                l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
+                                ret.add(l);
+                            }
+                            break;
+                        case 1:
+                            if(!record[9].isEmpty()){
+                                l.picture = record[9];
+                                l.sound = record[10];
+                                ret.add(l);
+                            }
+                            break;
+                        case 2:
+                            l.value = Float.parseFloat(record[5]);
+                            oUnit u = new oUnit(context);
+                            l.units = u.getUnitFromId(Integer.parseInt(record[6]));
+                            oCrop c = new oCrop(context);
+                            l.crop = c.getCropFromId(Integer.parseInt(record[7]));
+                            oTreatment t = new oTreatment(context);
+                            l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
+                            l.picture = record[9];
+                            l.sound = record[10];
+                            ret.add(l);
+                    }
                 }
             }
         }
         return ret;
     }
 
-    public ArrayList<oLog> createLog(String fName, int userId, int plot){
+    public ArrayList<oLog> createLog(String fName, int userId, int plot, int mode){
+
+        //mode: 0=data only; 1=picture + sound only; 2=both
+
         ArrayList<oLog> ret = new ArrayList<>();
         csvFileManager log;
 
@@ -129,16 +176,38 @@ public class oLog {
                     l.date = dH.stringToDate(record[3]);
                     oDataItem di = new oDataItem(context);
                     l.dataItem = di.getDataItemFromId(Integer.parseInt(record[4]));
-                    l.value = Float.parseFloat(record[5]);
-                    oUnit u = new oUnit(context);
-                    l.units = u.getUnitFromId(Integer.parseInt(record[6]));
-                    oCrop c = new oCrop(context);
-                    l.crop = c.getCropFromId(Integer.parseInt(record[7]));
-                    oTreatment t = new oTreatment(context);
-                    l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
-                    l.picture = record[9];
-                    l.sound = record[10];
-                    ret.add(l);
+                    switch(mode){
+                        case 0:
+                            if(l.dataItem!=null){
+                                l.value = Float.parseFloat(record[5]);
+                                oUnit u = new oUnit(context);
+                                l.units = u.getUnitFromId(Integer.parseInt(record[6]));
+                                oCrop c = new oCrop(context);
+                                l.crop = c.getCropFromId(Integer.parseInt(record[7]));
+                                oTreatment t = new oTreatment(context);
+                                l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
+                                ret.add(l);
+                            }
+                            break;
+                        case 1:
+                            if(!record[9].isEmpty()){
+                                l.picture = record[9];
+                                l.sound = record[10];
+                                ret.add(l);
+                            }
+                            break;
+                        case 2:
+                            l.value = Float.parseFloat(record[5]);
+                            oUnit u = new oUnit(context);
+                            l.units = u.getUnitFromId(Integer.parseInt(record[6]));
+                            oCrop c = new oCrop(context);
+                            l.crop = c.getCropFromId(Integer.parseInt(record[7]));
+                            oTreatment t = new oTreatment(context);
+                            l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
+                            l.picture = record[9];
+                            l.sound = record[10];
+                            ret.add(l);
+                    }
                 }
             }
         }

@@ -83,4 +83,6 @@
     <string name="soundButtonRecordingLabel">Recording - press to stop</string>
     <string name="soundRecordedMessage">Sound recorded</string>
     <string name="soundButtonLabelAgain">Record sound again</string>
+    <string name="pictureSoundSavedMessage">Picture and sound saved successfully</string>
+    <string name="dataManagerActivity">X records</string>
 </resources>

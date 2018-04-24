@@ -4,9 +4,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -16,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,7 +26,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 
 /**
  * Created by Eugenio on 19/04/2018.
@@ -33,12 +38,18 @@ public class pictureSound extends AppCompatActivity {
     private int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
 
     String photoFile;
-    String prevPhotoFile;
+    String prevPhotoFile="";
     boolean photoDone;
 
     private audioRecorder soundRecorder;
     private Boolean recording;
     private boolean recordingDone;
+    String soundFile;
+    String prevSoundFile="";
+
+    Date messageDate;
+
+    ArrayList<String> filesToDelete;
 
     public String user;
     public String userPass;
@@ -119,6 +130,10 @@ public class pictureSound extends AppCompatActivity {
         photoDone=false;
         recording = false;
         recordingDone = false;
+
+        filesToDelete = new ArrayList<>();
+
+        messageDate = new Date();
     }
 
     @Override
@@ -280,6 +295,9 @@ public class pictureSound extends AppCompatActivity {
 
             photoDone = true;
             bChanges = true;
+            if(!prevPhotoFile.isEmpty()){
+                filesToDelete.add(prevPhotoFile);
+            }
             prevPhotoFile = photoFile;
 
             if (recordingDone) {
@@ -359,7 +377,8 @@ public class pictureSound extends AppCompatActivity {
                 deleteFile(soundRecorder.getFilename(), false);
             }
             String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            soundRecorder.modifyPath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath() + File.separator + getString(R.string.app_name) + File.separator + "s" + timeStamp + ".amr");
+            soundFile=Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath() + File.separator + getString(R.string.app_name) + File.separator + "s" + timeStamp + ".amr";
+            soundRecorder.modifyPath(soundFile);
             try {
                 Button bRec = (Button) findViewById(R.id.soundButton);
                 bRec.setBackgroundResource(R.drawable.button_background_rec);
@@ -383,6 +402,10 @@ public class pictureSound extends AppCompatActivity {
                     recording = false;
                     recordingDone = true;
                     bChanges = true;
+                    if(!prevSoundFile.isEmpty()){
+                        filesToDelete.add(prevSoundFile);
+                    }
+                    prevSoundFile=soundFile;
                     if (photoDone) {
                         Button saveButton = (Button) findViewById(R.id.saveButton);
                         saveButton.setVisibility(View.VISIBLE);
@@ -397,7 +420,42 @@ public class pictureSound extends AppCompatActivity {
     }
 
     public void saveMessage(View v){
+        if(filesToDelete.size()>0){
+            Iterator<String> iterator = filesToDelete.iterator();
+            while (iterator.hasNext()) {
+                String f = iterator.next();
+                deleteFile(f,f.contains(".jpg"));
+            }
+        }
 
+        oLog log = new oLog(this);
+        log.appendToLog(farmName,userId,plot,messageDate,null,0f,null,null,null,photoFile,soundFile);
+
+        Button bs = (Button)findViewById(R.id.soundButton);
+        bs.setText(R.string.soundButtonLabel);
+        TextView tv = (TextView)findViewById(R.id.textSoundRecorded);
+        tv.setText(R.string.emptyString);
+        ImageView it = (ImageView)findViewById(R.id.thumbnail);
+        it.setImageResource(R.drawable.blank_image);
+        bs = (Button)findViewById(R.id.saveButton);
+        bs.setVisibility(View.GONE);
+
+        filesToDelete = new ArrayList<>();
+
+        messageDate = new Date();
+
+        photoDone=false;
+        photoFile="";
+        prevPhotoFile="";
+
+        soundRecorder.clear();
+        recordingDone=false;
+        soundFile="";
+        prevSoundFile="";
+
+        bChanges=false;
+
+        Toast.makeText(this, R.string.pictureSoundSavedMessage, Toast.LENGTH_SHORT).show();
     }
 
     private void deleteFile(String f, boolean isImage) {
