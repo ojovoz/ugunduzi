@@ -181,7 +181,15 @@ public class pictureSound extends AppCompatActivity {
         logoutDialog.setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-
+                if(!photoFile.isEmpty()){
+                    filesToDelete.add(photoFile);
+                }
+                if(!soundFile.isEmpty()){
+                    filesToDelete.add(soundFile);
+                }
+                if(filesToDelete.size()>0){
+                    deleteFiles();
+                }
                 switch (exitAction) {
                     case 0:
                         goToEnterData();
@@ -419,13 +427,17 @@ public class pictureSound extends AppCompatActivity {
         }
     }
 
+    public void deleteFiles(){
+        Iterator<String> iterator = filesToDelete.iterator();
+        while (iterator.hasNext()) {
+            String f = iterator.next();
+            deleteFile(f,f.contains(".jpg"));
+        }
+    }
+
     public void saveMessage(View v){
         if(filesToDelete.size()>0){
-            Iterator<String> iterator = filesToDelete.iterator();
-            while (iterator.hasNext()) {
-                String f = iterator.next();
-                deleteFile(f,f.contains(".jpg"));
-            }
+            deleteFiles();
         }
 
         oLog log = new oLog(this);
