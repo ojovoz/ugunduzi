@@ -85,4 +85,7 @@
     <string name="soundButtonLabelAgain">Record sound again</string>
     <string name="pictureSoundSavedMessage">Picture and sound saved successfully</string>
     <string name="dataManagerActivity">X records</string>
+    <string name="opManageFarmRecords">Farm records</string>
+    <string name="farmWord">Farm</string>
+    <string name="plotWord">Plot</string>
 </resources>

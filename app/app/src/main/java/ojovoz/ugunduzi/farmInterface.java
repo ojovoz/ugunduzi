@@ -32,8 +32,6 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -255,11 +253,12 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 menu.add(4, 4, 4, R.string.opCancelNewFarm);
             }
         } else if(state==1){
-            menu.add(0, 0, 0, R.string.opCreateNewFarm);
+            menu.add(0, 0, 0, R.string.opManageFarmRecords);
+            menu.add(1, 1, 1, R.string.opCreateNewFarm);
             if(prefs.getNumberOfValueItems(user + "_farms",";")>1) {
-                menu.add(1, 1, 1, R.string.opGoToOtherFarm);
+                menu.add(2, 2, 2, R.string.opGoToOtherFarm);
             }
-            menu.add(2, 2, 2, R.string.opSwitchUser);
+            menu.add(3, 3, 3, R.string.opSwitchUser);
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -290,12 +289,15 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         } else if (state==1){
             switch(item.getItemId()){
                 case 0:
-                    createNewFarm();
+                    goToRecords(true);
                     break;
                 case 1:
-                    goToFarmChooser();
+                    createNewFarm();
                     break;
                 case 2:
+                    goToFarmChooser();
+                    break;
+                case 3:
                     confirmExit();
             }
         }
@@ -772,6 +774,14 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         });
 
+        Button recordsButton = (Button)dialog.findViewById(R.id.manageRecordsButton);
+        recordsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToRecords(false);
+            }
+        });
+
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
@@ -823,6 +833,42 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         i.putExtra("userPass", userPass);
         i.putExtra("farmName",farmName);
         i.putExtra("plot",plotMatrix.currentPlot.id);
+        if(plotMatrix.currentPlot.crop1!=null) {
+            i.putExtra("crop1", plotMatrix.currentPlot.crop1.id);
+        } else {
+            i.putExtra("crop1", "-1");
+        }
+        if(plotMatrix.currentPlot.crop2!=null) {
+            i.putExtra("crop2", plotMatrix.currentPlot.crop2.id);
+        } else {
+            i.putExtra("crop2", "-1");
+        }
+        if(plotMatrix.currentPlot.treatment1!=null) {
+            i.putExtra("treatment1", plotMatrix.currentPlot.treatment1.id);
+        } else {
+            i.putExtra("treatment1", "-1");
+        }
+        if(plotMatrix.currentPlot.treatment2!=null) {
+            i.putExtra("treatment2", plotMatrix.currentPlot.treatment2.id);
+        } else {
+            i.putExtra("treatment2", "-1");
+        }
+        startActivity(i);
+        finish();
+    }
+
+    public void goToRecords(boolean bFarm){
+        final Context context = this;
+        Intent i = new Intent(context, dataManager.class);
+        i.putExtra("user", user);
+        i.putExtra("userId", userId);
+        i.putExtra("userPass", userPass);
+        i.putExtra("farmName",farmName);
+        if(bFarm){
+            i.putExtra("plot", -1);
+        } else {
+            i.putExtra("plot", plotMatrix.currentPlot.id);
+        }
         if(plotMatrix.currentPlot.crop1!=null) {
             i.putExtra("crop1", plotMatrix.currentPlot.crop1.id);
         } else {

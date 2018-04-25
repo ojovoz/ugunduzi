@@ -253,7 +253,34 @@ public class enterData extends AppCompatActivity {
     }
 
     void goToManageRecords(){
-
+        Intent i = new Intent(this, dataManager.class);
+        i.putExtra("user", user);
+        i.putExtra("userId", userId);
+        i.putExtra("userPass", userPass);
+        i.putExtra("farmName", farmName);
+        i.putExtra("plot", plot);
+        if(crop1!=null) {
+            i.putExtra("crop1", crop1.id);
+        } else {
+            i.putExtra("crop1", "-1");
+        }
+        if(crop2!=null) {
+            i.putExtra("crop2", crop2.id);
+        } else {
+            i.putExtra("crop2", "-1");
+        }
+        if(treatment1!=null) {
+            i.putExtra("treatment1", treatment1.id);
+        } else {
+            i.putExtra("treatment1", "-1");
+        }
+        if(treatment2!=null) {
+            i.putExtra("treatment2", treatment2.id);
+        } else {
+            i.putExtra("treatment2", "-1");
+        }
+        startActivity(i);
+        finish();
     }
 
     public void showDataItemsSelector(View v){
