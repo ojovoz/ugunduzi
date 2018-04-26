@@ -246,7 +246,7 @@ public class dataManager extends AppCompatActivity {
                 c.plotInfoColor=-1;
             }
             if(l.dataItem==null){
-                c.info = dH.dateToString(l.date);
+                c.info = (c.info.isEmpty()) ? dH.dateToString(l.date) : c.info + "\n\n" + dH.dateToString(l.date);
                 c.imgFile = l.picture;
                 c.sndFile = l.sound;
             } else {
