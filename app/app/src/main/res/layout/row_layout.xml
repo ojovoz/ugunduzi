@@ -16,15 +16,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/checkbox"
-            android:layout_marginRight="10dp"
-            android:layout_alignParentLeft="true"/>
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:onClick="selectItem"/>
 
         <TextView
             android:id="@+id/info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
             android:layout_toRightOf="@+id/checkbox"
-            android:layout_alignParentTop="true"
+            android:layout_alignTop="@+id/checkbox"
             android:textColor="@color/colorBlack"
             android:textSize="16dp" />
 
@@ -33,15 +36,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/info"
-            android:layout_marginRight="10dp"/>
-
-        <ImageView
-            android:id="@+id/playStopButton"
-            android:src="@drawable/play"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/imageView"
-            android:onClick="playStop"/>
+            android:maxWidth="200dp"
+            android:maxHeight="160dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitStart"
+            android:layout_alignLeft="@+id/info"
+            android:layout_marginTop="3dp"
+            android:onClick="viewImage"/>
 
     </RelativeLayout>
 

@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -33,10 +34,16 @@ public class dataManager extends AppCompatActivity {
 
     public ArrayList<oLog> logList;
 
+    public preferenceManager prefs;
+
+    oRecyclerViewAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data_manager);
+
+        prefs = new preferenceManager(this);
 
         crop1 = new oCrop(this);
         crop2 = new oCrop(this);
@@ -99,14 +106,14 @@ public class dataManager extends AppCompatActivity {
             tt.setText(title);
         } else {
             activityTitle = activityTitle.replace("X", getString(R.string.farmWord));
-            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
+            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
             tt.setText(farmName);
             tt.setTextColor(ContextCompat.getColor(this, R.color.colorWhite));
         }
         setTitle(activityTitle);
 
         oLog log = new oLog(this);
-        logList = (plot >= 0) ? log.createLog(farmName, userId, plot, 2) : log.createLog(farmName, userId, 2);
+        logList = (plot >= 0) ? log.sortLogByDate(log.createLog(farmName, userId, plot, 2),true,-1) : log.sortLogByDate(log.createLog(farmName, userId, 2),true,-1);
 
         fillRecyclerView();
     }
@@ -119,8 +126,10 @@ public class dataManager extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
         super.onCreateOptionsMenu(menu);
-        menu.add(0, 0, 0, R.string.opPictureSound);
-        menu.add(1, 1, 1, R.string.opEnterData);
+        if(plot>=0) {
+            menu.add(0, 0, 0, R.string.opPictureSound);
+            menu.add(1, 1, 1, R.string.opEnterData);
+        }
         menu.add(2, 2, 2, R.string.opGoBack);
         return true;
     }
@@ -217,7 +226,7 @@ public class dataManager extends AppCompatActivity {
     public void fillRecyclerView() {
         List<oCardData> data = cardDataFromLog();
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        oRecyclerViewAdapter adapter = new oRecyclerViewAdapter(data, getApplication());
+        adapter = new oRecyclerViewAdapter(data, getApplication());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
@@ -231,12 +240,17 @@ public class dataManager extends AppCompatActivity {
             oLog l = logIterator.next();
             oCardData c = new oCardData();
             c.id = n;
+            if(plot<0){
+                getPlotInfo(c,l);
+            } else {
+                c.plotInfoColor=-1;
+            }
             if(l.dataItem==null){
                 c.info = dH.dateToString(l.date);
                 c.imgFile = l.picture;
                 c.sndFile = l.sound;
             } else {
-                c.info = getDataItemText(l);
+                c.info = (c.info.isEmpty()) ? getDataItemText(l) : c.info + "\n\n" + getDataItemText(l);
             }
             ret.add(c);
             n++;
@@ -258,7 +272,62 @@ public class dataManager extends AppCompatActivity {
         return ret;
     }
 
-    public void playStop(View v){
+    public void getPlotInfo(oCardData c, oLog l){
+        oPlotMatrix pm = new oPlotMatrix();
+        pm.fromString(this,prefs.getPreference(user+"_"+farmName.replaceAll(" ","_")),";");
+
+        oPlot p = pm.getPlotFromId(l.plotId);
+        oCrop c1 = p.crop1;
+        oCrop c2 = p.crop2;
+        oTreatment t1 = p.treatment1;
+        oTreatment t2 = p.treatment2;
+
+        String title="";
+
+        if (c1 == null && c1 == null) {
+            title = getString(R.string.plotWord) + ": " + getString(R.string.textNone);
+        } else {
+            if (c1 != null && c1 == null) {
+                title = getString(R.string.plotWord) + ": " + c1.name;
+            } else if (c1 != null && c1 != null) {
+                title = getString(R.string.plotWord) + ": " + c1.name + ", " + c2.name;
+            }
+        }
+        title += "\n";
+        if (t1 == null && t2 == null) {
+            title += getString(R.string.textNone);
+            c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillFaded);
+        } else {
+            if (t1 != null && t2 == null) {
+                title += t1.name;
+                if (t1.category == 0) {
+                    c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillPestControlFaded);
+                } else {
+                    c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillSoilManagementFaded);
+                }
+            } else if (t1 != null && t2 != null) {
+                title += t1.name + ", " + t2.name;
+                if (t1.category != t2.category) {
+                    c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillSoilManagementAndPestControlFaded);
+                } else {
+                    if (t1.category == 0) {
+                        c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillPestControlFaded);
+                    } else {
+                        c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillSoilManagementFaded);
+                    }
+                }
+            }
+        }
+        c.info=title;
+    }
+
+    public void selectItem(View v){
+        int n = v.getId();
+        CheckBox cb = (CheckBox)v;
+        adapter.list.get(n).isSelected = cb.isChecked();
+    }
+
+    public void viewImage(View v){
         int n = v.getId();
     }
 }

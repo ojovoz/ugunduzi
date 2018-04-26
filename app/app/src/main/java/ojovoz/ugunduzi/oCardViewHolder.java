@@ -16,7 +16,6 @@ public class oCardViewHolder extends RecyclerView.ViewHolder {
     CheckBox cb;
     TextView info;
     ImageView image;
-    ImageView player;
 
     oCardViewHolder(View itemView) {
         super(itemView);
@@ -28,7 +27,6 @@ public class oCardViewHolder extends RecyclerView.ViewHolder {
         info = (TextView) itemView.findViewById(R.id.info);
         info.setTextSize(16f);
         image = (ImageView) itemView.findViewById(R.id.imageView);
-        player = (ImageView) itemView.findViewById(R.id.playStopButton);
     }
 
 }

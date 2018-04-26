@@ -69,6 +69,22 @@ public class oPlotMatrix {
         }
     }
 
+    public void fromString(Context c,String matrixString, String separator){
+        String matrixItems[] = matrixString.split(separator);
+        oPlot plot;
+        oCrop crop = new oCrop(c);
+        oTreatment treatment = new oTreatment(c);
+        for(int i=2;i<matrixItems.length;i+=9){
+            plot=new oPlot();
+            plot.id=Integer.parseInt(matrixItems[i]);
+            plot.crop1=crop.getCropFromId(Integer.parseInt(matrixItems[i+5]));
+            plot.crop2=crop.getCropFromId(Integer.parseInt(matrixItems[i+6]));
+            plot.treatment1=treatment.getTreatmentFromId(Integer.parseInt(matrixItems[i+7]));
+            plot.treatment2=treatment.getTreatmentFromId(Integer.parseInt(matrixItems[i+8]));
+            plots.add(plot);
+        }
+    }
+
     public void setCurrentPlot(oPlot p) {
         currentPlot = p;
     }
@@ -351,6 +367,19 @@ public class oPlotMatrix {
 
     public ArrayList<oPlot> getPlots() {
         return plots;
+    }
+
+    public oPlot getPlotFromId(int id){
+        oPlot ret = new oPlot();
+        Iterator<oPlot> iterator = plots.iterator();
+        while (iterator.hasNext()) {
+            oPlot plot = iterator.next();
+            if(plot.id==id){
+                ret=plot;
+                break;
+            }
+        }
+        return ret;
     }
 
     private class matrixContent {
