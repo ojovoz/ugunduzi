@@ -1,6 +1,11 @@
 package ojovoz.ugunduzi;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -8,9 +13,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -37,6 +47,9 @@ public class dataManager extends AppCompatActivity {
     public preferenceManager prefs;
 
     oRecyclerViewAdapter adapter;
+
+    boolean soundPlaying;
+    MediaPlayer soundPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +127,9 @@ public class dataManager extends AppCompatActivity {
 
         oLog log = new oLog(this);
         logList = (plot >= 0) ? log.sortLogByDate(log.createLog(farmName, userId, plot, 2),true,-1) : log.sortLogByDate(log.createLog(farmName, userId, 2),true,-1);
+
+        soundPlaying=false;
+        soundPlayer = new MediaPlayer();
 
         fillRecyclerView();
     }
@@ -329,5 +345,130 @@ public class dataManager extends AppCompatActivity {
 
     public void viewImage(View v){
         int n = v.getId();
+        oLog l = logList.get(n);
+
+        Bitmap picture = scaleBitmap(l.picture);
+
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_view_picturesound);
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.setCancelable(true);
+
+        ImageView i = (ImageView)dialog.findViewById(R.id.imageView);
+        i.setImageBitmap(picture);
+
+        final String s = l.sound;
+
+        ImageView player = (ImageView)dialog.findViewById(R.id.playStopButton);
+        player.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(soundPlaying && soundPlayer!=null){
+                    soundPlayer.stop();
+                    soundPlayer.release();
+                    ImageView player = (ImageView)view;
+                    player.setImageResource(R.drawable.play);
+                    player.invalidate();
+                    soundPlaying=!soundPlaying;
+                } else {
+                    final ImageView player = (ImageView)view;
+                    player.setImageResource(R.drawable.stop);
+                    player.invalidate();
+                    try {
+                        soundPlayer = new MediaPlayer();
+                        soundPlayer.setDataSource(s);
+                        soundPlayer.prepare();
+                        soundPlayer.start();
+                        soundPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer m) {
+                                if (soundPlayer != null) {
+                                    soundPlayer.stop();
+                                    soundPlayer.release();
+                                    player.setImageResource(R.drawable.play);
+                                    player.invalidate();
+                                    soundPlaying=false;
+                                }
+                            }
+                        });
+                        soundPlaying=!soundPlaying;
+                    } catch (IOException e) {
+
+                    }
+                }
+
+            }
+        });
+
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                if(soundPlaying && soundPlayer!=null){
+                    soundPlayer.stop();
+                    soundPlayer.release();
+                }
+            }
+        });
+
+        dialog.show();
+    }
+
+    public void editItem(View v){
+        int n=v.getId();
+        TextView tv = (TextView)v;
+        v.setBackgroundColor(ContextCompat.getColor(this,R.color.colorPrimaryLight));
+
+        //TODO go to edit
+    }
+
+    public Bitmap scaleBitmap(String path){
+        Bitmap ret=null;
+        final int IMAGE_MAX_SIZE = 200000;
+        try{
+            InputStream in = null;
+            in = new FileInputStream(path);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(in, null, options);
+            in.close();
+
+            int scale = 1;
+            while ((options.outWidth * options.outHeight) * (1 / Math.pow(scale, 2)) > IMAGE_MAX_SIZE) {
+                scale++;
+            }
+
+            in = new FileInputStream(path);
+
+            if (scale > 1) {
+                scale--;
+                options = new BitmapFactory.Options();
+                options.inSampleSize = scale;
+                ret = BitmapFactory.decodeStream(in, null, options);
+                in.close();
+
+                int height = ret.getHeight();
+                int width = ret.getWidth();
+
+                double y = Math.sqrt(IMAGE_MAX_SIZE / (((double) width) / height));
+                double x = (y / height) * width;
+
+                Bitmap scaledBitmap = Bitmap.createScaledBitmap(ret, (int) x, (int) y, true);
+
+                ret.recycle();
+                ret = scaledBitmap;
+                return ret;
+
+            } else {
+                ret = BitmapFactory.decodeStream(in);
+                in.close();
+                return ret;
+            }
+
+
+        } catch (IOException e){
+
+        }
+        return ret;
     }
 }

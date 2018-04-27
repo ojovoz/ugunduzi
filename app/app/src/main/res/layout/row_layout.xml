@@ -29,7 +29,8 @@
             android:layout_toRightOf="@+id/checkbox"
             android:layout_alignTop="@+id/checkbox"
             android:textColor="@color/colorBlack"
-            android:textSize="16dp" />
+            android:textSize="16dp"
+            android:onClick="editItem"/>
 
         <ImageView
             android:id="@+id/imageView"
