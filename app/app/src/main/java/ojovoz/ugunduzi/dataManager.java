@@ -166,6 +166,7 @@ public class dataManager extends AppCompatActivity {
     }
 
     public void goToPictureSound() {
+        stopSoundPlayer();
         Intent i = new Intent(this, pictureSound.class);
         i.putExtra("user", user);
         i.putExtra("userId", userId);
@@ -197,6 +198,7 @@ public class dataManager extends AppCompatActivity {
     }
 
     public void goToEnterData() {
+        stopSoundPlayer();
         Intent i = new Intent(this, enterData.class);
         i.putExtra("user", user);
         i.putExtra("userId", userId);
@@ -228,6 +230,7 @@ public class dataManager extends AppCompatActivity {
     }
 
     public void goBack() {
+        stopSoundPlayer();
         Intent i = new Intent(this, farmInterface.class);
         i.putExtra("user", user);
         i.putExtra("userId", userId);
@@ -237,6 +240,14 @@ public class dataManager extends AppCompatActivity {
         i.putExtra("firstFarm", false);
         startActivity(i);
         finish();
+    }
+
+    void stopSoundPlayer(){
+        if(soundPlaying && soundPlayer!=null){
+            soundPlayer.stop();
+            soundPlayer.release();
+            soundPlaying=false;
+        }
     }
 
     public void fillRecyclerView() {
@@ -404,10 +415,7 @@ public class dataManager extends AppCompatActivity {
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                if(soundPlaying && soundPlayer!=null){
-                    soundPlayer.stop();
-                    soundPlayer.release();
-                }
+                stopSoundPlayer();
             }
         });
 
