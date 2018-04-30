@@ -62,7 +62,7 @@
     <string name="enterNewDataItemButtonLabel">Enter new item</string>
     <string name="valueLabel">Value</string>
     <string name="unitsLabel">Units</string>
-    <string name="saveButtonText">Save</string>
+    <string name="saveButtonText">SAVE</string>
     <string name="enterDataActivityTitle">Enter data</string>
     <string name="dataNotSavedText">Data has not been saved. Do you really want to exit?</string>
     <string name="opGoBack">Go to farm</string>
@@ -88,4 +88,5 @@
     <string name="opManageFarmRecords">Farm records</string>
     <string name="farmWord">Farm</string>
     <string name="plotWord">Plot</string>
+    <string name="selected">selected</string>
 </resources>

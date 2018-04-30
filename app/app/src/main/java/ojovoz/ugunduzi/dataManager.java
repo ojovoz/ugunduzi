@@ -8,21 +8,29 @@ import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -51,6 +59,12 @@ public class dataManager extends AppCompatActivity {
     boolean soundPlaying;
     MediaPlayer soundPlayer;
 
+    oLog editing;
+    oUnit editedUnits;
+
+    int nSelected=0;
+    String activityTitle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +92,7 @@ public class dataManager extends AppCompatActivity {
         TextView tt = (TextView) findViewById(R.id.plotLabel);
         String title = "";
 
-        String activityTitle = getTitle().toString();
+        activityTitle = getTitle().toString();
         if (plot >= 0) {
             activityTitle = activityTitle.replace("X", getString(R.string.plotWord));
 
@@ -126,9 +140,9 @@ public class dataManager extends AppCompatActivity {
         setTitle(activityTitle);
 
         oLog log = new oLog(this);
-        logList = (plot >= 0) ? log.sortLogByDate(log.createLog(farmName, userId, plot, 2),true,-1) : log.sortLogByDate(log.createLog(farmName, userId, 2),true,-1);
+        logList = (plot >= 0) ? log.sortLogByDate(log.createLog(farmName, userId, plot, 2), true, -1) : log.sortLogByDate(log.createLog(farmName, userId, 2), true, -1);
 
-        soundPlaying=false;
+        soundPlaying = false;
         soundPlayer = new MediaPlayer();
 
         fillRecyclerView();
@@ -142,7 +156,7 @@ public class dataManager extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
         super.onCreateOptionsMenu(menu);
-        if(plot>=0) {
+        if (plot >= 0) {
             menu.add(0, 0, 0, R.string.opPictureSound);
             menu.add(1, 1, 1, R.string.opEnterData);
         }
@@ -242,11 +256,11 @@ public class dataManager extends AppCompatActivity {
         finish();
     }
 
-    void stopSoundPlayer(){
-        if(soundPlaying && soundPlayer!=null){
+    void stopSoundPlayer() {
+        if (soundPlaying && soundPlayer != null) {
             soundPlayer.stop();
             soundPlayer.release();
-            soundPlaying=false;
+            soundPlaying = false;
         }
     }
 
@@ -258,50 +272,55 @@ public class dataManager extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
-    public List<oCardData> cardDataFromLog(){
+    public List<oCardData> cardDataFromLog() {
         dateHelper dH = new dateHelper();
         List<oCardData> ret = new ArrayList<>();
         Iterator<oLog> logIterator = logList.iterator();
-        int n=0;
+        int n = 0;
         while (logIterator.hasNext()) {
             oLog l = logIterator.next();
             oCardData c = new oCardData();
             c.id = n;
-            if(plot<0){
-                getPlotInfo(c,l);
+            if (plot < 0) {
+                getPlotInfo(c, l);
             } else {
-                c.plotInfoColor=-1;
+                if (n % 2 == 0) {
+                    c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillFaded);
+                } else {
+                    c.plotInfoColor = ContextCompat.getColor(this, R.color.colorWhite);
+                }
             }
-            if(l.dataItem==null){
+            if (l.dataItem == null) {
                 c.info = (c.info.isEmpty()) ? dH.dateToString(l.date) : c.info + "\n\n" + dH.dateToString(l.date);
                 c.imgFile = l.picture;
                 c.sndFile = l.sound;
             } else {
                 c.info = (c.info.isEmpty()) ? getDataItemText(l) : c.info + "\n\n" + getDataItemText(l);
             }
+            c.isSelected=false;
             ret.add(c);
             n++;
         }
         return ret;
     }
 
-    public String getDataItemText(oLog l){
+    public String getDataItemText(oLog l) {
         dateHelper dH = new dateHelper();
-        String ret="";
+        String ret = "";
         String dataItem = l.getDataItemName();
         String date = dH.dateToString(l.date);
-        if(l.dataItem.type==1){
-            ret=date+"\n"+dataItem;
-        } else if(l.dataItem.type==0 || l.dataItem.type==2){
+        if (l.dataItem.type == 1) {
+            ret = date + "\n" + dataItem;
+        } else if (l.dataItem.type == 0 || l.dataItem.type == 2) {
             String valueUnits = String.valueOf(l.value) + " " + l.units.name;
-            ret=date+"\n"+dataItem+": "+valueUnits;
+            ret = date + "\n" + dataItem + ": " + valueUnits;
         }
         return ret;
     }
 
-    public void getPlotInfo(oCardData c, oLog l){
+    public void getPlotInfo(oCardData c, oLog l) {
         oPlotMatrix pm = new oPlotMatrix();
-        pm.fromString(this,prefs.getPreference(user+"_"+farmName.replaceAll(" ","_")),";");
+        pm.fromString(this, prefs.getPreference(user + "_" + farmName.replaceAll(" ", "_")), ";");
 
         oPlot p = pm.getPlotFromId(l.plotId);
         oCrop c1 = p.crop1;
@@ -309,7 +328,7 @@ public class dataManager extends AppCompatActivity {
         oTreatment t1 = p.treatment1;
         oTreatment t2 = p.treatment2;
 
-        String title="";
+        String title = "";
 
         if (c1 == null && c1 == null) {
             title = getString(R.string.plotWord) + ": " + getString(R.string.textNone);
@@ -323,39 +342,46 @@ public class dataManager extends AppCompatActivity {
         title += "\n";
         if (t1 == null && t2 == null) {
             title += getString(R.string.textNone);
-            c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillFaded);
+            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillFaded);
         } else {
             if (t1 != null && t2 == null) {
                 title += t1.name;
                 if (t1.category == 0) {
-                    c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillPestControlFaded);
+                    c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillPestControlFaded);
                 } else {
-                    c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillSoilManagementFaded);
+                    c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillSoilManagementFaded);
                 }
             } else if (t1 != null && t2 != null) {
                 title += t1.name + ", " + t2.name;
                 if (t1.category != t2.category) {
-                    c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillSoilManagementAndPestControlFaded);
+                    c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControlFaded);
                 } else {
                     if (t1.category == 0) {
-                        c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillPestControlFaded);
+                        c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillPestControlFaded);
                     } else {
-                        c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillSoilManagementFaded);
+                        c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillSoilManagementFaded);
                     }
                 }
             }
         }
-        c.info=title;
+        c.info = title;
     }
 
-    public void selectItem(View v){
-        int n = v.getId();
-        CheckBox cb = (CheckBox)v;
+    public void selectItem(View v) {
+        int n = (int) v.getTag();
+        CheckBox cb = (CheckBox) v;
         adapter.list.get(n).isSelected = cb.isChecked();
+
+        nSelected = (cb.isChecked()) ? nSelected+1 : nSelected-1;
+        if(nSelected>0){
+            setTitle(activityTitle+": "+String.valueOf(nSelected)+" "+getString(R.string.selected));
+        } else {
+            setTitle(activityTitle);
+        }
     }
 
-    public void viewImage(View v){
-        int n = v.getId();
+    public void viewImage(View v) {
+        int n = (int) v.getTag();
         oLog l = logList.get(n);
 
         Bitmap picture = scaleBitmap(l.picture);
@@ -366,24 +392,24 @@ public class dataManager extends AppCompatActivity {
         dialog.setCanceledOnTouchOutside(true);
         dialog.setCancelable(true);
 
-        ImageView i = (ImageView)dialog.findViewById(R.id.imageView);
+        ImageView i = (ImageView) dialog.findViewById(R.id.imageView);
         i.setImageBitmap(picture);
 
         final String s = l.sound;
 
-        ImageView player = (ImageView)dialog.findViewById(R.id.playStopButton);
+        ImageView player = (ImageView) dialog.findViewById(R.id.playStopButton);
         player.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(soundPlaying && soundPlayer!=null){
+                if (soundPlaying && soundPlayer != null) {
                     soundPlayer.stop();
                     soundPlayer.release();
-                    ImageView player = (ImageView)view;
+                    ImageView player = (ImageView) view;
                     player.setImageResource(R.drawable.play);
                     player.invalidate();
-                    soundPlaying=!soundPlaying;
+                    soundPlaying = !soundPlaying;
                 } else {
-                    final ImageView player = (ImageView)view;
+                    final ImageView player = (ImageView) view;
                     player.setImageResource(R.drawable.stop);
                     player.invalidate();
                     try {
@@ -399,11 +425,11 @@ public class dataManager extends AppCompatActivity {
                                     soundPlayer.release();
                                     player.setImageResource(R.drawable.play);
                                     player.invalidate();
-                                    soundPlaying=false;
+                                    soundPlaying = false;
                                 }
                             }
                         });
-                        soundPlaying=!soundPlaying;
+                        soundPlaying = !soundPlaying;
                     } catch (IOException e) {
 
                     }
@@ -422,18 +448,159 @@ public class dataManager extends AppCompatActivity {
         dialog.show();
     }
 
-    public void editItem(View v){
-        int n=v.getId();
-        TextView tv = (TextView)v;
-        v.setBackgroundColor(ContextCompat.getColor(this,R.color.colorPrimaryLight));
+    public void editItem(View v) {
+        final int position = (int) v.getTag();
 
-        //TODO go to edit
+        if (position >= 0) {
+
+            final dateHelper dH = new dateHelper();
+
+            editing = logList.get(position);
+            editedUnits = editing.units;
+
+            final Dialog dialog = new Dialog(this);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.setContentView(R.layout.dialog_edit_data);
+            dialog.setCanceledOnTouchOutside(true);
+            dialog.setCancelable(true);
+
+            TextView tv = (TextView) dialog.findViewById(R.id.dataItem);
+            tv.setText(editing.getDataItemName());
+
+            final EditText ev = (EditText)dialog.findViewById(R.id.dataItemValue);
+            final TextView ut = (TextView) dialog.findViewById(R.id.unitsText);
+            final Button bu = (Button) dialog.findViewById(R.id.dataItemUnits);
+
+            final Button db = (Button) dialog.findViewById(R.id.dateButton);
+            db.setText(dH.dateToString(editing.date));
+            db.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final Dialog dialogDate = new Dialog(view.getContext());
+                    dialogDate.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialogDate.setContentView(R.layout.dialog_datepicker);
+
+                    DatePicker dp = (DatePicker) dialogDate.findViewById(R.id.datePicker);
+                    Calendar calActivity = Calendar.getInstance();
+                    calActivity.setTime(editing.date);
+                    dp.init(calActivity.get(Calendar.YEAR), calActivity.get(Calendar.MONTH), calActivity.get(Calendar.DAY_OF_MONTH), null);
+
+                    Calendar calMax = Calendar.getInstance();
+                    calMax.setTime(new Date());
+
+                    dp.setMaxDate(calMax.getTimeInMillis());
+
+                    Button dialogButton = (Button) dialogDate.findViewById(R.id.okButton);
+                    dialogButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            DatePicker dp = (DatePicker) dialogDate.findViewById(R.id.datePicker);
+                            int day = dp.getDayOfMonth();
+                            int month = dp.getMonth();
+                            int year = dp.getYear();
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.set(year, month, day);
+
+                            Date nd = calendar.getTime();
+
+                            db.setText(dH.dateToString(nd));
+                            dialogDate.dismiss();
+                        }
+                    });
+                    dialogDate.show();
+                }
+            });
+
+            if (editing.dataItem.type != 1) {
+
+                ev.setText(String.valueOf(editing.value));
+
+                oUnit u = new oUnit(this);
+                final ArrayList<oUnit> unitsList = u.getUnits(editing.dataItem.type);
+
+                if (unitsList.size() == 1) {
+                    String units = unitsList.get(0).name;
+                    ut.setText(units);
+                    bu.setVisibility(View.GONE);
+                } else {
+                    ut.setVisibility(View.GONE);
+                    final CharSequence unitsNamesArray[] = u.getUnitNames(editing.dataItem.type).toArray(new CharSequence[unitsList.size()]);
+                    bu.setText(editing.units.name);
+                    bu.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                            builder.setCancelable(true);
+                            builder.setNegativeButton(R.string.cancelButtonText, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialogUnits, int which) {
+                                    dialogUnits.dismiss();
+                                }
+                            });
+                            final ListAdapter adapter = new ArrayAdapter<>(view.getContext(), R.layout.checked_list_template, unitsNamesArray);
+                            builder.setSingleChoiceItems(adapter, -1, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    if (i >= 0) {
+                                        editedUnits = unitsList.get(i);
+                                        String chosenUnitsName = unitsNamesArray[i].toString();
+                                        bu.setText(chosenUnitsName);
+                                    }
+                                    dialogInterface.dismiss();
+                                }
+                            });
+                            AlertDialog dialogUnits = builder.create();
+                            dialogUnits.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                            dialogUnits.show();
+                        }
+                    });
+                }
+            } else {
+                ut.setVisibility(View.GONE);
+                ev.setVisibility(View.GONE);
+                bu.setVisibility(View.GONE);
+            }
+
+            Button bs = (Button)dialog.findViewById(R.id.saveButton);
+            bs.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String tv = ev.getText().toString();
+                    if(!tv.isEmpty() || editing.dataItem.type==1){
+                        float editedValue = (tv.isEmpty()) ? 0 : Float.parseFloat(tv);
+                        if((editedValue>=0.0f && (editing.dataItem.type==0 || editing.dataItem.type==2)) || editing.dataItem.type==1){
+                            editing.date=dH.stringToDate(db.getText().toString());
+                            editing.value=editedValue;
+                            editing.units=editedUnits;
+                            oLog l = new oLog();
+                            logList=l.sortLogByDate(logList,true,-1);
+                            adapter.list=cardDataFromLog();
+                            adapter.setList(adapter.list);
+                            adapter.notifyDataSetChanged();
+                            //TODO: update log file
+                            dialog.dismiss();
+                        } else {
+                            Toast.makeText(dialog.getContext(), R.string.valueNegativeMessage, Toast.LENGTH_SHORT).show();
+                            ev.requestFocus();
+                        }
+                    } else {
+                        Toast.makeText(dialog.getContext(), R.string.valueEmptyMessage, Toast.LENGTH_SHORT).show();
+                        ev.requestFocus();
+                    }
+
+                }
+            });
+
+            dialog.show();
+
+        }
+
     }
 
-    public Bitmap scaleBitmap(String path){
-        Bitmap ret=null;
+    public Bitmap scaleBitmap(String path) {
+        Bitmap ret = null;
         final int IMAGE_MAX_SIZE = 200000;
-        try{
+        try {
             InputStream in = null;
             in = new FileInputStream(path);
             BitmapFactory.Options options = new BitmapFactory.Options();
@@ -474,7 +641,7 @@ public class dataManager extends AppCompatActivity {
             }
 
 
-        } catch (IOException e){
+        } catch (IOException e) {
 
         }
         return ret;

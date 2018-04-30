@@ -717,7 +717,6 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         dialog.setContentView(R.layout.dialog_action_chooser);
         dialog.setCanceledOnTouchOutside(true);
         dialog.setCancelable(true);
-        dialog.getWindow().setLayout(displayWidth-50,550);
 
         TextView tt = (TextView)dialog.findViewById(R.id.plotLabel);
 

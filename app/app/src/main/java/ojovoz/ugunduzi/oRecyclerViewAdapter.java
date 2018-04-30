@@ -40,25 +40,20 @@ public class oRecyclerViewAdapter extends RecyclerView.Adapter<oCardViewHolder> 
     @Override
     public void onBindViewHolder(oCardViewHolder holder, int position) {
 
-        holder.cb.setId(position);
         holder.cb.setChecked(list.get(position).isSelected);
+        holder.cb.setTag(position);
         holder.info.setText(list.get(position).info);
-        if(list.get(position).plotInfoColor==-1){
-            if (position % 2 == 0) {
-                holder.cv.setBackgroundColor(ContextCompat.getColor(context, R.color.colorFillFaded));
-            } else {
-                holder.cv.setBackgroundColor(ContextCompat.getColor(context, R.color.colorWhite));
-            }
-        } else {
-            holder.cv.setBackgroundColor(list.get(position).plotInfoColor);
-        }
+
+        holder.cv.setBackgroundColor(list.get(position).plotInfoColor);
 
         if(!list.get(position).imgFile.isEmpty()){
             holder.image.setVisibility(View.VISIBLE);
             holder.image.setImageBitmap(scaleBitmap(list.get(position).imgFile));
-            holder.image.setId(position);
+            holder.image.setTag(position);
+            holder.info.setTag(-1);
         } else {
             holder.image.setVisibility(View.GONE);
+            holder.info.setTag(position);
         }
     }
 
@@ -70,6 +65,10 @@ public class oRecyclerViewAdapter extends RecyclerView.Adapter<oCardViewHolder> 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
+    }
+
+    public void setList(List<oCardData> newList){
+        this.list=newList;
     }
 
     public void insert(int position, oCardData data) {
