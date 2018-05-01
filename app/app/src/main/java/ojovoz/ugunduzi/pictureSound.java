@@ -175,10 +175,10 @@ public class pictureSound extends AppCompatActivity {
 
     public void confirmExit(int e) {
         final int exitAction = e;
-        AlertDialog.Builder logoutDialog = new AlertDialog.Builder(this);
-        logoutDialog.setMessage(R.string.pictureSoundNotSavedText);
-        logoutDialog.setNegativeButton(R.string.noButtonText, null);
-        logoutDialog.setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
+        AlertDialog.Builder exitDialog = new AlertDialog.Builder(this);
+        exitDialog.setMessage(R.string.pictureSoundNotSavedText);
+        exitDialog.setNegativeButton(R.string.noButtonText, null);
+        exitDialog.setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 if(!photoFile.isEmpty()){
@@ -203,8 +203,8 @@ public class pictureSound extends AppCompatActivity {
 
             }
         });
-        logoutDialog.create();
-        logoutDialog.show();
+        exitDialog.create();
+        exitDialog.show();
     }
 
     public void goBack(){

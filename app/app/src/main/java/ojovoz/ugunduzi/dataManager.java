@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +26,7 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -156,11 +158,13 @@ public class dataManager extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
         super.onCreateOptionsMenu(menu);
+        menu.add(0, 0, 0, R.string.opSendSelectedItems);
+        menu.add(1, 1, 1, R.string.opDeleteSelectedItems);
         if (plot >= 0) {
-            menu.add(0, 0, 0, R.string.opPictureSound);
-            menu.add(1, 1, 1, R.string.opEnterData);
+            menu.add(2, 2, 2, R.string.opPictureSound);
+            menu.add(3, 3, 3, R.string.opEnterData);
         }
-        menu.add(2, 2, 2, R.string.opGoBack);
+        menu.add(4, 4, 4, R.string.opGoBack);
         return true;
     }
 
@@ -168,12 +172,17 @@ public class dataManager extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case 0:
-                goToPictureSound();
                 break;
             case 1:
-                goToEnterData();
+                tryDeleteSelectedItems();
                 break;
             case 2:
+                goToPictureSound();
+                break;
+            case 3:
+                goToEnterData();
+                break;
+            case 4:
                 goBack();
         }
         return super.onOptionsItemSelected(item);
@@ -572,13 +581,15 @@ public class dataManager extends AppCompatActivity {
                             editing.date=dH.stringToDate(db.getText().toString());
                             editing.value=editedValue;
                             editing.units=editedUnits;
-                            oLog l = new oLog();
+                            oLog l = new oLog(dialog.getContext());
                             logList=l.sortLogByDate(logList,true,-1);
                             adapter.list=cardDataFromLog();
                             adapter.setList(adapter.list);
                             adapter.notifyDataSetChanged();
-                            //TODO: update log file
+                            l.updateLogItem(editing.line,editing.farmName,editing.userId,editing.plotId,editing.date,editing.dataItem,editing.value,editing.units,editing.crop,editing.treatment);
                             dialog.dismiss();
+                            nSelected=0;
+                            setTitle(activityTitle);
                         } else {
                             Toast.makeText(dialog.getContext(), R.string.valueNegativeMessage, Toast.LENGTH_SHORT).show();
                             ev.requestFocus();
@@ -595,6 +606,78 @@ public class dataManager extends AppCompatActivity {
 
         }
 
+    }
+
+    public void tryDeleteSelectedItems(){
+        if(nSelected>0){
+            AlertDialog.Builder confirmDialog = new AlertDialog.Builder(this);
+            confirmDialog.setMessage(R.string.deleteItemsConfirmMessage);
+            confirmDialog.setNegativeButton(R.string.noButtonText, null);
+            confirmDialog.setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                   deleteSelectedItems();
+
+                }
+            });
+            confirmDialog.create();
+            confirmDialog.show();
+        } else {
+            Toast.makeText(this, R.string.noItemsSelectedMessage, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void deleteSelectedItems(){
+        int[] delete = new int[adapter.list.size()];
+        ArrayList<String> deleteFiles = new ArrayList<>();
+        List<oCardData> list = adapter.list;
+        Iterator<oCardData> iterator = list.iterator();
+        int n=0;
+        while (iterator.hasNext()) {
+            oCardData cd = iterator.next();
+            if(cd.isSelected){
+                delete[n]=logList.get(cd.id).line;
+                if(!cd.imgFile.isEmpty()){
+                    deleteFiles.add(cd.imgFile);
+                }
+                if(!cd.sndFile.isEmpty()){
+                    deleteFiles.add(cd.sndFile);
+                }
+            } else {
+                delete[n]=-1;
+            }
+            n++;
+        }
+        oLog l = new oLog(this);
+        l.deleteLogItems(delete);
+        deleteImgSndFiles(deleteFiles);
+        logList = (plot >= 0) ? l.sortLogByDate(l.createLog(farmName, userId, plot, 2), true, -1) : l.sortLogByDate(l.createLog(farmName, userId, 2), true, -1);
+        adapter.list=cardDataFromLog();
+        adapter.setList(adapter.list);
+        adapter.notifyDataSetChanged();
+        nSelected=0;
+        setTitle(activityTitle);
+    }
+
+    public void deleteImgSndFiles(ArrayList<String> deleteFiles){
+        Iterator<String> iterator = deleteFiles.iterator();
+        while (iterator.hasNext()) {
+            String f = iterator.next();
+            File fileX = new File(f);
+            long imgFileDate = fileX.lastModified();
+            fileX.delete();
+            if (f.contains("jpg")) {
+                String defaultGalleryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + File.separator + "Camera";
+                File imgs = new File(defaultGalleryPath);
+                File imgsArray[] = imgs.listFiles();
+                for (int i = 0; i < imgsArray.length; i++) {
+                    if (Math.abs(imgsArray[i].lastModified() - imgFileDate) <= 3000) {
+                        imgsArray[i].delete();
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     public Bitmap scaleBitmap(String path) {

@@ -8,6 +8,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -91,6 +93,90 @@ public class csvFileManager {
             }
         }
 
+    }
+
+    public void update(Context context, String[] newLine, int line){
+
+        List<String[]> currentCSV = read(context);
+        List<String[]> newCSV = new ArrayList<>();
+
+        if(currentCSV!=null){
+            Iterator<String[]> iteratorUpdate = currentCSV.iterator();
+            int n=0;
+            while (iteratorUpdate.hasNext()) {
+                String[] thisLine = iteratorUpdate.next();
+                if(n==line){
+                    newCSV.add(newLine);
+                } else {
+                    newCSV.add(thisLine);
+                }
+                n++;
+            }
+
+            deleteCSVFile(context);
+
+            File file = new File(context.getFilesDir(), filename);
+            try {
+                FileWriter w = new FileWriter(file);
+                CSVWriter writer = new CSVWriter(w, ',', '"');
+
+                Iterator<String[]> iteratorWrite = newCSV.iterator();
+                while (iteratorWrite.hasNext()) {
+                    String[] thisLine = iteratorWrite.next();
+                    writer.writeNext(thisLine);
+                }
+                writer.close();
+            } catch (IOException e) {
+
+            } finally {
+
+            }
+
+        }
+    }
+
+    public void deleteLines(Context context, int[] delete){
+        List<String[]> currentCSV = read(context);
+        List<String[]> newCSV = new ArrayList<>();
+
+        if(currentCSV!=null) {
+            Iterator<String[]> iteratorUpdate = currentCSV.iterator();
+            int n = 0;
+            while (iteratorUpdate.hasNext()) {
+                String[] thisLine = iteratorUpdate.next();
+                boolean bDelete=false;
+                for(int i=0;i<delete.length;i++){
+                    if(delete[i]==n){
+                        bDelete=true;
+                        break;
+                    }
+                }
+                if(!bDelete){
+                    newCSV.add(thisLine);
+                }
+                n++;
+            }
+
+            deleteCSVFile(context);
+
+            File file = new File(context.getFilesDir(), filename);
+            try {
+                FileWriter w = new FileWriter(file);
+                CSVWriter writer = new CSVWriter(w, ',', '"');
+
+                Iterator<String[]> iteratorWrite = newCSV.iterator();
+                while (iteratorWrite.hasNext()) {
+                    String[] thisLine = iteratorWrite.next();
+                    writer.writeNext(thisLine);
+                }
+                writer.close();
+            } catch (IOException e) {
+
+            } finally {
+
+            }
+
+        }
     }
 
     public void deleteCSVFile(Context context) {

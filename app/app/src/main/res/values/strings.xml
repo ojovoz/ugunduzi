@@ -49,7 +49,9 @@
     <string name="opGoToOtherFarm">Switch to other farm</string>
     <string name="cancelNewFarmMessage">Cancel new farm?</string>
     <string name="noFarmsSelectedMessage">No farms selected</string>
+    <string name="noItemsSelectedMessage">No items selected</string>
     <string name="deleteFarmConfirmMessage">Do you really want to delete the selected farms?</string>
+    <string name="deleteItemsConfirmMessage">Do you really want to delete the selected items?</string>
     <string name="deletingFarmsLabel">Deleting farms</string>
     <string name="pictureSoundButtonText">PICTURE + SOUND</string>
     <string name="dataButtonText">DATA</string>
@@ -89,4 +91,6 @@
     <string name="farmWord">Farm</string>
     <string name="plotWord">Plot</string>
     <string name="selected">selected</string>
+    <string name="opDeleteSelectedItems">Delete selected items</string>
+    <string name="opSendSelectedItems">Send selected items</string>
 </resources>

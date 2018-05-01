@@ -17,6 +17,8 @@ import java.util.TimeZone;
  */
 public class oLog {
 
+    public int line;
+
     public String farmName;
     public int userId;
 
@@ -53,9 +55,11 @@ public class oLog {
         List<String[]> logCSV = log.read(context);
         if(logCSV!=null) {
             Iterator<String[]> iterator = logCSV.iterator();
+            int n=0;
             while (iterator.hasNext()) {
                 String[] record = iterator.next();
                 oLog l = new oLog();
+                l.line=n;
                 l.farmName = record[0];
                 l.userId = Integer.parseInt(record[1]);
                 l.plotId = Integer.parseInt(record[2]);
@@ -94,6 +98,7 @@ public class oLog {
                         l.sound = record[10];
                         ret.add(l);
                 }
+                n++;
             }
         }
         return ret;
@@ -107,10 +112,12 @@ public class oLog {
         List<String[]> logCSV = log.read(context);
         if(logCSV!=null) {
             Iterator<String[]> iterator = logCSV.iterator();
+            int n=0;
             while (iterator.hasNext()) {
                 String[] record = iterator.next();
                 if(record[0].equals(fName) && Integer.parseInt(record[1])==userId) {
                     oLog l = new oLog();
+                    l.line=n;
                     l.farmName = record[0];
                     l.userId = Integer.parseInt(record[1]);
                     l.plotId = Integer.parseInt(record[2]);
@@ -150,6 +157,7 @@ public class oLog {
                             ret.add(l);
                     }
                 }
+                n++;
             }
         }
         return ret;
@@ -166,10 +174,12 @@ public class oLog {
         List<String[]> logCSV = log.read(context);
         if(logCSV!=null) {
             Iterator<String[]> iterator = logCSV.iterator();
+            int n=0;
             while (iterator.hasNext()) {
                 String[] record = iterator.next();
                 if(record[0].equals(fName) && (Integer.parseInt(record[1])==userId) && (Integer.parseInt(record[2])==plot)) {
                     oLog l = new oLog();
+                    l.line=n;
                     l.farmName = record[0];
                     l.userId = Integer.parseInt(record[1]);
                     l.plotId = Integer.parseInt(record[2]);
@@ -209,6 +219,7 @@ public class oLog {
                             ret.add(l);
                     }
                 }
+                n++;
             }
         }
         return ret;
@@ -229,6 +240,28 @@ public class oLog {
         String[] newLine = {farmName, Integer.toString(userId), Integer.toString(plot), dH.dateToString(date), dataItemId, Float.toString(value), unitsId, cropId, treatmentId, picture, sound};
 
         log.append(context, newLine);
+    }
+
+    public void updateLogItem(int line, String farmName, int userId, int plot, Date date, oDataItem dataItem, float value, oUnit units, oCrop crop, oTreatment treatment){
+        dateHelper dH = new dateHelper();
+
+        csvFileManager log = new csvFileManager("log");
+        String dataItemId;
+        String unitsId;
+        String cropId;
+        String treatmentId;
+        dataItemId = (dataItem == null) ? "0" : Integer.toString(dataItem.id);
+        unitsId = (units == null) ? "0" : Integer.toString(units.id);
+        cropId = (crop == null) ? "0" : Integer.toString(crop.id);
+        treatmentId = (treatment == null) ? "0" : Integer.toString(treatment.id);
+
+        String[] newLine = {farmName, Integer.toString(userId), Integer.toString(plot), dH.dateToString(date), dataItemId, Float.toString(value), unitsId, cropId, treatmentId, "", ""};
+        log.update(context, newLine, line);
+    }
+
+    public void deleteLogItems(int[] delete){
+        csvFileManager log = new csvFileManager("log");
+        log.deleteLines(context, delete);
     }
 
     public ArrayList<oLog> sortLogByDate(ArrayList<oLog> sortedLog, boolean reverse, int limit){
