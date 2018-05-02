@@ -71,11 +71,10 @@ public class oPlotMatrix {
 
     public void fromString(Context c,String matrixString, String separator){
         String matrixItems[] = matrixString.split(separator);
-        oPlot plot;
         oCrop crop = new oCrop(c);
         oTreatment treatment = new oTreatment(c);
         for(int i=2;i<matrixItems.length;i+=9){
-            plot=new oPlot();
+            oPlot plot=new oPlot();
             plot.id=Integer.parseInt(matrixItems[i]);
             plot.crop1=crop.getCropFromId(Integer.parseInt(matrixItems[i+5]));
             plot.crop2=crop.getCropFromId(Integer.parseInt(matrixItems[i+6]));

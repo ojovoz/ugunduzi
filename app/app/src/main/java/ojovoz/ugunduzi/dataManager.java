@@ -329,7 +329,8 @@ public class dataManager extends AppCompatActivity {
 
     public void getPlotInfo(oCardData c, oLog l) {
         oPlotMatrix pm = new oPlotMatrix();
-        pm.fromString(this, prefs.getPreference(user + "_" + farmName.replaceAll(" ", "_")), ";");
+        String farmString = prefs.getPreference(user + "_" + farmName);
+        pm.fromString(this, farmString, ";");
 
         oPlot p = pm.getPlotFromId(l.plotId);
         oCrop c1 = p.crop1;
@@ -339,13 +340,13 @@ public class dataManager extends AppCompatActivity {
 
         String title = "";
 
-        if (c1 == null && c1 == null) {
+        if (c1 == null && c2 == null) {
             title = getString(R.string.plotWord) + ": " + getString(R.string.textNone);
         } else {
-            if (c1 != null && c1 == null) {
+            if (c1 != null && c2 == null) {
                 title = getString(R.string.plotWord) + ": " + c1.name;
-            } else if (c1 != null && c1 != null) {
-                title = getString(R.string.plotWord) + ": " + c1.name + ", " + c2.name;
+            } else if (c1 != null && c2 != null) {
+                title = getString(R.string.plotWord).toString() + ": " + c1.name + ", " + c2.name;
             }
         }
         title += "\n";

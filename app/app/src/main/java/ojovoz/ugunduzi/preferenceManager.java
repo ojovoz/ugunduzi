@@ -47,14 +47,16 @@ public class preferenceManager {
     public ArrayList<String> getPreferenceAsArrayList(String keyName, String separator, String prefixExcluded) {
         ArrayList<String> ret = new ArrayList<>();
         String list = getPreference(keyName);
-        String valuesArray[] = list.split(separator);
-        for(int i=0;i<valuesArray.length;i++) {
-            if(!prefixExcluded.isEmpty()){
-                if(prefixExcluded.charAt(0)!=valuesArray[i].charAt(0)){
+        if(!list.isEmpty()) {
+            String valuesArray[] = list.split(separator);
+            for (int i = 0; i < valuesArray.length; i++) {
+                if (!prefixExcluded.isEmpty()) {
+                    if (prefixExcluded.charAt(0) != valuesArray[i].charAt(0)) {
+                        ret.add(valuesArray[i]);
+                    }
+                } else {
                     ret.add(valuesArray[i]);
                 }
-            } else {
-                ret.add(valuesArray[i]);
             }
         }
         return ret;
@@ -150,8 +152,9 @@ public class preferenceManager {
         for(int i=0;i<currentFarmList.length;i++) {
             boolean bFound=false;
             for(int j=0;j<deleteFarmList.length;j++){
-                String deleteFarm = deleteFarmList[j].replaceAll("_"," ");
-                if(currentFarmList[i].equals(deleteFarm)){
+                String deleteFarm = deleteFarmList[j];
+                String currentFarm = currentFarmList[i];
+                if(currentFarm.equals(deleteFarm)){
                     bFound=true;
                     break;
                 }
@@ -160,7 +163,7 @@ public class preferenceManager {
                 newFarms = (newFarms.isEmpty()) ? currentFarmList[i] : newFarms + separator + currentFarmList[i];
             } else {
                 newFarms = (newFarms.isEmpty()) ? "-" + currentFarmList[i] : newFarms + separator + "-" + currentFarmList[i];
-                deletePreference(user + "_" + currentFarmList[i].replaceAll(" ","_"));
+                deletePreference(user + "_" + currentFarmList[i]);
             }
         }
         savePreference(user + "_farms", newFarms);
@@ -173,7 +176,7 @@ public class preferenceManager {
         for(int i=0;i<currentFarmList.length;i++) {
             boolean bFound=false;
             for(int j=0;j<deleteFarmList.length;j++){
-                String deleteFarm = deleteFarmList[j].replaceAll("_"," ");
+                String deleteFarm = deleteFarmList[j];
                 if(currentFarmList[i].equals(deleteFarm)){
                     bFound=true;
                     break;
@@ -182,9 +185,27 @@ public class preferenceManager {
             if(!bFound){
                 newFarms = (newFarms.isEmpty()) ? currentFarmList[i] : newFarms + separator + currentFarmList[i];
             } else {
-                deletePreference(user + "_" + currentFarmList[i].replaceAll(" ","_"));
+                deletePreference(user + "_" + currentFarmList[i]);
             }
         }
         savePreference(user + "_farms", newFarms);
+    }
+
+    public String getActiveFarms(String user, String separator){
+        String ret="";
+        if(preferenceExists(user + "_farms")){
+            String[] userFarms = getPreference(user + "_farms").split(separator);
+            for(int i=0;i<userFarms.length;i++){
+                if(!userFarms[i].startsWith("-")){
+                    ret = (ret.isEmpty()) ? userFarms[i] : ret + separator + userFarms[i];
+                }
+            }
+        }
+        return ret;
+    }
+
+    public int getNumberOfActiveFarms(String user, String separator){
+        int ret = getActiveFarms(user,separator).split(separator).length;
+        return ret;
     }
 }

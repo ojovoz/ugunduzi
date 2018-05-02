@@ -216,7 +216,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         if(newFarm){
             plotMatrix.addPlot(mw, mh, rw, rh, cw, ch, aw, ah);
         } else if(state==1){
-            plotMatrix.fromString(this,prefs.getPreference(user+"_"+farmName.replaceAll(" ","_")),";",mw,mh,rw,rh,cw,ch,aw,ah);
+            plotMatrix.fromString(this,prefs.getPreference(user+"_"+farmName),";",mw,mh,rw,rh,cw,ch,aw,ah);
         }
     }
 
@@ -255,7 +255,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         } else if(state==1){
             menu.add(0, 0, 0, R.string.opManageFarmRecords);
             menu.add(1, 1, 1, R.string.opCreateNewFarm);
-            if(prefs.getNumberOfValueItems(user + "_farms",";")>1) {
+            if(prefs.getNumberOfActiveFarms(user,";")>1) {
                 menu.add(2, 2, 2, R.string.opGoToOtherFarm);
             }
             menu.add(3, 3, 3, R.string.opSwitchUser);
@@ -375,7 +375,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             if(!farmName.isEmpty()){
                 plotMatrix = new oPlotMatrix();
                 plotMatrix.createMatrix(displayWidth,displayHeight);
-                plotMatrix.fromString(this,prefs.getPreference(user+"_"+farmName.replaceAll(" ","_")),";",iconMove.getWidth(), iconMove.getHeight(), iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight());
+                plotMatrix.fromString(this,prefs.getPreference(user+"_"+farmName),";",iconMove.getWidth(), iconMove.getHeight(), iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight());
                 state=1;
                 this.setTitle(farmName);
                 canvasView.invalidate();
@@ -905,7 +905,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         sMatrix = plotMatrix.toString();
 
         farmName = farmName.replaceAll("'", "");
-        String fName = farmName.replaceAll(" ", "_");
+        String fName = farmName;
 
         Date farmDate = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -939,6 +939,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             state=1;
             canvasView.invalidate();
             firstFarm=false;
+            this.setTitle(farmName);
         }
     }
 
@@ -947,7 +948,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         if (http.isOnline()) {
             if (!bConnecting) {
                 bConnecting = true;
-                http.execute(server + "/mobile/create_new_farm.php?farm=" + s, "");
+                http.execute(server + "/mobile/create_new_farm.php?farm=" + s.replaceAll(" ","_"), "");
             }
         }
     }
@@ -956,8 +957,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     public void processFinish(String output) {
         bConnecting=false;
         createFarmDialog.dismiss();
-        String fName = farmName.replaceAll(" ", "_");
-        if(!output.equals("ko")){
+        String fName = farmName;
+        if(!output.equals("ko") && !output.isEmpty()){
             prefs.appendIfNewValue(user+"_farms",farmName,";");
         } else {
             prefs.appendIfNewValue(user+"_farms","*"+farmName,";");
@@ -967,6 +968,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             state=1;
             firstFarm=false;
             canvasView.invalidate();
+            this.setTitle(farmName);
         }
         Toast.makeText(this, R.string.farmSavedMessage, Toast.LENGTH_SHORT).show();
     }

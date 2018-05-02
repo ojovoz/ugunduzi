@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -121,7 +122,6 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
         dataItems.add("treatments");
         dataItems.add("units");
         dataItems.add("data_items");
-        dataItems.add("users_farms");
 
         httpConnection http = new httpConnection(this, this);
         if (http.isOnline()) {
@@ -171,7 +171,12 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
             if (!bConnecting) {
                 bConnecting = true;
                 connectionTask = 1;
-                http.execute(server + "/mobile/create_new_user.php?alias=" + uAS + "&pass=" + uPS, "");
+                try{
+                    String arguments="alias=" + URLEncoder.encode(uAS,"UTF-8") + "&pass=" + URLEncoder.encode(uPS,"UTF-8");
+                    http.execute(server + "/mobile/create_new_user.php?" + arguments, "");
+                } catch (IOException e){
+
+                }
             }
         }
     }
@@ -318,12 +323,6 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
             dialog.incrementProgressBy(uploadIncrement);
             CharSequence dialogTitle = getString(R.string.downloadDataProgressDialogTitle) + " " + dataItems.get(index);
             dialog.setMessage(dialogTitle);
-            /*
-            if (dialog.getProgress() == dialog.getMax()) {
-                bConnecting = false;
-                dialog.dismiss();
-            }
-            */
         }
     };
 
@@ -356,9 +355,8 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
         }
 
         if(bProceed) {
-
-            if (prefs.preferenceExists(user + "_farms")) {
-                String userFarms = prefs.getPreference(user + "_farms");
+            String userFarms = prefs.getActiveFarms(user,";");
+            if (!userFarms.isEmpty()) {
                 String[] userFarmsList = userFarms.split(";");
                 if (userFarmsList.length > 1) {
                     //farm chooser
@@ -374,13 +372,16 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                     if (!userFarmsList[0].isEmpty()) {
                         //go to single farm
 
+                        String fName = userFarmsList[0];
+                        fName = fName.replaceAll("\\*","");
+                        prefs.savePreference("farm",fName);
                         Intent i = new Intent(context, farmInterface.class);
                         i.putExtra("user", user);
                         i.putExtra("userId", userId);
                         i.putExtra("userPass", userPass);
                         i.putExtra("newFarm", false);
                         i.putExtra("firstFarm", false);
-                        i.putExtra("farmName", userFarmsList[0]);
+                        i.putExtra("farmName", fName);
                         startActivity(i);
                         finish();
 
