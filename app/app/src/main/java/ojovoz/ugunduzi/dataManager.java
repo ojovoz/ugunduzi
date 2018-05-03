@@ -341,7 +341,7 @@ public class dataManager extends AppCompatActivity {
         String title = "";
 
         if (c1 == null && c2 == null) {
-            title = getString(R.string.plotWord) + ": " + getString(R.string.textNone);
+            title = getString(R.string.plotWord) + ": " + getString(R.string.textNoCrops);
         } else {
             if (c1 != null && c2 == null) {
                 title = getString(R.string.plotWord) + ": " + c1.name;
