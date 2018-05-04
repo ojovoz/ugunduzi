@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by Eugenio on 08/03/2018.
@@ -207,5 +208,76 @@ public class preferenceManager {
     public int getNumberOfActiveFarms(String user, String separator){
         int ret = getActiveFarms(user,separator).split(separator).length;
         return ret;
+    }
+
+    public ArrayList<String> getFarmsPendingSave(String keyName, String separator){
+        ArrayList<String> ret = new ArrayList<>();
+        ArrayList<String> current = getPreferenceAsArrayList(keyName, separator, "");
+        Iterator<String> farmIterator = current.iterator();
+        while (farmIterator.hasNext()) {
+            String farmName = farmIterator.next();
+            if(farmName.startsWith("*")){
+                ret.add(farmName.substring(1));
+            }
+        }
+        return ret;
+    }
+
+    public void updateSavedFarm(String updateFarmName, String keyName, String separator){
+        String farms="";
+        ArrayList<String> current = getPreferenceAsArrayList(keyName, separator, "");
+        Iterator<String> farmIterator = current.iterator();
+        while (farmIterator.hasNext()) {
+            String farmName = farmIterator.next();
+            if(farmName.startsWith("*") && updateFarmName.equals(farmName.substring(1))){
+                farms = (farms.isEmpty()) ? updateFarmName : farms + separator + updateFarmName;
+            } else {
+                farms = (farms.isEmpty()) ? farmName : farms + separator + farmName;
+            }
+        }
+        savePreference(keyName, farms);
+    }
+
+    public String getFarmsPendingDelete(String keyName, String separator){
+        String farms="";
+        String ret = "";
+        ArrayList<String> current = getPreferenceAsArrayList(keyName, separator, "");
+        Iterator<String> farmIterator = current.iterator();
+        while (farmIterator.hasNext()) {
+            String farmName = farmIterator.next();
+            if(farmName.startsWith("-*")){
+                //ignore
+            } else {
+                if (farmName.startsWith("-")) {
+                    ret = (ret.isEmpty()) ? farmName.substring(1) : ret + separator + farmName.substring(1);
+                }
+                farms = (farms.isEmpty()) ? farmName : farms + separator + farmName;
+            }
+        }
+        savePreference(keyName, farms);
+        return ret;
+    }
+
+    public void updateDeletedFarms(String updateFarmNames, String keyName, String separator){
+        String farms="";
+        String[] updateFarmNamesList = updateFarmNames.split(separator);
+        ArrayList<String> current = getPreferenceAsArrayList(keyName, separator, "");
+        Iterator<String> farmIterator = current.iterator();
+        while (farmIterator.hasNext()) {
+            String farmName = farmIterator.next();
+            String updateFarm="";
+            for(int i=0; i<updateFarmNamesList.length;i++) {
+                if (farmName.startsWith("-") && updateFarmNamesList[i].equals(farmName.substring(1))) {
+                    updateFarm = updateFarmNamesList[i];
+                    break;
+                }
+            }
+            if(!updateFarm.isEmpty()){
+                farms = (farms.isEmpty()) ? updateFarm : farms + separator + updateFarm;
+            } else {
+                farms = (farms.isEmpty()) ? farmName : farms + separator + farmName;
+            }
+        }
+        savePreference(keyName, farms);
     }
 }

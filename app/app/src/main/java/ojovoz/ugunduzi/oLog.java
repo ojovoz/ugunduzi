@@ -34,6 +34,8 @@ public class oLog {
     public String picture;
     public String sound;
 
+    public boolean sent;
+
     private Context context;
 
     private dateHelper dH;
@@ -96,6 +98,7 @@ public class oLog {
                         l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
                         l.picture = record[9];
                         l.sound = record[10];
+                        l.sent = (record[11].equals("1"));
                         ret.add(l);
                 }
                 n++;
@@ -134,6 +137,7 @@ public class oLog {
                                 l.crop = c.getCropFromId(Integer.parseInt(record[7]));
                                 oTreatment t = new oTreatment(context);
                                 l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
+                                l.sent = (record[11].equals("1"));
                                 ret.add(l);
                             }
                             break;
@@ -141,6 +145,7 @@ public class oLog {
                             if(!record[9].isEmpty()){
                                 l.picture = record[9];
                                 l.sound = record[10];
+                                l.sent = (record[11].equals("1"));
                                 ret.add(l);
                             }
                             break;
@@ -154,6 +159,7 @@ public class oLog {
                             l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
                             l.picture = record[9];
                             l.sound = record[10];
+                            l.sent = (record[11].equals("1"));
                             ret.add(l);
                     }
                 }
@@ -193,6 +199,7 @@ public class oLog {
                                 l.crop = c.getCropFromId(Integer.parseInt(record[7]));
                                 oTreatment t = new oTreatment(context);
                                 l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
+                                l.sent = (record[11].equals("1"));
                                 ret.add(l);
                             }
                             break;
@@ -200,6 +207,7 @@ public class oLog {
                             if(!record[9].isEmpty()){
                                 l.picture = record[9];
                                 l.sound = record[10];
+                                l.sent = (record[11].equals("1"));
                                 ret.add(l);
                             }
                             break;
@@ -213,6 +221,7 @@ public class oLog {
                             l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
                             l.picture = record[9];
                             l.sound = record[10];
+                            l.sent = (record[11].equals("1"));
                             ret.add(l);
                     }
                 }
@@ -255,6 +264,7 @@ public class oLog {
                                 l.crop = c.getCropFromId(Integer.parseInt(record[7]));
                                 oTreatment t = new oTreatment(context);
                                 l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
+                                l.sent = (record[11].equals("1"));
                                 ret.add(l);
                             }
                             break;
@@ -262,6 +272,7 @@ public class oLog {
                             if(!record[9].isEmpty()){
                                 l.picture = record[9];
                                 l.sound = record[10];
+                                l.sent = (record[11].equals("1"));
                                 ret.add(l);
                             }
                             break;
@@ -275,6 +286,7 @@ public class oLog {
                             l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
                             l.picture = record[9];
                             l.sound = record[10];
+                            l.sent = (record[11].equals("1"));
                             ret.add(l);
                     }
                 }
@@ -296,7 +308,7 @@ public class oLog {
         unitsId = (units == null) ? "0" : Integer.toString(units.id);
         cropId = (crop == null) ? "0" : Integer.toString(crop.id);
         treatmentId = (treatment == null) ? "0" : Integer.toString(treatment.id);
-        String[] newLine = {farmName, Integer.toString(userId), Integer.toString(plot), dH.dateToString(date), dataItemId, Float.toString(value), unitsId, cropId, treatmentId, picture, sound};
+        String[] newLine = {farmName, Integer.toString(userId), Integer.toString(plot), dH.dateToString(date), dataItemId, Float.toString(value), unitsId, cropId, treatmentId, picture, sound, "0"};
 
         log.append(context, newLine);
     }
@@ -314,7 +326,7 @@ public class oLog {
         cropId = (crop == null) ? "0" : Integer.toString(crop.id);
         treatmentId = (treatment == null) ? "0" : Integer.toString(treatment.id);
 
-        String[] newLine = {farmName, Integer.toString(userId), Integer.toString(plot), dH.dateToString(date), dataItemId, Float.toString(value), unitsId, cropId, treatmentId, "", ""};
+        String[] newLine = {farmName, Integer.toString(userId), Integer.toString(plot), dH.dateToString(date), dataItemId, Float.toString(value), unitsId, cropId, treatmentId, "", "", "0"};
         log.update(context, newLine, line);
     }
 

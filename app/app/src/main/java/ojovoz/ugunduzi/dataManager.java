@@ -1,6 +1,7 @@
 package ojovoz.ugunduzi;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -30,16 +31,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Created by Eugenio on 24/04/2018.
  */
-public class dataManager extends AppCompatActivity {
+public class dataManager extends AppCompatActivity implements httpConnection.AsyncResponse {
 
     public oCrop crop1;
     public oCrop crop2;
@@ -67,12 +70,22 @@ public class dataManager extends AppCompatActivity {
     int nSelected=0;
     String activityTitle;
 
+    public String server;
+    String farmsPendingDelete;
+    ArrayList<String> farmsPendingSave;
+    int farmSaveIndex;
+    int connectionTask; // 0=delete pending farms, 1=send pending farms, 2=send items
+    boolean bConnecting=false;
+    ProgressDialog deletingFarmDialog;
+    ProgressDialog savingFarmDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data_manager);
 
         prefs = new preferenceManager(this);
+        server = prefs.getPreference("server");
 
         crop1 = new oCrop(this);
         crop2 = new oCrop(this);
@@ -172,6 +185,7 @@ public class dataManager extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case 0:
+                sendSelectedItems();
                 break;
             case 1:
                 tryDeleteSelectedItems();
@@ -186,6 +200,79 @@ public class dataManager extends AppCompatActivity {
                 goBack();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void sendSelectedItems(){
+        if(!bConnecting) {
+            httpConnection http = new httpConnection(this, this);
+            if (nSelected > 0) {
+                if (http.isOnline()) {
+                    bConnecting=true;
+                    farmsPendingDelete = prefs.getFarmsPendingDelete(user + "_farms", ";");
+                    if (!farmsPendingDelete.isEmpty()) {
+                        connectionTask = 0;
+                        doDeleteFarms();
+                    } else {
+                        farmsPendingSave = prefs.getFarmsPendingSave(user + "_farms", ";");
+                        if (farmsPendingSave.size() > 0) {
+                            connectionTask = 1;
+                            doSaveFarms();
+                        } else {
+                            //TODO send non-multimedia messages
+                            //TODO send unsent multimedia messages
+                        }
+                    }
+                } else {
+                    Toast.makeText(this, R.string.pleaseConnectMessage, Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, R.string.noItemsSelectedMessage, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    public void doDeleteFarms(){
+        httpConnection http = new httpConnection(this, this);
+        CharSequence dialogTitle = getString(R.string.deletingFarmsLabel);
+        deletingFarmDialog = new ProgressDialog(this);
+        deletingFarmDialog.setCancelable(true);
+        deletingFarmDialog.setCanceledOnTouchOutside(false);
+        deletingFarmDialog.setMessage(dialogTitle);
+        deletingFarmDialog.setIndeterminate(true);
+        deletingFarmDialog.show();
+        deletingFarmDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface d) {
+                bConnecting = false;
+                deletingFarmDialog.dismiss();
+            }
+        });
+        http.execute(server + "/mobile/delete_farm.php?user=" + userId + "&farm=" + farmsPendingDelete.replaceAll(" ","_"), "");
+    }
+
+    public void doSaveFarms(){
+        CharSequence dialogTitle = getString(R.string.createNewFarmLabel);
+        savingFarmDialog = new ProgressDialog(this);
+        savingFarmDialog.setCancelable(true);
+        savingFarmDialog.setCanceledOnTouchOutside(false);
+        savingFarmDialog.setMessage(dialogTitle);
+        savingFarmDialog.setIndeterminate(true);
+        savingFarmDialog.show();
+        savingFarmDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface d) {
+                bConnecting = false;
+                savingFarmDialog.dismiss();
+            }
+        });
+        farmSaveIndex=0;
+        executeSaveFarm();
+    }
+
+    public void executeSaveFarm(){
+        httpConnection http = new httpConnection(this, this);
+        String saveString = user + ";" + userPass + ";" + farmsPendingSave.get(farmSaveIndex) + ";" + prefs.getPreference(user+"_"+farmsPendingSave.get(farmSaveIndex));
+        http.execute(server + "/mobile/create_new_farm.php?farm=" + saveString.replaceAll(" ","_"), "");
     }
 
     public void goToPictureSound() {
@@ -729,5 +816,37 @@ public class dataManager extends AppCompatActivity {
 
         }
         return ret;
+    }
+
+    @Override
+    public void processFinish(String output) {
+        switch(connectionTask){
+            case 0:
+                deletingFarmDialog.dismiss();
+                if(output.equals("ok")) {
+                    prefs.updateDeletedFarms(farmsPendingDelete, user + "_farms", ";");
+                }
+                farmsPendingSave = prefs.getFarmsPendingSave(user + "_farms", ";");
+                if (farmsPendingSave.size() > 0) {
+                    connectionTask = 1;
+                    doSaveFarms();
+                } else {
+                    //TODO send non-multimedia messages
+                    //TODO send unsent multimedia messages
+                }
+                break;
+            case 1:
+                if(output.equals("ok")){
+                    prefs.updateSavedFarm(farmsPendingSave.get(farmSaveIndex), user+"_farms",";");
+                }
+                farmSaveIndex++;
+                if(farmSaveIndex<farmsPendingSave.size()){
+                    executeSaveFarm();
+                } else {
+                    savingFarmDialog.dismiss();
+                    //TODO send non-multimedia messages
+                    //TODO send unsent multimedia messages
+                }
+        }
     }
 }
