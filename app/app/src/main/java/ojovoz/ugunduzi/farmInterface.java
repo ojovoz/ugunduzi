@@ -803,22 +803,22 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         if(plotMatrix.currentPlot.crop1!=null) {
             i.putExtra("crop1", plotMatrix.currentPlot.crop1.id);
         } else {
-            i.putExtra("crop1", "-1");
+            i.putExtra("crop1", -1);
         }
         if(plotMatrix.currentPlot.crop2!=null) {
             i.putExtra("crop2", plotMatrix.currentPlot.crop2.id);
         } else {
-            i.putExtra("crop2", "-1");
+            i.putExtra("crop2", -1);
         }
         if(plotMatrix.currentPlot.treatment1!=null) {
             i.putExtra("treatment1", plotMatrix.currentPlot.treatment1.id);
         } else {
-            i.putExtra("treatment1", "-1");
+            i.putExtra("treatment1", -1);
         }
         if(plotMatrix.currentPlot.treatment2!=null) {
             i.putExtra("treatment2", plotMatrix.currentPlot.treatment2.id);
         } else {
-            i.putExtra("treatment2", "-1");
+            i.putExtra("treatment2", -1);
         }
         startActivity(i);
         finish();
@@ -835,22 +835,22 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         if(plotMatrix.currentPlot.crop1!=null) {
             i.putExtra("crop1", plotMatrix.currentPlot.crop1.id);
         } else {
-            i.putExtra("crop1", "-1");
+            i.putExtra("crop1", -1);
         }
         if(plotMatrix.currentPlot.crop2!=null) {
             i.putExtra("crop2", plotMatrix.currentPlot.crop2.id);
         } else {
-            i.putExtra("crop2", "-1");
+            i.putExtra("crop2", -1);
         }
         if(plotMatrix.currentPlot.treatment1!=null) {
             i.putExtra("treatment1", plotMatrix.currentPlot.treatment1.id);
         } else {
-            i.putExtra("treatment1", "-1");
+            i.putExtra("treatment1", -1);
         }
         if(plotMatrix.currentPlot.treatment2!=null) {
             i.putExtra("treatment2", plotMatrix.currentPlot.treatment2.id);
         } else {
-            i.putExtra("treatment2", "-1");
+            i.putExtra("treatment2", -1);
         }
         startActivity(i);
         finish();
@@ -871,22 +871,22 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         if(plotMatrix.currentPlot.crop1!=null) {
             i.putExtra("crop1", plotMatrix.currentPlot.crop1.id);
         } else {
-            i.putExtra("crop1", "-1");
+            i.putExtra("crop1", -1);
         }
         if(plotMatrix.currentPlot.crop2!=null) {
             i.putExtra("crop2", plotMatrix.currentPlot.crop2.id);
         } else {
-            i.putExtra("crop2", "-1");
+            i.putExtra("crop2", -1);
         }
         if(plotMatrix.currentPlot.treatment1!=null) {
             i.putExtra("treatment1", plotMatrix.currentPlot.treatment1.id);
         } else {
-            i.putExtra("treatment1", "-1");
+            i.putExtra("treatment1", -1);
         }
         if(plotMatrix.currentPlot.treatment2!=null) {
             i.putExtra("treatment2", plotMatrix.currentPlot.treatment2.id);
         } else {
-            i.putExtra("treatment2", "-1");
+            i.putExtra("treatment2", -1);
         }
         startActivity(i);
         finish();

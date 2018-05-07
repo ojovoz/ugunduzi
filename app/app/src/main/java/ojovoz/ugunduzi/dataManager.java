@@ -98,11 +98,16 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
         farmName = getIntent().getExtras().getString("farmName");
         plot = getIntent().getExtras().getInt("plot");
 
-        crop1 = (getIntent().getExtras().getInt("crop1") > 0) ? crop1.getCropFromId(getIntent().getExtras().getInt("crop1")) : null;
-        crop2 = (getIntent().getExtras().getInt("crop2") > 0) ? crop2.getCropFromId(getIntent().getExtras().getInt("crop2")) : null;
+        int crop1Id=getIntent().getExtras().getInt("crop1");
+        int crop2Id=getIntent().getExtras().getInt("crop2");
+        int treatment1Id=getIntent().getExtras().getInt("treatment1");
+        int treatment2Id=getIntent().getExtras().getInt("treatment2");
 
-        treatment1 = (getIntent().getExtras().getInt("treatment1") > 0) ? treatment1.getTreatmentFromId(getIntent().getExtras().getInt("treatment1")) : null;
-        treatment2 = (getIntent().getExtras().getInt("treatment2") > 0) ? treatment2.getTreatmentFromId(getIntent().getExtras().getInt("treatment2")) : null;
+        crop1 = (crop1Id > 0) ? crop1.getCropFromId(crop1Id) : null;
+        crop2 = (crop2Id > 0) ? crop2.getCropFromId(crop2Id) : null;
+
+        treatment1 = (treatment1Id > 0) ? treatment1.getTreatmentFromId(treatment1Id) : null;
+        treatment2 = (treatment2Id > 0) ? treatment2.getTreatmentFromId(treatment2Id) : null;
 
         TextView tt = (TextView) findViewById(R.id.plotLabel);
         String title = "";
@@ -218,7 +223,7 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
                             connectionTask = 1;
                             doSaveFarms();
                         } else {
-                            //TODO send non-multimedia messages
+                            //TODO send ALL non-multimedia messages (delete all remotely)
                             //TODO send unsent multimedia messages
                         }
                     }
@@ -286,22 +291,22 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
         if (crop1 != null) {
             i.putExtra("crop1", crop1.id);
         } else {
-            i.putExtra("crop1", "-1");
+            i.putExtra("crop1", -1);
         }
         if (crop2 != null) {
             i.putExtra("crop2", crop2.id);
         } else {
-            i.putExtra("crop2", "-1");
+            i.putExtra("crop2", -1);
         }
         if (treatment1 != null) {
             i.putExtra("treatment1", treatment1.id);
         } else {
-            i.putExtra("treatment1", "-1");
+            i.putExtra("treatment1", -1);
         }
         if (treatment2 != null) {
             i.putExtra("treatment2", treatment2.id);
         } else {
-            i.putExtra("treatment2", "-1");
+            i.putExtra("treatment2", -1);
         }
         startActivity(i);
         finish();
@@ -318,22 +323,22 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
         if (crop1 != null) {
             i.putExtra("crop1", crop1.id);
         } else {
-            i.putExtra("crop1", "-1");
+            i.putExtra("crop1", -1);
         }
         if (crop2 != null) {
             i.putExtra("crop2", crop2.id);
         } else {
-            i.putExtra("crop2", "-1");
+            i.putExtra("crop2", -1);
         }
         if (treatment1 != null) {
             i.putExtra("treatment1", treatment1.id);
         } else {
-            i.putExtra("treatment1", "-1");
+            i.putExtra("treatment1", -1);
         }
         if (treatment2 != null) {
             i.putExtra("treatment2", treatment2.id);
         } else {
-            i.putExtra("treatment2", "-1");
+            i.putExtra("treatment2", -1);
         }
         startActivity(i);
         finish();
@@ -831,12 +836,12 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
                     connectionTask = 1;
                     doSaveFarms();
                 } else {
-                    //TODO send non-multimedia messages
+                    //TODO send ALL non-multimedia messages (delete all remotely)
                     //TODO send unsent multimedia messages
                 }
                 break;
             case 1:
-                if(output.equals("ok")){
+                if(!output.equals("ko")){
                     prefs.updateSavedFarm(farmsPendingSave.get(farmSaveIndex), user+"_farms",";");
                 }
                 farmSaveIndex++;

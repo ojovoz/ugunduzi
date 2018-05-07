@@ -78,6 +78,7 @@ public class oLog {
                             l.crop = c.getCropFromId(Integer.parseInt(record[7]));
                             oTreatment t = new oTreatment(context);
                             l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
+                            l.sent = (record[1].equals("1"));
                             ret.add(l);
                         }
                         break;
@@ -85,6 +86,7 @@ public class oLog {
                         if(!record[9].isEmpty()){
                             l.picture = record[9];
                             l.sound = record[10];
+                            l.sent = (record[1].equals("1"));
                             ret.add(l);
                         }
                         break;

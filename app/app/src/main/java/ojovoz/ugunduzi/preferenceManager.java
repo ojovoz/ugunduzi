@@ -273,7 +273,7 @@ public class preferenceManager {
                 }
             }
             if(!updateFarm.isEmpty()){
-                farms = (farms.isEmpty()) ? updateFarm : farms + separator + updateFarm;
+                //ignore
             } else {
                 farms = (farms.isEmpty()) ? farmName : farms + separator + farmName;
             }
