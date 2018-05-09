@@ -92,6 +92,9 @@
     <string name="plotWord">Plot</string>
     <string name="selected">selected</string>
     <string name="opDeleteSelectedItems">Delete selected items</string>
-    <string name="opSendSelectedItems">Send selected items</string>
+    <string name="opSendSelectedItems">Send records</string>
     <string name="textNoCrops">No crops</string>
+    <string name="downloadingParametersMessage">Downloading parameters</string>
+    <string name="incorrectInternetParamsMessage">Incorrect internet parameters. Please contact the system administrator</string>
+    <string name="sendingRecordsMessage">Sending records</string>
 </resources>

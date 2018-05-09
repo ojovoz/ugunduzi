@@ -1,6 +1,7 @@
 package ojovoz.ugunduzi;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -600,6 +602,11 @@ public class enterData extends AppCompatActivity {
     }
 
     public void saveData(View v){
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
         EditText ev = (EditText)findViewById(R.id.dataItemValue);
         String tv = ev.getText().toString();
         if(!tv.isEmpty() || chosenDataItem.type==1){

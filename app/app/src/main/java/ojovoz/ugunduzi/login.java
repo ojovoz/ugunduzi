@@ -117,6 +117,7 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
 
     public void downloadData() {
         dataItems = new ArrayList<>();
+        dataItems.add("parameters");
         dataItems.add("users");
         dataItems.add("crops");
         dataItems.add("treatments");
@@ -256,6 +257,7 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                     } catch (IOException e) {
 
                     }
+
                     index++;
                     if (index < dataItems.size()) {
                         progressHandler.sendMessage(progressHandler.obtainMessage());

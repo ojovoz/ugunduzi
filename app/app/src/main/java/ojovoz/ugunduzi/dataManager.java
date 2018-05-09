@@ -2,11 +2,13 @@ package ojovoz.ugunduzi;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
@@ -29,15 +31,18 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TimeZone;
+
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
 
 /**
  * Created by Eugenio on 24/04/2018.
@@ -67,22 +72,35 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
     oLog editing;
     oUnit editedUnits;
 
-    int nSelected=0;
+    int nSelected = 0;
     String activityTitle;
 
     public String server;
     String farmsPendingDelete;
     ArrayList<String> farmsPendingSave;
     int farmSaveIndex;
-    int connectionTask; // 0=delete pending farms, 1=send pending farms, 2=send items
-    boolean bConnecting=false;
+    int connectionTask; // 0=delete pending farms, 1=send pending farms, 2=send items, 3=downloading parameters
+    boolean bConnecting = false;
     ProgressDialog deletingFarmDialog;
-    ProgressDialog savingFarmDialog;
+    ProgressDialog savingFarmsDialog;
+    ProgressDialog downloadingParamsDialog;
+
+    public String ugunduziEmail = "";
+    public String ugunduziPass = "";
+    public String dataSubject = "";
+    public String multimediaSubject = "";
+    public String smtpServer = "";
+    public String smtpPort = "";
+
+    private ProgressDialog sendingDataDialog;
+    private Context dataManagerContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data_manager);
+
+        dataManagerContext = this;
 
         prefs = new preferenceManager(this);
         server = prefs.getPreference("server");
@@ -98,10 +116,10 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
         farmName = getIntent().getExtras().getString("farmName");
         plot = getIntent().getExtras().getInt("plot");
 
-        int crop1Id=getIntent().getExtras().getInt("crop1");
-        int crop2Id=getIntent().getExtras().getInt("crop2");
-        int treatment1Id=getIntent().getExtras().getInt("treatment1");
-        int treatment2Id=getIntent().getExtras().getInt("treatment2");
+        int crop1Id = getIntent().getExtras().getInt("crop1");
+        int crop2Id = getIntent().getExtras().getInt("crop2");
+        int treatment1Id = getIntent().getExtras().getInt("treatment1");
+        int treatment2Id = getIntent().getExtras().getInt("treatment2");
 
         crop1 = (crop1Id > 0) ? crop1.getCropFromId(crop1Id) : null;
         crop2 = (crop2Id > 0) ? crop2.getCropFromId(crop2Id) : null;
@@ -207,36 +225,31 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
         return super.onOptionsItemSelected(item);
     }
 
-    public void sendSelectedItems(){
-        if(!bConnecting) {
+    public void sendSelectedItems() {
+        if (!bConnecting) {
             httpConnection http = new httpConnection(this, this);
-            if (nSelected > 0) {
-                if (http.isOnline()) {
-                    bConnecting=true;
-                    farmsPendingDelete = prefs.getFarmsPendingDelete(user + "_farms", ";");
-                    if (!farmsPendingDelete.isEmpty()) {
-                        connectionTask = 0;
-                        doDeleteFarms();
-                    } else {
-                        farmsPendingSave = prefs.getFarmsPendingSave(user + "_farms", ";");
-                        if (farmsPendingSave.size() > 0) {
-                            connectionTask = 1;
-                            doSaveFarms();
-                        } else {
-                            //TODO send ALL non-multimedia messages (delete all remotely)
-                            //TODO send unsent multimedia messages
-                        }
-                    }
+            if (http.isOnline()) {
+                bConnecting = true;
+                farmsPendingDelete = prefs.getFarmsPendingDelete(user + "_farms", ";");
+                if (!farmsPendingDelete.isEmpty()) {
+                    connectionTask = 0;
+                    doDeleteFarms();
                 } else {
-                    Toast.makeText(this, R.string.pleaseConnectMessage, Toast.LENGTH_SHORT).show();
+                    farmsPendingSave = prefs.getFarmsPendingSave(user + "_farms", ";");
+                    if (farmsPendingSave.size() > 0) {
+                        connectionTask = 1;
+                        doSaveFarms();
+                    } else {
+                        sendMessages();
+                    }
                 }
             } else {
-                Toast.makeText(this, R.string.noItemsSelectedMessage, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.pleaseConnectMessage, Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    public void doDeleteFarms(){
+    public void doDeleteFarms() {
         httpConnection http = new httpConnection(this, this);
         CharSequence dialogTitle = getString(R.string.deletingFarmsLabel);
         deletingFarmDialog = new ProgressDialog(this);
@@ -252,32 +265,32 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
                 deletingFarmDialog.dismiss();
             }
         });
-        http.execute(server + "/mobile/delete_farm.php?user=" + userId + "&farm=" + farmsPendingDelete.replaceAll(" ","_"), "");
+        http.execute(server + "/mobile/delete_farm.php?user=" + userId + "&farm=" + farmsPendingDelete.replaceAll(" ", "_"), "");
     }
 
-    public void doSaveFarms(){
+    public void doSaveFarms() {
         CharSequence dialogTitle = getString(R.string.createNewFarmLabel);
-        savingFarmDialog = new ProgressDialog(this);
-        savingFarmDialog.setCancelable(true);
-        savingFarmDialog.setCanceledOnTouchOutside(false);
-        savingFarmDialog.setMessage(dialogTitle);
-        savingFarmDialog.setIndeterminate(true);
-        savingFarmDialog.show();
-        savingFarmDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+        savingFarmsDialog = new ProgressDialog(this);
+        savingFarmsDialog.setCancelable(true);
+        savingFarmsDialog.setCanceledOnTouchOutside(false);
+        savingFarmsDialog.setMessage(dialogTitle);
+        savingFarmsDialog.setIndeterminate(true);
+        savingFarmsDialog.show();
+        savingFarmsDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface d) {
                 bConnecting = false;
-                savingFarmDialog.dismiss();
+                savingFarmsDialog.dismiss();
             }
         });
-        farmSaveIndex=0;
+        farmSaveIndex = 0;
         executeSaveFarm();
     }
 
-    public void executeSaveFarm(){
+    public void executeSaveFarm() {
         httpConnection http = new httpConnection(this, this);
-        String saveString = user + ";" + userPass + ";" + farmsPendingSave.get(farmSaveIndex) + ";" + prefs.getPreference(user+"_"+farmsPendingSave.get(farmSaveIndex));
-        http.execute(server + "/mobile/create_new_farm.php?farm=" + saveString.replaceAll(" ","_"), "");
+        String saveString = user + ";" + userPass + ";" + farmsPendingSave.get(farmSaveIndex) + ";" + prefs.getPreference(user + "_" + farmsPendingSave.get(farmSaveIndex));
+        http.execute(server + "/mobile/create_new_farm.php?farm=" + saveString.replaceAll(" ", "_"), "");
     }
 
     public void goToPictureSound() {
@@ -395,10 +408,12 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
                 c.info = (c.info.isEmpty()) ? dH.dateToString(l.date) : c.info + "\n\n" + dH.dateToString(l.date);
                 c.imgFile = l.picture;
                 c.sndFile = l.sound;
+                c.isSelected = !l.sent;
             } else {
                 c.info = (c.info.isEmpty()) ? getDataItemText(l) : c.info + "\n\n" + getDataItemText(l);
+                c.isSelected = false;
             }
-            c.isSelected=false;
+
             ret.add(c);
             n++;
         }
@@ -474,9 +489,9 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
         CheckBox cb = (CheckBox) v;
         adapter.list.get(n).isSelected = cb.isChecked();
 
-        nSelected = (cb.isChecked()) ? nSelected+1 : nSelected-1;
-        if(nSelected>0){
-            setTitle(activityTitle+": "+String.valueOf(nSelected)+" "+getString(R.string.selected));
+        nSelected = (cb.isChecked()) ? nSelected + 1 : nSelected - 1;
+        if (nSelected > 0) {
+            setTitle(activityTitle + ": " + String.valueOf(nSelected) + " " + getString(R.string.selected));
         } else {
             setTitle(activityTitle);
         }
@@ -569,7 +584,7 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
             TextView tv = (TextView) dialog.findViewById(R.id.dataItem);
             tv.setText(editing.getDataItemName());
 
-            final EditText ev = (EditText)dialog.findViewById(R.id.dataItemValue);
+            final EditText ev = (EditText) dialog.findViewById(R.id.dataItemValue);
             final TextView ut = (TextView) dialog.findViewById(R.id.unitsText);
             final Button bu = (Button) dialog.findViewById(R.id.dataItemUnits);
 
@@ -663,25 +678,25 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
                 bu.setVisibility(View.GONE);
             }
 
-            Button bs = (Button)dialog.findViewById(R.id.saveButton);
+            Button bs = (Button) dialog.findViewById(R.id.saveButton);
             bs.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     String tv = ev.getText().toString();
-                    if(!tv.isEmpty() || editing.dataItem.type==1){
+                    if (!tv.isEmpty() || editing.dataItem.type == 1) {
                         float editedValue = (tv.isEmpty()) ? 0 : Float.parseFloat(tv);
-                        if((editedValue>=0.0f && (editing.dataItem.type==0 || editing.dataItem.type==2)) || editing.dataItem.type==1){
-                            editing.date=dH.stringToDate(db.getText().toString());
-                            editing.value=editedValue;
-                            editing.units=editedUnits;
+                        if ((editedValue >= 0.0f && (editing.dataItem.type == 0 || editing.dataItem.type == 2)) || editing.dataItem.type == 1) {
+                            editing.date = dH.stringToDate(db.getText().toString());
+                            editing.value = editedValue;
+                            editing.units = editedUnits;
                             oLog l = new oLog(dialog.getContext());
-                            logList=l.sortLogByDate(logList,true,-1);
-                            adapter.list=cardDataFromLog();
+                            logList = l.sortLogByDate(logList, true, -1);
+                            adapter.list = cardDataFromLog();
                             adapter.setList(adapter.list);
                             adapter.notifyDataSetChanged();
-                            l.updateLogItem(editing.line,editing.farmName,editing.userId,editing.plotId,editing.date,editing.dataItem,editing.value,editing.units,editing.crop,editing.treatment);
+                            l.updateLogItem(editing.line, editing.farmName, editing.userId, editing.plotId, editing.date, editing.dataItem, editing.value, editing.units, editing.crop, editing.treatment);
                             dialog.dismiss();
-                            nSelected=0;
+                            nSelected = 0;
                             setTitle(activityTitle);
                         } else {
                             Toast.makeText(dialog.getContext(), R.string.valueNegativeMessage, Toast.LENGTH_SHORT).show();
@@ -701,15 +716,15 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
 
     }
 
-    public void tryDeleteSelectedItems(){
-        if(nSelected>0){
+    public void tryDeleteSelectedItems() {
+        if (nSelected > 0) {
             AlertDialog.Builder confirmDialog = new AlertDialog.Builder(this);
             confirmDialog.setMessage(R.string.deleteItemsConfirmMessage);
             confirmDialog.setNegativeButton(R.string.noButtonText, null);
             confirmDialog.setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                   deleteSelectedItems();
+                    deleteSelectedItems();
 
                 }
             });
@@ -720,24 +735,24 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
         }
     }
 
-    public void deleteSelectedItems(){
+    public void deleteSelectedItems() {
         int[] delete = new int[adapter.list.size()];
         ArrayList<String> deleteFiles = new ArrayList<>();
         List<oCardData> list = adapter.list;
         Iterator<oCardData> iterator = list.iterator();
-        int n=0;
+        int n = 0;
         while (iterator.hasNext()) {
             oCardData cd = iterator.next();
-            if(cd.isSelected){
-                delete[n]=logList.get(cd.id).line;
-                if(!cd.imgFile.isEmpty()){
+            if (cd.isSelected) {
+                delete[n] = logList.get(cd.id).line;
+                if (!cd.imgFile.isEmpty()) {
                     deleteFiles.add(cd.imgFile);
                 }
-                if(!cd.sndFile.isEmpty()){
+                if (!cd.sndFile.isEmpty()) {
                     deleteFiles.add(cd.sndFile);
                 }
             } else {
-                delete[n]=-1;
+                delete[n] = -1;
             }
             n++;
         }
@@ -745,14 +760,14 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
         l.deleteLogItems(delete);
         deleteImgSndFiles(deleteFiles);
         logList = (plot >= 0) ? l.sortLogByDate(l.createLog(farmName, userId, plot, 2), true, -1) : l.sortLogByDate(l.createLog(farmName, userId, 2), true, -1);
-        adapter.list=cardDataFromLog();
+        adapter.list = cardDataFromLog();
         adapter.setList(adapter.list);
         adapter.notifyDataSetChanged();
-        nSelected=0;
+        nSelected = 0;
         setTitle(activityTitle);
     }
 
-    public void deleteImgSndFiles(ArrayList<String> deleteFiles){
+    public void deleteImgSndFiles(ArrayList<String> deleteFiles) {
         Iterator<String> iterator = deleteFiles.iterator();
         while (iterator.hasNext()) {
             String f = iterator.next();
@@ -823,12 +838,164 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
         return ret;
     }
 
+    public boolean getEmailParams() {
+        boolean ret = false;
+        csvFileManager paramList;
+
+        paramList = new csvFileManager("parameters");
+        List<String[]> paramCSV = paramList.read(this);
+        if (paramCSV != null) {
+            Iterator<String[]> iterator = paramCSV.iterator();
+            while (iterator.hasNext()) {
+                String[] record = iterator.next();
+                if (record.length == 6) {
+                    ugunduziEmail = record[0];
+                    ugunduziPass = record[1];
+                    dataSubject = record[2];
+                    multimediaSubject = record[3];
+                    smtpServer = record[4];
+                    smtpPort = record[5];
+                    ret = true;
+                }
+            }
+        }
+        return ret;
+    }
+
+    public void sendMessages() {
+        httpConnection http = new httpConnection(this, this);
+        if (http.isOnline()) {
+            if (getEmailParams()) {
+                doSendMessages();
+            } else {
+                CharSequence dialogTitle = getString(R.string.downloadingParametersMessage);
+                downloadingParamsDialog = new ProgressDialog(this);
+                downloadingParamsDialog.setCancelable(true);
+                downloadingParamsDialog.setCanceledOnTouchOutside(false);
+                downloadingParamsDialog.setMessage(dialogTitle);
+                downloadingParamsDialog.setIndeterminate(true);
+                downloadingParamsDialog.show();
+                downloadingParamsDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface d) {
+                        bConnecting = false;
+                        downloadingParamsDialog.dismiss();
+                    }
+                });
+                connectionTask = 3;
+                http.execute(server + "/mobile/get_parameters.php?", "");
+            }
+
+        } else {
+            Toast.makeText(this, R.string.pleaseConnectMessage, Toast.LENGTH_SHORT).show();
+            bConnecting=false;
+        }
+    }
+
+    public void doSendMessages() {
+        String b = "";
+        Iterator<oLog> iterator = logList.iterator();
+        while (iterator.hasNext()) {
+            oLog l = iterator.next();
+            if (l.dataItem != null) {
+                b = (b.isEmpty()) ? l.toString(";") : b + "*" + l.toString(";");
+            }
+        }
+
+        if (!b.isEmpty()) {
+            final String emailBody=b;
+            httpConnection http = new httpConnection(this, this);
+            if (http.isOnline()) {
+                if(!ugunduziEmail.isEmpty() && !ugunduziPass.isEmpty() && !smtpServer.isEmpty() && !smtpPort.isEmpty()){
+                    AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+
+                        @Override
+                        protected void onPreExecute() {
+                            sendingDataDialog = new ProgressDialog(dataManagerContext);
+                            CharSequence dialogTitle = getString(R.string.sendingRecordsMessage);
+                            sendingDataDialog.setMessage(dialogTitle);
+                            sendingDataDialog.setCancelable(true);
+                            sendingDataDialog.setCanceledOnTouchOutside(false);
+                            sendingDataDialog.setIndeterminate(true);
+                            sendingDataDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface d) {
+                                    bConnecting = false;
+                                    sendingDataDialog.dismiss();
+                                }
+                            });
+                            sendingDataDialog.show();
+                        }
+
+                        @Override
+                        protected Void doInBackground(Void... arg0) {
+                            try {
+                                Mail m = new Mail(ugunduziEmail, ugunduziPass, smtpServer, smtpPort);
+                                String[] toArr = {ugunduziEmail};
+                                m.setTo(toArr);
+                                m.setFrom(ugunduziEmail);
+                                m.setSubject(dataSubject);
+                                m.setBody(emailBody);
+                                try {
+                                    if(m.send()){
+
+                                    } else {
+                                        Toast.makeText(dataManagerContext, R.string.incorrectInternetParamsMessage, Toast.LENGTH_SHORT).show();
+                                        if (sendingDataDialog != null) {
+                                            sendingDataDialog.dismiss();
+                                        }
+                                        bConnecting=false;
+                                    }
+                                } catch (Exception e) {
+                                    Toast.makeText(dataManagerContext, R.string.incorrectInternetParamsMessage, Toast.LENGTH_SHORT).show();
+                                    if (sendingDataDialog != null) {
+                                        sendingDataDialog.dismiss();
+                                    }
+                                    bConnecting=false;
+                                }
+                            } catch (Exception e) {
+                                Toast.makeText(dataManagerContext, R.string.incorrectInternetParamsMessage, Toast.LENGTH_SHORT).show();
+                                if (sendingDataDialog != null) {
+                                    sendingDataDialog.dismiss();
+                                }
+                                bConnecting=false;
+                            }
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(Void result) {
+                            if (sendingDataDialog!=null) {
+                                sendingDataDialog.dismiss();
+                            }
+                            if(bConnecting) {
+                                doSendMultimediaMessages();
+                            }
+                        }
+                    };
+                    task.execute((Void[])null);
+                } else {
+                    Toast.makeText(this, R.string.incorrectInternetParamsMessage, Toast.LENGTH_SHORT).show();
+                    bConnecting=false;
+                }
+            } else {
+                Toast.makeText(this, R.string.pleaseConnectMessage, Toast.LENGTH_SHORT).show();
+                bConnecting=false;
+            }
+        }
+
+    }
+
+    public void doSendMultimediaMessages(){
+        //TODO: send multimedia messages
+    }
+
     @Override
     public void processFinish(String output) {
-        switch(connectionTask){
+        switch (connectionTask) {
             case 0:
                 deletingFarmDialog.dismiss();
-                if(output.equals("ok")) {
+                if (output.equals("ok")) {
                     prefs.updateDeletedFarms(farmsPendingDelete, user + "_farms", ";");
                 }
                 farmsPendingSave = prefs.getFarmsPendingSave(user + "_farms", ";");
@@ -836,21 +1003,43 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
                     connectionTask = 1;
                     doSaveFarms();
                 } else {
-                    //TODO send ALL non-multimedia messages (delete all remotely)
-                    //TODO send unsent multimedia messages
+                    sendMessages();
                 }
                 break;
             case 1:
-                if(!output.equals("ko")){
-                    prefs.updateSavedFarm(farmsPendingSave.get(farmSaveIndex), user+"_farms",";");
+                if (!output.equals("ko")) {
+                    prefs.updateSavedFarm(farmsPendingSave.get(farmSaveIndex), user + "_farms", ";");
                 }
                 farmSaveIndex++;
-                if(farmSaveIndex<farmsPendingSave.size()){
+                if (farmSaveIndex < farmsPendingSave.size()) {
                     executeSaveFarm();
                 } else {
-                    savingFarmDialog.dismiss();
-                    //TODO send non-multimedia messages
-                    //TODO send unsent multimedia messages
+                    savingFarmsDialog.dismiss();
+                    sendMessages();
+                }
+                break;
+            case 3:
+                downloadingParamsDialog.dismiss();
+                String[] nextLine;
+                CSVReader reader = new CSVReader(new StringReader(output), ',', '"');
+                File file = new File(this.getFilesDir(), "parameters");
+                try {
+                    FileWriter w = new FileWriter(file);
+                    CSVWriter writer = new CSVWriter(w, ',', '"');
+                    while ((nextLine = reader.readNext()) != null) {
+                        writer.writeNext(nextLine);
+                    }
+                    writer.close();
+                    reader.close();
+                    if (getEmailParams()) {
+                        doSendMessages();
+                    } else {
+                        Toast.makeText(this, R.string.incorrectInternetParamsMessage, Toast.LENGTH_SHORT).show();
+                        bConnecting=false;
+                    }
+                } catch (IOException e) {
+                    Toast.makeText(this, R.string.incorrectInternetParamsMessage, Toast.LENGTH_SHORT).show();
+                    bConnecting=false;
                 }
         }
     }

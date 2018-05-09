@@ -391,4 +391,17 @@ public class oLog {
         return ret;
     }
 
+    public String toString(String separator){
+        String ret="";
+        dateHelper dH = new dateHelper();
+        int dataItemId = (dataItem==null) ? -1 : dataItem.id;
+        int unitsId = (units==null) ? -1 : units.id;
+        int cropId = (crop==null) ? -1 : crop.id;
+        int treatmentId = (treatment==null) ? -1 : treatment.id;
+        ret=farmName+separator+Integer.toString(userId)+separator+Integer.toString(plotId)+separator+dH.dateToString(date)+separator+
+                Integer.toString(dataItemId)+separator+Float.toString(value)+separator+Integer.toString(unitsId)+separator+
+                Integer.toString(cropId)+separator+Integer.toString(treatmentId);
+        return ret;
+    }
+
 }
