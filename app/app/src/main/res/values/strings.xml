@@ -97,5 +97,5 @@
     <string name="downloadingParametersMessage">Downloading parameters</string>
     <string name="incorrectInternetParamsMessage">Incorrect internet parameters. Please contact the system administrator</string>
     <string name="sendingRecordsMessage">Sending records</string>
-    <string name="sendingMultimediaRecordsMessage">Sending pictures and sounds</string>
+    <string name="sendingMultimediaRecordsMessage">Sending new pictures and sounds</string>
 </resources>

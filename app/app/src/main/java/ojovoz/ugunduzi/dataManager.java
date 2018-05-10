@@ -414,11 +414,11 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
                 c.info = (c.info.isEmpty()) ? dH.dateToString(l.date) : c.info + "\n\n" + dH.dateToString(l.date);
                 c.imgFile = l.picture;
                 c.sndFile = l.sound;
-                c.isSelected = !l.sent;
             } else {
                 c.info = (c.info.isEmpty()) ? getDataItemText(l) : c.info + "\n\n" + getDataItemText(l);
-                c.isSelected = false;
+
             }
+            c.isSelected = false;
 
             ret.add(c);
             n++;
@@ -1042,7 +1042,7 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
 
                         int n=0;
                         Iterator<oLog> iterator = attachments.iterator();
-                        while (iterator.hasNext()) {
+                        while (iterator.hasNext() && bConnecting) {
                             oLog item = iterator.next();
                             String body = emailBody.get(n);
 
