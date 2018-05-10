@@ -332,6 +332,11 @@ public class oLog {
         log.update(context, newLine, line);
     }
 
+    public void setSent(Context c){
+        csvFileManager log = new csvFileManager("log");
+        log.sent(c,line);
+    }
+
     public ArrayList<String> deleteFarmItems(String deleteList, int userId){
         ArrayList<String> ret = new ArrayList<>();
         String[] farmList = deleteList.split(";");

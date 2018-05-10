@@ -135,6 +135,44 @@ public class csvFileManager {
         }
     }
 
+    public void sent(Context context, int line){
+        List<String[]> currentCSV = read(context);
+        List<String[]> newCSV = new ArrayList<>();
+
+        if(currentCSV!=null){
+            Iterator<String[]> iteratorUpdate = currentCSV.iterator();
+            int n=0;
+            while (iteratorUpdate.hasNext()) {
+                String[] thisLine = iteratorUpdate.next();
+                if(n==line) {
+                    thisLine[thisLine.length - 1] = "1";
+                }
+                newCSV.add(thisLine);
+                n++;
+            }
+
+            deleteCSVFile(context);
+
+            File file = new File(context.getFilesDir(), filename);
+            try {
+                FileWriter w = new FileWriter(file);
+                CSVWriter writer = new CSVWriter(w, ',', '"');
+
+                Iterator<String[]> iteratorWrite = newCSV.iterator();
+                while (iteratorWrite.hasNext()) {
+                    String[] thisLine = iteratorWrite.next();
+                    writer.writeNext(thisLine);
+                }
+                writer.close();
+            } catch (IOException e) {
+
+            } finally {
+
+            }
+
+        }
+    }
+
     public void deleteLines(Context context, int[] delete){
         List<String[]> currentCSV = read(context);
         List<String[]> newCSV = new ArrayList<>();

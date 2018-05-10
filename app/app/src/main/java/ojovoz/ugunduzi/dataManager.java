@@ -11,6 +11,8 @@ import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -93,6 +95,10 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
     public String smtpPort = "";
 
     private ProgressDialog sendingDataDialog;
+    private ProgressDialog sendingMultimediaDialog;
+    private Thread uploadMultimedia;
+    private int[] multimediaCleanUpList;
+    private ArrayList<oLog> multimediaSentItems;
     private Context dataManagerContext;
 
     @Override
@@ -982,13 +988,147 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
                 Toast.makeText(this, R.string.pleaseConnectMessage, Toast.LENGTH_SHORT).show();
                 bConnecting=false;
             }
+        } else {
+            doSendMultimediaMessages();
         }
 
     }
 
     public void doSendMultimediaMessages(){
-        //TODO: send multimedia messages
+        ArrayList<String> b = new ArrayList<>();
+        ArrayList<oLog> multimediaLog = new ArrayList<>();
+        Iterator<oLog> iterator = logList.iterator();
+        while (iterator.hasNext()) {
+            oLog l = iterator.next();
+            if (l.dataItem==null && !l.sent) {
+                b.add(l.toString(";"));
+                multimediaLog.add(l);
+            }
+        }
+
+        if(!b.isEmpty()){
+            final ArrayList<String> emailBody=b;
+            final ArrayList<oLog> attachments = multimediaLog;
+            multimediaCleanUpList = new int[attachments.size()];
+            multimediaSentItems = new ArrayList<>();
+            httpConnection http = new httpConnection(this, this);
+            if (http.isOnline()) {
+                sendingMultimediaDialog = new ProgressDialog(this);
+                sendingMultimediaDialog.setCancelable(true);
+                sendingMultimediaDialog.setCanceledOnTouchOutside(false);
+                CharSequence dialogTitle = getString(R.string.sendingMultimediaRecordsMessage);
+                sendingMultimediaDialog.setMessage(dialogTitle);
+                sendingMultimediaDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                sendingMultimediaDialog.setProgress(0);
+                int dialogMax=attachments.size();
+                sendingMultimediaDialog.setMax(dialogMax);
+                sendingMultimediaDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface d) {
+                        bConnecting=false;
+                        uploadMultimedia.interrupt();
+                        sendingMultimediaDialog.dismiss();
+                        oLog l = new oLog(dataManagerContext);
+                        logList = l.sortLogByDate(logList, true, -1);
+                        adapter.list = cardDataFromLog();
+                        adapter.setList(adapter.list);
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+                sendingMultimediaDialog.show();
+
+                uploadMultimedia = new Thread(new Runnable() {
+                    public void run() {
+
+                        int n=0;
+                        Iterator<oLog> iterator = attachments.iterator();
+                        while (iterator.hasNext()) {
+                            oLog item = iterator.next();
+                            String body = emailBody.get(n);
+
+                            Mail m = new Mail(ugunduziEmail, ugunduziPass, smtpServer, smtpPort);
+                            String[] toArr = {ugunduziEmail};
+                            m.setTo(toArr);
+                            m.setFrom(ugunduziEmail);
+                            m.setSubject(multimediaSubject);
+                            m.setBody(body);
+                            boolean proceed=true;
+
+                            try{
+                                File f1 = new File(item.picture);
+                                if(f1.exists()){
+                                    m.addAttachment(item.picture);
+                                } else {
+                                    proceed=false;
+                                }
+                                File f2 = new File(item.sound);
+                                if(f2.exists()){
+                                    m.addAttachment(item.sound);
+                                } else {
+                                    proceed=false;
+                                }
+                            } catch (Exception e){
+                                proceed=false;
+                            }
+
+                            if(proceed){
+                                try{
+                                    if(m.send()){
+                                        multimediaCleanUpList[n]=-1;
+                                        multimediaSentItems.add(item);
+                                    }
+                                } catch (Exception e){
+
+                                }
+                            } else {
+                                multimediaCleanUpList[n] = item.line;
+                            }
+                            progressHandler.sendMessage(progressHandler.obtainMessage());
+
+                            n++;
+
+                        }
+                    }
+                });
+                uploadMultimedia.start();
+
+            } else {
+                Toast.makeText(this, R.string.pleaseConnectMessage, Toast.LENGTH_SHORT).show();
+                bConnecting=false;
+            }
+        } else {
+            bConnecting=false;
+        }
     }
+
+    Handler progressHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            sendingMultimediaDialog.incrementProgressBy(1);
+            if (sendingMultimediaDialog.getProgress() == sendingMultimediaDialog.getMax()) {
+                bConnecting=false;
+                sendingMultimediaDialog.dismiss();
+                uploadMultimedia.interrupt();
+
+                Iterator<oLog> iterator = multimediaSentItems.iterator();
+                while (iterator.hasNext()) {
+                    oLog item = iterator.next();
+                    item.setSent(dataManagerContext);
+                }
+
+                oLog l = new oLog(dataManagerContext);
+
+                l.deleteLogItems(multimediaCleanUpList);
+
+                logList = (plot >= 0) ? l.sortLogByDate(l.createLog(farmName, userId, plot, 2), true, -1) : l.sortLogByDate(l.createLog(farmName, userId, 2), true, -1);
+                adapter.list = cardDataFromLog();
+                adapter.setList(adapter.list);
+                adapter.notifyDataSetChanged();
+                nSelected = 0;
+                setTitle(activityTitle);
+            }
+        }
+    };
 
     @Override
     public void processFinish(String output) {
