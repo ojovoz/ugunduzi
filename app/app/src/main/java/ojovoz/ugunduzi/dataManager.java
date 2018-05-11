@@ -464,7 +464,7 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
         }
         title += "\n";
         if (t1 == null && t2 == null) {
-            title += getString(R.string.textNone);
+            title += getString(R.string.textNoTreatments);
             c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillFaded);
         } else {
             if (t1 != null && t2 == null) {
