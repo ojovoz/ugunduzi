@@ -1,11 +1,17 @@
 <?php
-$ugunduzi_email="ugunduzi@sautiyawakulima.net";
-$ugunduzi_pass="hQgfewmGRTW7xOL9";
+$root_folder="ugunduzi";
 
-$data_subject="bIOM9B7pLnf6Ev6m";
-$multimedia_subject="kzJuyyIIXMX9gnIA";
+$ugunduzi_email="xxx";
+$ugunduzi_pass="xxx";
 
-$smtp_server="smtp.sautiyawakulima.net";
-$smtp_server_port="578";
-$mail_server="{134.0.12.74:110/pop3/notls}";
+$data_subject="xxx";
+$multimedia_subject="xxx";
+
+$smtp_server="xxx";
+$smtp_server_port="xxx";
+$mail_server="xxx";
+
+$servpath="xxx";
+$ffmpeg_path="xxx";
+$sample_rate="22050";
 ?>
