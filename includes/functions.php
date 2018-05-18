@@ -110,7 +110,6 @@ function checkRecords($dbh,$ugunduzi_email,$ugunduzi_pass,$data_subject,$multime
 						$text=str_replace(array("\n\r", "\n", "\r"),'',$text);
 						
 						$log_items=explode("*",$text);
-						$prev_farms=array();
 						
 						for($i=0;$i<sizeof($log_items);$i++){
 							$log_item=str_replace('=','',$log_items[$i]);
@@ -128,10 +127,9 @@ function checkRecords($dbh,$ugunduzi_email,$ugunduzi_pass,$data_subject,$multime
 								$crop_id=$log_item_parts[7];
 								$treatment_id=$log_item_parts[8];
 								
-								if(!in_array($farm_id,$prev_farms)){
+								if($i==0){
 									$query="DELETE FROM log WHERE plot_id IN (SELECT plot_id FROM plot WHERE farm_id=$farm_id) AND log_data_item_id>0";
 									$result = mysqli_query($dbh,$query);
-									array_push($prev_farms,$farm_id);
 								}
 							
 								$query="INSERT INTO log (plot_id, log_date, log_data_item_id, log_value, log_units_id, log_crop_id, log_treatment_id) VALUES ($plot_id, '$date', $data_item_id, $value, $units_id, $crop_id, $treatment_id)";

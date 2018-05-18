@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net
 --
 -- Servidor: 192.168.86.55
--- Tiempo de generación: 17-04-2018 a las 12:05:37
+-- Tiempo de generación: 18-05-2018 a las 11:20:15
 -- Versión del servidor: 5.5.57-0+deb7u1-log
 -- Versión de PHP: 5.3.29-1~dotdeb.0
 
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `crop` (
   `crop_id` int(10) unsigned NOT NULL,
   `crop_name` varchar(30) NOT NULL,
   `crop_variety` varchar(30) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `crop`
@@ -40,7 +40,8 @@ INSERT INTO `crop` (`crop_id`, `crop_name`, `crop_variety`) VALUES
 (1, 'Mahindi', ''),
 (2, 'Mihogo', ''),
 (3, 'Choroko', ''),
-(4, 'Alizeti', '');
+(4, 'Alizeti', ''),
+(5, 'Viazi vitamu', '');
 
 -- --------------------------------------------------------
 
@@ -84,23 +85,15 @@ CREATE TABLE IF NOT EXISTS `farm` (
   `farm_size_acres` int(10) unsigned NOT NULL,
   `farm_date_created` date NOT NULL,
   `parent_farm_id` int(10) unsigned NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `farm`
 --
 
 INSERT INTO `farm` (`farm_id`, `user_id`, `farm_name`, `farm_size_acres`, `farm_date_created`, `parent_farm_id`) VALUES
-(12, 2, 'Shamba 2', 1, '2018-03-29', 0),
-(13, 2, 'Shamba 3', 1, '2018-03-29', 0),
-(14, 2, 'Shamba 4', 1, '2018-04-02', 0),
-(15, 2, 'Shamba 5', 1, '2018-04-04', 0),
-(16, 4, 'Shamba 1', 1, '2018-04-09', 0),
-(17, 2, 'Shamba 6', 1, '2018-04-09', 0),
-(18, 2, 'Shamba 7', 1, '2018-04-09', 0),
-(19, 2, 'Shamba 1', 1, '2018-04-13', 0),
-(20, 1, 'Shamba 1', 1, '2018-04-13', 0),
-(21, 1, 'Shamba 2', 1, '2018-04-16', 0);
+(52, 2, 'Shamba 3', 1, '2018-05-08', 0),
+(55, 1, 'Shamba 1', 1, '2018-05-17', 51);
 
 -- --------------------------------------------------------
 
@@ -119,7 +112,28 @@ CREATE TABLE IF NOT EXISTS `log` (
   `log_treatment_id` int(10) unsigned NOT NULL,
   `log_picture` varchar(100) NOT NULL,
   `log_sound` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=163 DEFAULT CHARSET=utf8;
+
+--
+-- Volcado de datos para la tabla `log`
+--
+
+INSERT INTO `log` (`log_id`, `plot_id`, `log_date`, `log_data_item_id`, `log_value`, `log_units_id`, `log_crop_id`, `log_treatment_id`, `log_picture`, `log_sound`) VALUES
+(65, 158, '2018-05-15', 0, 0, 0, 0, 0, '/img/img1.jpg', '/snd/snd1.mp3'),
+(66, 162, '2018-05-14', 0, 0, 0, 0, 0, '/img/img66.jpg', '/snd/snd66.mp3'),
+(121, 163, '2018-05-16', 0, 0, 0, 0, 0, '/img/img121.jpg', '/snd/snd121.mp3'),
+(122, 163, '2018-05-16', 0, 0, 0, 0, 0, '/img/img122.jpg', '/snd/snd122.mp3'),
+(142, 161, '2018-05-17', 0, 0, 0, 0, 0, '/img/img142.jpg', '/snd/snd142.mp3'),
+(153, 162, '2018-05-16', 6, 5500, 4, 0, 0, '', ''),
+(154, 160, '2018-05-15', 1, 0, 0, 0, 0, '', ''),
+(155, 163, '2018-05-15', 6, 1000, 4, 0, 0, '', ''),
+(156, 163, '2018-05-15', 7, 5000, 4, 0, 0, '', ''),
+(157, 161, '2018-05-15', 1, 0, 0, 0, 0, '', ''),
+(158, 158, '2018-05-15', 7, 5555, 4, 0, 2, '', ''),
+(159, 159, '2018-05-09', 6, 1000, 4, 0, 0, '', ''),
+(160, 159, '2018-05-09', 4, 25, 2, 0, 0, '', ''),
+(161, 159, '2018-05-09', 7, 1000, 4, 0, 0, '', ''),
+(162, 160, '2018-05-08', 6, 1000, 4, 0, 0, '', '');
 
 -- --------------------------------------------------------
 
@@ -139,41 +153,20 @@ CREATE TABLE IF NOT EXISTS `plot` (
   `plot_crop2` int(10) unsigned NOT NULL,
   `plot_treatment1` int(10) unsigned NOT NULL,
   `plot_treatment2` int(10) unsigned NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=87 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=172 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `plot`
 --
 
 INSERT INTO `plot` (`plot_id`, `internal_plot_id`, `farm_id`, `plot_x`, `plot_y`, `plot_w`, `plot_h`, `plot_crop1`, `plot_crop2`, `plot_treatment1`, `plot_treatment2`) VALUES
-(55, 0, 12, 0, 0, 2, 4, 1, 0, 0, 0),
-(56, 1, 12, 2, 0, 2, 4, 1, 3, 0, 0),
-(57, 0, 13, 0, 0, 1, 1, 1, 3, 2, 0),
-(58, 0, 14, 0, 0, 1, 3, 1, 0, 1, 0),
-(59, 1, 14, 1, 0, 1, 4, 2, 0, 2, 0),
-(60, 2, 14, 2, 0, 2, 4, 3, 0, 0, 0),
-(61, 3, 14, 0, 3, 1, 1, 0, 0, 0, 0),
-(62, 0, 15, 1, 1, 2, 2, 1, 0, 0, 0),
-(63, 1, 15, 0, 0, 1, 1, 1, 0, 0, 0),
-(64, 2, 15, 1, 0, 1, 1, 1, 0, 2, 0),
-(65, 3, 15, 2, 0, 1, 1, 1, 0, 1, 0),
-(66, 4, 15, 3, 0, 1, 1, 1, 0, 2, 1),
-(67, 5, 15, 0, 1, 1, 1, 1, 0, 2, 0),
-(68, 6, 15, 3, 1, 1, 1, 1, 0, 1, 0),
-(69, 7, 15, 0, 2, 1, 1, 1, 0, 2, 1),
-(70, 8, 15, 3, 2, 1, 1, 1, 0, 0, 0),
-(71, 9, 15, 0, 3, 1, 1, 1, 0, 1, 0),
-(72, 10, 15, 1, 3, 1, 1, 1, 0, 2, 0),
-(73, 11, 15, 2, 3, 1, 1, 1, 0, 2, 1),
-(74, 12, 15, 3, 3, 1, 1, 1, 0, 1, 0),
-(75, 0, 16, 0, 0, 2, 2, 3, 0, 2, 0),
-(78, 0, 17, 1, 1, 3, 3, 3, 0, 1, 2),
-(79, 0, 18, 0, 0, 3, 2, 1, 0, 0, 0),
-(82, 0, 19, 0, 0, 4, 2, 1, 0, 2, 0),
-(83, 1, 19, 0, 2, 4, 2, 2, 0, 1, 0),
-(84, 0, 20, 0, 0, 4, 2, 1, 0, 2, 0),
-(85, 1, 20, 0, 2, 4, 2, 2, 0, 1, 0),
-(86, 0, 21, 0, 0, 1, 1, 1, 0, 2, 1);
+(158, 0, 52, 0, 0, 2, 4, 1, 0, 2, 1),
+(159, 1, 52, 2, 0, 2, 1, 1, 0, 1, 0),
+(160, 2, 52, 2, 1, 1, 2, 1, 0, 0, 0),
+(161, 3, 52, 3, 1, 1, 1, 1, 0, 1, 0),
+(162, 4, 52, 3, 2, 1, 1, 1, 0, 2, 0),
+(163, 5, 52, 2, 3, 2, 1, 1, 0, 2, 0),
+(170, 0, 55, 0, 0, 1, 1, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -231,16 +224,44 @@ CREATE TABLE IF NOT EXISTS `user` (
   `user_group` varchar(30) NOT NULL,
   `user_association` varchar(30) NOT NULL,
   `user_location` varchar(30) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `user`
 --
 
 INSERT INTO `user` (`user_id`, `user_name`, `user_alias`, `user_password`, `user_mobile`, `user_group`, `user_association`, `user_location`) VALUES
-(1, 'Test user', 'test', 'test', '', '', '', ''),
+(1, 'Test User', 'test', 'test', '', '', '', ''),
 (2, 'Eugenio Tisselli', 'eugenio', 'cubo23', '', '', '', ''),
-(4, '', 'eg', 'gh', '', '', '', '');
+(5, 'Elias Charles Maajire', 'elias', 'maajire', '', '', '', 'Morogoro'),
+(6, 'Betina J. Mgwama', 'betina', 'mgwama', '', '', '', 'Morogoro'),
+(7, 'Teddy Kaweah', 'teddy', 'kaweah', '', '', '', 'Morogoro'),
+(8, 'Faudhia Magawa', 'faudhia', 'magawa', '', '', '', 'Morogoro'),
+(9, 'Tausi Omary Juma', 'tausi', 'juma', '', '', '', 'Morogoro'),
+(10, 'Eugenia K. Kishogo', 'eugenia', 'kishogo', '', '', '', 'Morogoro'),
+(11, 'Tabu Said', 'tabu', 'said', '', '', '', 'Morogoro'),
+(12, 'Sylvester Letus', 'sylvester', 'letus', '', '', '', 'Morogoro'),
+(13, 'Christopher Benagire', 'christopher', 'benagire', '', '', '', 'Morogoro'),
+(14, 'Parkursi Ngobwa', 'parkursi', 'ngobwa', '', '', '', 'Morogoro'),
+(15, 'Hamisi R. Shomari', 'hamisi r', 'shomari', '', '', '', 'Morogoro'),
+(16, 'Abdallah Jumanne', 'abdallah j', 'jumanne', '', '', '', 'Chambezi'),
+(17, 'Ana Macha', 'ana', 'macha', '', '', '', 'Chambezi'),
+(18, 'Renalda Msaki', 'renalda', 'msaki', '', '', '', 'Chambezi'),
+(19, 'Rehema Maganga', 'rehema', 'maganga', '', '', '', 'Chambezi'),
+(20, 'Nuru Mohamedi', 'nuru', 'mohamedi', '', '', '', 'Chambezi'),
+(21, 'Fatuma Ngomero', 'fatuma', 'ngomero', '', '', '', 'Chambezi'),
+(22, 'Mwanaidi Shabani', 'mwanaidi', 'shabani', '', '', '', 'Chambezi'),
+(23, 'Hamisi Palango', 'hamisi', 'palango', '', '', '', 'Chambezi'),
+(24, 'Fadhili Salum', 'fadhili', 'salum', '', '', '', 'Chambezi'),
+(25, 'Abdallah Mahmudu', 'abdallah m', 'mahmudu', '', '', '', 'Chambezi'),
+(26, 'Tumaini Mussa', 'tumaini', 'mussa', '', '', '', 'Masasi'),
+(27, 'Hadija Wende', 'hadija', 'wende', '', '', '', 'Masasi'),
+(28, 'Mohamedi Simosya', 'mohamedi', 'simosya', '', '', '', 'Masasi'),
+(29, 'Omari Aleka', 'omari', 'aleka', '', '', '', 'Masasi'),
+(30, 'Regina Hamisi', 'regina', 'hamisi', '', '', '', 'Masasi'),
+(31, 'Zena Rajabu', 'zena', 'rajabu', '', '', '', 'Masasi'),
+(32, 'Salima Mponda', 'salima', 'mponda', '', '', '', 'Masasi'),
+(33, 'Laina Selemani', 'laina', 'selemani', '', '', '', 'Masasi');
 
 --
 -- Índices para tablas volcadas
@@ -302,7 +323,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `crop`
 --
 ALTER TABLE `crop`
-  MODIFY `crop_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=5;
+  MODIFY `crop_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=6;
 --
 -- AUTO_INCREMENT de la tabla `data_item`
 --
@@ -312,17 +333,17 @@ ALTER TABLE `data_item`
 -- AUTO_INCREMENT de la tabla `farm`
 --
 ALTER TABLE `farm`
-  MODIFY `farm_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=22;
+  MODIFY `farm_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=57;
 --
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(10) unsigned NOT NULL AUTO_INCREMENT;
+  MODIFY `log_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=163;
 --
 -- AUTO_INCREMENT de la tabla `plot`
 --
 ALTER TABLE `plot`
-  MODIFY `plot_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=87;
+  MODIFY `plot_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=172;
 --
 -- AUTO_INCREMENT de la tabla `treatment`
 --
@@ -337,7 +358,7 @@ ALTER TABLE `units`
 -- AUTO_INCREMENT de la tabla `user`
 --
 ALTER TABLE `user`
-  MODIFY `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=5;
+  MODIFY `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=34;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
