@@ -141,17 +141,17 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
             activityTitle = activityTitle.replace("X", getString(R.string.plotWord));
 
             if (crop1 == null && crop2 == null) {
-                title = getString(R.string.plotCropLabel) + " " + getString(R.string.textNone);
+                title = getString(R.string.plotCropLabel) + "s: " + getString(R.string.textNone);
             } else {
                 if (crop1 != null && crop2 == null) {
                     title = getString(R.string.plotCropLabel) + ": " + crop1.name;
                 } else if (crop1 != null && crop2 != null) {
-                    title = getString(R.string.plotCropLabel) + " " + crop1.name + ", " + crop2.name;
+                    title = getString(R.string.plotCropLabel) + "s: " + crop1.name + ", " + crop2.name;
                 }
             }
             title += "\n";
             if (treatment1 == null && treatment2 == null) {
-                title += getString(R.string.plotTreatmentLabel) + " " + getString(R.string.textNone);
+                title += getString(R.string.plotTreatmentLabel) + "s: " + getString(R.string.textNone);
                 tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillDefault));
             } else {
                 if (treatment1 != null && treatment2 == null) {
@@ -162,7 +162,7 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
                         tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagement));
                     }
                 } else if (treatment1 != null && treatment2 != null) {
-                    title += getString(R.string.plotTreatmentLabel) + " " + treatment1.name + ", " + treatment2.name;
+                    title += getString(R.string.plotTreatmentLabel) + "s: " + treatment1.name + ", " + treatment2.name;
                     if (treatment1.category != treatment2.category) {
                         tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControl));
                     } else {

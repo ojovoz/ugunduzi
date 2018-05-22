@@ -722,17 +722,17 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
         String title="";
         if(plotMatrix.currentPlot.crop1==null && plotMatrix.currentPlot.crop2==null){
-            title=getString(R.string.plotCropLabel)+" "+getString(R.string.textNone);
+            title=getString(R.string.plotCropLabel)+"s: "+getString(R.string.textNone);
         } else {
             if(plotMatrix.currentPlot.crop1!=null && plotMatrix.currentPlot.crop2==null){
                 title=getString(R.string.plotCropLabel)+": "+plotMatrix.currentPlot.crop1.name;
             } else if(plotMatrix.currentPlot.crop1!=null && plotMatrix.currentPlot.crop2!=null){
-                title=getString(R.string.plotCropLabel)+" "+plotMatrix.currentPlot.crop1.name+", "+plotMatrix.currentPlot.crop2.name;
+                title=getString(R.string.plotCropLabel)+"s: "+plotMatrix.currentPlot.crop1.name+", "+plotMatrix.currentPlot.crop2.name;
             }
         }
         title+="\n";
         if(plotMatrix.currentPlot.treatment1==null && plotMatrix.currentPlot.treatment2==null){
-            title+=getString(R.string.plotTreatmentLabel)+" "+getString(R.string.textNone);
+            title+=getString(R.string.plotTreatmentLabel)+"s: "+getString(R.string.textNone);
             tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorFillDefault));
         } else {
             if(plotMatrix.currentPlot.treatment1!=null && plotMatrix.currentPlot.treatment2==null){
@@ -743,7 +743,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagement));
                 }
             } else if(plotMatrix.currentPlot.treatment1!=null && plotMatrix.currentPlot.treatment2!=null){
-                title+=getString(R.string.plotTreatmentLabel)+" "+plotMatrix.currentPlot.treatment1.name+", "+plotMatrix.currentPlot.treatment2.name;
+                title+=getString(R.string.plotTreatmentLabel)+"s: "+plotMatrix.currentPlot.treatment1.name+", "+plotMatrix.currentPlot.treatment2.name;
                 if(plotMatrix.currentPlot.treatment1.category!=plotMatrix.currentPlot.treatment2.category){
                     tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControl));
                 } else {

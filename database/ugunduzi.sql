@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net
 --
 -- Servidor: 192.168.86.55
--- Tiempo de generación: 18-05-2018 a las 11:20:15
+-- Tiempo de generación: 22-05-2018 a las 16:25:06
 -- Versión del servidor: 5.5.57-0+deb7u1-log
 -- Versión de PHP: 5.3.29-1~dotdeb.0
 
@@ -29,19 +29,20 @@ SET time_zone = "+00:00";
 CREATE TABLE IF NOT EXISTS `crop` (
   `crop_id` int(10) unsigned NOT NULL,
   `crop_name` varchar(30) NOT NULL,
-  `crop_variety` varchar(30) NOT NULL
+  `crop_variety` varchar(30) NOT NULL,
+  `crop_name_english` varchar(30) NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `crop`
 --
 
-INSERT INTO `crop` (`crop_id`, `crop_name`, `crop_variety`) VALUES
-(1, 'Mahindi', ''),
-(2, 'Mihogo', ''),
-(3, 'Choroko', ''),
-(4, 'Alizeti', ''),
-(5, 'Viazi vitamu', '');
+INSERT INTO `crop` (`crop_id`, `crop_name`, `crop_variety`, `crop_name_english`) VALUES
+(1, 'Mahindi', '', 'Maize'),
+(2, 'Mihogo', '', 'Cassava'),
+(3, 'Choroko', '', 'Mung beans'),
+(4, 'Alizeti', '', 'Sunflower'),
+(5, 'Viazi vitamu', '', 'Sweet potato leaves');
 
 -- --------------------------------------------------------
 
@@ -55,22 +56,23 @@ CREATE TABLE IF NOT EXISTS `data_item` (
   `data_item_default_units_id` int(10) unsigned NOT NULL,
   `data_item_type` int(10) unsigned NOT NULL COMMENT '0=number, 1=date, 2=cost',
   `is_crop_specific` tinyint(1) NOT NULL,
-  `is_treatment_specific` tinyint(1) NOT NULL
+  `is_treatment_specific` tinyint(1) NOT NULL,
+  `data_item_name_english` varchar(30) NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `data_item`
 --
 
-INSERT INTO `data_item` (`data_item_id`, `data_item_name`, `data_item_default_units_id`, `data_item_type`, `is_crop_specific`, `is_treatment_specific`) VALUES
-(1, 'Land preparation', 0, 1, 0, 0),
-(2, 'Planting', 0, 1, 1, 0),
-(3, 'Harvesting', 0, 1, 1, 0),
-(4, 'Yield', 1, 0, 1, 0),
-(5, 'Application (treatment)', 0, 1, 0, 1),
-(6, 'Costs (crop)', 4, 2, 1, 0),
-(7, 'Costs (treatment)', 4, 2, 0, 1),
-(8, 'Sales', 4, 2, 1, 0);
+INSERT INTO `data_item` (`data_item_id`, `data_item_name`, `data_item_default_units_id`, `data_item_type`, `is_crop_specific`, `is_treatment_specific`, `data_item_name_english`) VALUES
+(1, 'Maandalizi ya shamba', 0, 1, 0, 0, 'Land preparation'),
+(2, 'Kupanda', 0, 1, 1, 0, 'Planting'),
+(3, 'Kuvuna', 0, 1, 1, 0, 'Harvesting'),
+(4, 'Mavuno', 1, 0, 1, 0, 'Yield'),
+(5, 'Utumiaji (Matibabu)', 0, 1, 0, 1, 'Application (treatment)'),
+(6, 'Bei (Mazao)', 4, 2, 1, 0, 'Costs (crop)'),
+(7, 'Bei (Matibabu)', 4, 2, 0, 1, 'Costs (treatment)'),
+(8, 'Mauzo', 4, 2, 1, 0, 'Sales');
 
 -- --------------------------------------------------------
 
@@ -177,16 +179,17 @@ INSERT INTO `plot` (`plot_id`, `internal_plot_id`, `farm_id`, `plot_x`, `plot_y`
 CREATE TABLE IF NOT EXISTS `treatment` (
   `treatment_id` int(10) unsigned NOT NULL,
   `treatment_name` varchar(30) NOT NULL,
-  `treatment_category` tinyint(3) unsigned NOT NULL
+  `treatment_category` tinyint(3) unsigned NOT NULL,
+  `treatment_name_english` varchar(30) NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `treatment`
 --
 
-INSERT INTO `treatment` (`treatment_id`, `treatment_name`, `treatment_category`) VALUES
-(1, 'Pest control', 0),
-(2, 'Compost', 1);
+INSERT INTO `treatment` (`treatment_id`, `treatment_name`, `treatment_category`, `treatment_name_english`) VALUES
+(1, 'Uthibiti wa wadudu', 0, 'Pest control'),
+(2, 'Usimamizi wa udongo', 1, 'Soil management');
 
 -- --------------------------------------------------------
 
@@ -197,17 +200,18 @@ INSERT INTO `treatment` (`treatment_id`, `treatment_name`, `treatment_category`)
 CREATE TABLE IF NOT EXISTS `units` (
   `units_id` int(10) unsigned NOT NULL,
   `units_name` varchar(100) NOT NULL,
-  `units_type` int(10) unsigned NOT NULL COMMENT '0=number, 1=date, 2=cost'
+  `units_type` int(10) unsigned NOT NULL COMMENT '0=number, 1=date, 2=cost',
+  `units_name_english` varchar(30) NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `units`
 --
 
-INSERT INTO `units` (`units_id`, `units_name`, `units_type`) VALUES
-(1, 'Kg', 0),
-(2, 'Baskets', 0),
-(4, 'TZS', 2);
+INSERT INTO `units` (`units_id`, `units_name`, `units_type`, `units_name_english`) VALUES
+(1, 'Kg', 0, 'Kg'),
+(2, 'Debe', 0, 'Baskets'),
+(4, 'TZS', 2, 'TZS');
 
 -- --------------------------------------------------------
 
