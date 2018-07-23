@@ -27,6 +27,7 @@ public class oLog {
     public int plotId;
     public Date date;
     public oDataItem dataItem;
+    public float quantity;
     public float value;
     public oUnit units;
 

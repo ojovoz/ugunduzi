@@ -14,7 +14,7 @@ public class oDataItem {
     public int id;
     public String name;
     public oUnit defaultUnits;
-    public int type; //0=number, 1=date, 2=cost
+    public int type; //0=activity (cost), 1=activity (cost with quantity), 2=input (cost), 3=output (sale)
     public boolean isCropSpecific;
     public boolean isTreatmentSpecific;
 

@@ -73,7 +73,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     boolean bFarmSaved;
     String farmName="";
     String prevFarmName="";
-    int farmSize;
+    float farmSize;
     String farmDateString;
 
     int state; //0 = new farm; 1 = actions; 2 = edit farm
@@ -139,7 +139,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     fName=getString(R.string.defaultFarmNamePrefix)+" "+String.valueOf(n);
                 }
             }
-            defineFarmNameAcres(n,false);
+            defineFarmNameAcres(n,true);
         } else {
             state=1;
             farmName=getIntent().getExtras().getString("farmName");
@@ -190,7 +190,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 paint.setStrokeWidth(4);
 
                 textPaint = new TextPaint();
-                textPaint.setTextSize(26);
+                textPaint.setTextSize(21);
                 textPaint.setAntiAlias(true);
                 textPaint.setTextAlign(Paint.Align.LEFT);
                 textPaint.setColor(ContextCompat.getColor(ctxt, R.color.colorBlack));
@@ -352,7 +352,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             n++;
             farmName = getString(R.string.defaultFarmNamePrefix)+" "+String.valueOf(n+1);
         }
-        defineFarmNameAcres(1,false);
+        defineFarmNameAcres(1,true);
     }
 
     public void cancelNewFarm(){
@@ -678,9 +678,9 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
         EditText fSize = (EditText)dialog.findViewById(R.id.acres);
         if(farmSize>0){
-            fSize.setText(Integer.toString(farmSize));
+            fSize.setText(Float.toString(farmSize));
         } else {
-            fSize.setText(Integer.toString(1));
+            fSize.setText(Float.toString(1f));
         }
 
         Button button = (Button)dialog.findViewById(R.id.okButton);
@@ -696,7 +696,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                         Toast.makeText(view.getContext(), R.string.farmNameRepeated, Toast.LENGTH_SHORT).show();
                     } else {
                         EditText fSize = (EditText) dialog.findViewById(R.id.acres);
-                        int farmSize = Integer.parseInt(fSize.getText().toString());
+                        float farmSize = Float.parseFloat(fSize.getText().toString());
                         if (farmSize <= 0) {
                             Toast.makeText(view.getContext(), R.string.farmSizeMustBeAboveZero, Toast.LENGTH_SHORT).show();
                         } else {
@@ -892,7 +892,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         finish();
     }
 
-    public void updateFarmData(String fName, int fSize){
+    public void updateFarmData(String fName, float fSize){
         fName = fName.replaceAll(";", " ");
         fName = fName.replaceAll("\\*", "");
         this.setTitle(getString(R.string.drawNewFarmTitle)+ ": " + fName);
@@ -1097,7 +1097,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             if(p.crop1!=null) {
                 textPaint.getTextBounds(p.crop1.name, 0, p.crop1.name.length(), txtBounds1);
 
-                int n1=p.crop1.name.length();
+                int n1=p.crop1.name.length()-1;
                 while(txtBounds1.width()>(p.w)){
                     n1--;
                     textPaint.getTextBounds(p.crop1.name, 0, n1, txtBounds1);
@@ -1107,10 +1107,10 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
                     textPaint.getTextBounds(p.crop2.name, 0, p.crop2.name.length(), txtBounds2);
 
-                    int n2=p.crop2.name.length();
+                    int n2=p.crop2.name.length()-1;
                     while(txtBounds2.width()>(p.w)){
                         n2--;
-                        textPaint.getTextBounds(p.crop1.name, 0, n2, txtBounds1);
+                        textPaint.getTextBounds(p.crop2.name, 0, n2, txtBounds2);
                     }
 
                     txtX = ((p.w - txtBounds1.width()) / 2) + p.x;

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net
 --
 -- Servidor: 192.168.86.55
--- Tiempo de generación: 06-07-2018 a las 11:22:38
+-- Tiempo de generación: 23-07-2018 a las 17:21:21
 -- Versión del servidor: 5.5.57-0+deb7u1-log
 -- Versión de PHP: 5.3.29-1~dotdeb.0
 
@@ -146,7 +146,14 @@ CREATE TABLE IF NOT EXISTS `farm` (
   `farm_date_created` date NOT NULL,
   `parent_farm_id` int(10) unsigned NOT NULL,
   `farm_active` tinyint(3) unsigned NOT NULL DEFAULT '1'
-) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8;
+
+--
+-- Volcado de datos para la tabla `farm`
+--
+
+INSERT INTO `farm` (`farm_id`, `user_id`, `farm_name`, `farm_size_acres`, `farm_date_created`, `parent_farm_id`, `farm_active`) VALUES
+(64, 2, 'Shamba 1', 1, '2018-07-23', 0, 1);
 
 -- --------------------------------------------------------
 
@@ -159,7 +166,7 @@ CREATE TABLE IF NOT EXISTS `log` (
   `plot_id` int(10) unsigned NOT NULL,
   `log_date` date NOT NULL,
   `log_data_item_id` int(10) unsigned NOT NULL,
-  `log_quantity` int(10) unsigned NOT NULL,
+  `log_quantity` decimal(10,0) unsigned NOT NULL,
   `log_value` float unsigned NOT NULL,
   `log_units_id` int(10) unsigned NOT NULL,
   `log_crop_id` int(10) unsigned NOT NULL,
@@ -461,7 +468,7 @@ ALTER TABLE `data_item`
 -- AUTO_INCREMENT de la tabla `farm`
 --
 ALTER TABLE `farm`
-  MODIFY `farm_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=64;
+  MODIFY `farm_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=65;
 --
 -- AUTO_INCREMENT de la tabla `log`
 --

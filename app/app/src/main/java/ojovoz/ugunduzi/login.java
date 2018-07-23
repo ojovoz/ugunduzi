@@ -121,6 +121,7 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
         dataItems.add("users");
         dataItems.add("crops");
         dataItems.add("treatments");
+        dataItems.add("treatment_ingredients");
         dataItems.add("units");
         dataItems.add("data_items");
 

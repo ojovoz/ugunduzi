@@ -45,7 +45,7 @@
         android:background="@color/colorInput"
         android:imeOptions="actionDone"
         android:padding="@dimen/activity_view_padding"
-        android:inputType="number"
+        android:inputType="numberDecimal"
         android:singleLine="true"
         android:textColor="@color/colorBlack" />
 

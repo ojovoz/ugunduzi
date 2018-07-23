@@ -13,7 +13,7 @@ public class oUnit {
 
     public int id;
     public String name;
-    public int type;
+    public int type; //0=number, 1=date, 2=cost
 
     private Context context;
 

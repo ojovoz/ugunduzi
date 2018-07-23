@@ -1,5 +1,7 @@
 package ojovoz.ugunduzi;
 
+import java.util.ArrayList;
+
 /**
  * Created by Eugenio on 15/03/2018.
  */
@@ -31,13 +33,21 @@ public class oPlot {
     public int iActionsW;
     public int iActionsH;
 
+    //delete: begin
     public oCrop crop1;
     public oCrop crop2;
     public oTreatment treatment1;
     public oTreatment treatment2;
+    //delete: end
+
+    public ArrayList<oCrop> crops;
+    public ArrayList<oTreatment> treatments;
 
     oPlot(){
         state=0;
+
+        crops = new ArrayList<>();
+        treatments = new ArrayList<>();
     }
 
     oPlot(int rX, int rY, int rW, int rH){
@@ -47,6 +57,9 @@ public class oPlot {
         h=rH;
 
         state=0;
+
+        crops = new ArrayList<>();
+        treatments = new ArrayList<>();
     }
 
     public void addAreas(int rIMoveW, int rIMoveH, int rIResizeW, int rIResizeH, int rIContentsW, int rIContentsH, int rIActionsW, int rIActionsH){

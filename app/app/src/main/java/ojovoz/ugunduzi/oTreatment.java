@@ -15,10 +15,12 @@ public class oTreatment {
     public String name;
     public int category; //0=pest control; 1=soil management
 
+    public ArrayList<oTreatmentIngredient> ingredients;
+
     private Context context;
 
     oTreatment(){
-
+        ingredients = new ArrayList<>();
     }
 
     oTreatment(Context c){
