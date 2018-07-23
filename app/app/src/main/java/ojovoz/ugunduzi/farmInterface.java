@@ -1097,7 +1097,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             if(p.crop1!=null) {
                 textPaint.getTextBounds(p.crop1.name, 0, p.crop1.name.length(), txtBounds1);
 
-                int n1=p.crop1.name.length()-1;
+                int n1=p.crop1.name.length();
                 while(txtBounds1.width()>(p.w)){
                     n1--;
                     textPaint.getTextBounds(p.crop1.name, 0, n1, txtBounds1);
@@ -1107,7 +1107,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
                     textPaint.getTextBounds(p.crop2.name, 0, p.crop2.name.length(), txtBounds2);
 
-                    int n2=p.crop2.name.length()-1;
+                    int n2=p.crop2.name.length();
                     while(txtBounds2.width()>(p.w)){
                         n2--;
                         textPaint.getTextBounds(p.crop2.name, 0, n2, txtBounds2);
