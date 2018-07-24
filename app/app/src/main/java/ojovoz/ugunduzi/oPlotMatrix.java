@@ -305,6 +305,8 @@ public class oPlotMatrix {
             currentPlot.y = closestY;
             currentPlot.w = Math.round(destW / (displayWidth / 4)) * (displayWidth / 4);
             currentPlot.h = Math.round(destH / (displayHeight / 4)) * (displayHeight / 4);
+            currentPlot.iMoveW=(int)currentPlot.w;
+            currentPlot.iMoveH=(int)currentPlot.h-(currentPlot.iContentsH+currentPlot.iResizeH);
             currentPlot.calculateAreasXY();
         }
 

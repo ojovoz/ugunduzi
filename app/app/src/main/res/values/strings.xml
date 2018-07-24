@@ -101,4 +101,8 @@
     <string name="textNoTreatments">No treatments</string>
     <string name="cropMarker">(crop)</string>
     <string name="treatmentMarker">(treatment)</string>
+    <string name="selectCropsLabel">CROPS</string>
+    <string name="selectPestControlIngredients">PEST CONTROL</string>
+    <string name="selectSoilManagementIngredients">SOIL MANAGEMENT</string>
+    <string name="selectCropsTitle">Select crops</string>
 </resources>

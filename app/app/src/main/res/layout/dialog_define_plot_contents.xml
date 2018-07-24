@@ -17,83 +17,42 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/crop1Label"
+            <Button
+                android:id="@+id/cropButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/enterCrop1Label"
-                android:textColor="@color/colorPrimary"
+                android:height="40dp"
+                android:background="@drawable/button_background_light"
+                android:text="@string/selectCropsLabel"
+                android:textColor="@color/colorBlack"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:textSize="20dp" />
 
             <Button
-                android:id="@+id/crop1Button"
+                android:id="@+id/pestControlButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:height="40dp"
                 android:background="@drawable/button_background_light"
-                android:text="@string/textNone"
-                android:textColor="@color/colorWhite"
-                android:textSize="20dp" />
-
-            <TextView
-                android:id="@+id/crop2Label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/enterCrop2Label"
-                android:textColor="@color/colorPrimary"
-                android:layout_marginTop="10dp"
+                android:text="@string/selectPestControlIngredients"
+                android:textColor="@color/colorBlack"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:textSize="20dp" />
 
             <Button
-                android:id="@+id/crop2Button"
+                android:id="@+id/soilManagementButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:height="40dp"
                 android:background="@drawable/button_background_light"
-                android:text="@string/textNone"
-                android:textColor="@color/colorWhite"
-                android:textSize="20dp" />
-
-            <TextView
-                android:id="@+id/treatment1Label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/enterTreatment1Label"
-                android:textColor="@color/colorPrimary"
-                android:layout_marginTop="10dp"
-                android:textSize="20dp" />
-
-            <Button
-                android:id="@+id/treatment1Button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:height="40dp"
-                android:background="@drawable/button_background_light"
-                android:text="@string/textNone"
-                android:textColor="@color/colorWhite"
-                android:textSize="20dp" />
-
-            <TextView
-                android:id="@+id/treatment2Label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/enterTreatment2Label"
-                android:textColor="@color/colorPrimary"
-                android:layout_marginTop="10dp"
-                android:textSize="20dp" />
-
-            <Button
-                android:id="@+id/treatment2Button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:height="40dp"
-                android:background="@drawable/button_background_light"
-                android:text="@string/textNone"
-                android:textColor="@color/colorWhite"
+                android:text="@string/selectSoilManagementIngredients"
+                android:textColor="@color/colorBlack"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:textSize="20dp" />
 
             <Button
@@ -105,6 +64,8 @@
                 android:background="@drawable/button_background"
                 android:text="@string/okButtonText"
                 android:textColor="@color/colorWhite"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
                 android:textSize="20dp" />
 
         </LinearLayout>

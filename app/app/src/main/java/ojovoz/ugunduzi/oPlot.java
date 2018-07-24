@@ -41,13 +41,15 @@ public class oPlot {
     //delete: end
 
     public ArrayList<oCrop> crops;
-    public ArrayList<oTreatment> treatments;
+    public ArrayList<oTreatmentIngredient> pestControlIngredients;
+    public ArrayList<oTreatmentIngredient> soilManagementIngredients;
 
     oPlot(){
         state=0;
 
         crops = new ArrayList<>();
-        treatments = new ArrayList<>();
+        pestControlIngredients = new ArrayList<>();
+        soilManagementIngredients = new ArrayList<>();
     }
 
     oPlot(int rX, int rY, int rW, int rH){
@@ -59,12 +61,13 @@ public class oPlot {
         state=0;
 
         crops = new ArrayList<>();
-        treatments = new ArrayList<>();
+        pestControlIngredients = new ArrayList<>();
+        soilManagementIngredients = new ArrayList<>();
     }
 
     public void addAreas(int rIMoveW, int rIMoveH, int rIResizeW, int rIResizeH, int rIContentsW, int rIContentsH, int rIActionsW, int rIActionsH){
-        iMoveW = rIMoveW;
-        iMoveH = rIMoveH;
+        iMoveW = (int)w;
+        iMoveH = (int)h-(rIContentsH+rIResizeH);
         iResizeW = rIResizeW;
         iResizeH = rIResizeH;
         iContentsW = rIContentsW;

@@ -84,15 +84,9 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     ArrayList<oCrop> cropList;
     public CharSequence cropNamesArray[];
-    int editingCrop;
-    oCrop editCrop1;
-    oCrop editCrop2;
-    oTreatment editTreatment1;
-    oTreatment editTreatment2;
 
     ArrayList<oTreatment> treatmentList;
     public CharSequence treatmentNamesArray[];
-    int editingTreatment;
 
     preferenceManager prefs;
 
@@ -118,7 +112,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
         oCrop seed = new oCrop(this);
         cropList = seed.getCrops();
-        cropNamesArray = seed.getCropNames(true).toArray(new CharSequence[cropList.size()]);
+        cropNamesArray = seed.getCropNames(false).toArray(new CharSequence[cropList.size()]);
 
         oTreatment start = new oTreatment(this);
         treatmentList = start.getTreatments();
@@ -421,16 +415,12 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         dialog.setContentView(R.layout.dialog_define_plot_contents);
         dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(true);
-        dialog.getWindow().setLayout(displayWidth-50,displayHeight-100);
+        //dialog.getWindow().setLayout(displayWidth-50,300);
 
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
                 plotMatrix.currentPlot.state=1;
-                editCrop1=null;
-                editCrop2=null;
-                editTreatment1=null;
-                editTreatment2=null;
                 dialog.dismiss();
                 canvasView.invalidate();
             }
@@ -442,30 +432,6 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             public void onClick(View v){
                 switch (v.getId()) {
                     case R.id.okButton:
-                        if(editCrop1==null && editCrop2!=null){
-                            editCrop1=editCrop2;
-                            editCrop2=null;
-                        }
-                        plotMatrix.currentPlot.crop1 = editCrop1;
-                        if(editCrop1==editCrop2){
-                            plotMatrix.currentPlot.crop2 = null;
-                        } else {
-                            plotMatrix.currentPlot.crop2 = editCrop2;
-                        }
-                        if(editTreatment1==null && editTreatment2!=null){
-                            editTreatment1=editTreatment2;
-                            editTreatment2=null;
-                        }
-                        plotMatrix.currentPlot.treatment1=editTreatment1;
-                        if(editTreatment1==editTreatment2) {
-                            plotMatrix.currentPlot.treatment2 = null;
-                        } else {
-                            plotMatrix.currentPlot.treatment2 = editTreatment2;
-                        }
-                        editCrop1=null;
-                        editCrop2=null;
-                        editTreatment1=null;
-                        editTreatment2=null;
                         plotMatrix.currentPlot.state=1;
                         dialog.dismiss();
                         canvasView.invalidate();
@@ -476,18 +442,12 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         });
 
-        Button crop1 = (Button)dialog.findViewById(R.id.crop1Button);
-        if(plotMatrix.currentPlot.crop1!=null){
-            crop1.setText(plotMatrix.currentPlot.crop1.name);
-            crop1.setTextColor(ContextCompat.getColor(dialog.getContext(),R.color.colorBlack));
-            editCrop1=plotMatrix.currentPlot.crop1;
-        }
-        crop1.setOnClickListener(new View.OnClickListener(){
+        Button crops = (Button)dialog.findViewById(R.id.cropButton);
+        crops.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 switch (v.getId()) {
-                    case R.id.crop1Button:
-                        editingCrop=1;
+                    case R.id.cropButton:
                         showCropSelector(dialog);
                         break;
                     default:
@@ -496,19 +456,13 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         });
 
-        Button crop2 = (Button)dialog.findViewById(R.id.crop2Button);
-        if(plotMatrix.currentPlot.crop2!=null){
-            crop2.setText(plotMatrix.currentPlot.crop2.name);
-            crop2.setTextColor(ContextCompat.getColor(dialog.getContext(),R.color.colorBlack));
-            editCrop2=plotMatrix.currentPlot.crop2;
-        }
-        crop2.setOnClickListener(new View.OnClickListener(){
+        Button pestControl = (Button)dialog.findViewById(R.id.pestControlButton);
+        pestControl.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 switch (v.getId()) {
-                    case R.id.crop2Button:
-                        editingCrop=2;
-                        showCropSelector(dialog);
+                    case R.id.pestControlButton:
+                        //showPestControlIngredientSelector(dialog);
                         break;
                     default:
                         break;
@@ -516,39 +470,13 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         });
 
-        Button treatment1 = (Button)dialog.findViewById(R.id.treatment1Button);
-        if(plotMatrix.currentPlot.treatment1!=null){
-            treatment1.setText(plotMatrix.currentPlot.treatment1.name);
-            treatment1.setTextColor(ContextCompat.getColor(dialog.getContext(),R.color.colorBlack));
-            editTreatment1=plotMatrix.currentPlot.treatment1;
-        }
-        treatment1.setOnClickListener(new View.OnClickListener(){
+        Button soilManagement = (Button)dialog.findViewById(R.id.soilManagementButton);
+        soilManagement.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 switch (v.getId()) {
-                    case R.id.treatment1Button:
-                        editingTreatment=1;
-                        showTreatmentSelector(dialog);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
-
-        Button treatment2 = (Button)dialog.findViewById(R.id.treatment2Button);
-        if(plotMatrix.currentPlot.treatment2!=null){
-            treatment2.setText(plotMatrix.currentPlot.treatment2.name);
-            treatment2.setTextColor(ContextCompat.getColor(dialog.getContext(),R.color.colorBlack));
-            editTreatment2=plotMatrix.currentPlot.treatment2;
-        }
-        treatment2.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.treatment2Button:
-                        editingTreatment=2;
-                        showTreatmentSelector(dialog);
+                    case R.id.soilManagementButton:
+                        //showSoilManagementIngredientSelector(dialog);
                         break;
                     default:
                         break;
@@ -560,54 +488,37 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     }
 
     public void showCropSelector(Dialog d){
-        final Dialog dialog = d;
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(true);
-        builder.setNegativeButton(R.string.cancelButtonText, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        final ListAdapter adapter = new ArrayAdapter<>(this,R.layout.checked_list_template,cropNamesArray);
-        builder.setSingleChoiceItems(adapter,-1,new DialogInterface.OnClickListener() {
+        final Dialog parentDialog = d;
+        boolean[] checkedCrops = new boolean[cropNamesArray.length];
+        for(int i=0;i<cropNamesArray.length;i++){
+            checkedCrops[i]=(plotMatrix.currentPlot.crops.contains(cropList.get(i)));
+        }
+
+        DialogInterface.OnMultiChoiceClickListener cropsDialogListener = new DialogInterface.OnMultiChoiceClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if(i>=0) {
-                    String chosenCrop=cropNamesArray[i].toString();
-                    Button cropButton;
-                    switch(editingCrop){
-                        case 1:
-                            cropButton = (Button)dialog.findViewById(R.id.crop1Button);
-                            cropButton.setText(chosenCrop);
-                            if(i>0) {
-                                editCrop1 = cropList.get(i-1);
-                                cropButton.setTextColor(ContextCompat.getColor(dialog.getContext(),R.color.colorBlack));
-                            } else {
-                                editCrop1 = null;
-                                cropButton.setTextColor(ContextCompat.getColor(dialog.getContext(),R.color.colorWhite));
-                            }
-                            break;
-                        case 2:
-                            cropButton = (Button)dialog.findViewById(R.id.crop2Button);
-                            cropButton.setText(chosenCrop);
-                            if(i>0) {
-                                editCrop2 = cropList.get(i-1);
-                                cropButton.setTextColor(ContextCompat.getColor(dialog.getContext(),R.color.colorBlack));
-                            } else {
-                                editCrop2 = null;
-                                cropButton.setTextColor(ContextCompat.getColor(dialog.getContext(),R.color.colorWhite));
-                            }
-                            break;
-                    }
-
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                if (isChecked) {
+                    plotMatrix.currentPlot.crops.add(cropList.get(which));
+                } else {
+                    plotMatrix.currentPlot.crops.remove(cropList.get(which));
                 }
-                dialogInterface.dismiss();
-
+            }
+        };
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.selectCropsTitle);
+        builder.setMultiChoiceItems(cropNamesArray, checkedCrops, cropsDialogListener);
+        builder.setPositiveButton(R.string.okButtonText, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                parentDialog.dismiss();
+                canvasView.invalidate();
             }
         });
-        AlertDialog dialogCrops = builder.create();
-        dialogCrops.show();
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
     }
+
+    /*
 
     public void showTreatmentSelector(Dialog d){
         final Dialog dialog = d;
@@ -658,6 +569,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         AlertDialog dialogTreatments = builder.create();
         dialogTreatments.show();
     }
+
+    */
 
     public void defineFarmNameAcres(int n, boolean cancellable){
 
@@ -1076,16 +989,14 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(border);
             canvas.drawRect(p.x,p.y,p.x+p.w,p.y+p.h,paint);
-            canvas.drawBitmap(iMove,p.iMoveX,p.iMoveY,paint);
+            //canvas.drawBitmap(iMove,p.iMoveX,p.iMoveY,paint);
             canvas.drawBitmap(iResize,p.iResizeX,p.iResizeY,paint);
             canvas.drawBitmap(iContents,p.iContentsX,p.iContentsY,paint);
+
+            drawPlotCropLabels(canvas, p, p.iContentsY+p.iContentsH+30);
         }
 
         private void drawPlot(Canvas canvas, oPlot p, int border, int fill, Bitmap iActions){
-            Rect txtBounds1 = new Rect();
-            Rect txtBounds2 = new Rect();
-            float txtX;
-            float txtY;
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(fill);
             canvas.drawRect(p.x,p.y,p.x+p.w,p.y+p.h,paint);
@@ -1094,37 +1005,29 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             canvas.drawRect(p.x,p.y,p.x+p.w,p.y+p.h,paint);
             canvas.drawBitmap(iActions,p.iActionsX,p.iActionsY,paint);
 
-            if(p.crop1!=null) {
-                textPaint.getTextBounds(p.crop1.name, 0, p.crop1.name.length(), txtBounds1);
+            drawPlotCropLabels(canvas, p, p.iActionsY+p.iActionsH+30);
+        }
 
-                int n1=p.crop1.name.length();
-                while(txtBounds1.width()>(p.w)){
-                    n1--;
-                    textPaint.getTextBounds(p.crop1.name, 0, n1, txtBounds1);
+        private void drawPlotCropLabels(Canvas canvas, oPlot p, float txtY){
+            Rect txtBounds = new Rect();
+            float txtX;
+
+            Iterator<oCrop> iterator = p.crops.iterator();
+            while (iterator.hasNext()) {
+                oCrop c = iterator.next();
+                textPaint.getTextBounds(c.name, 0, c.name.length(), txtBounds);
+
+                int n=c.name.length();
+                while(txtBounds.width()>(p.w)){
+                    n--;
+                    textPaint.getTextBounds(c.name, 0, n, txtBounds);
                 }
 
-                if (p.crop2 != null) {
+                txtX = ((p.w - txtBounds.width()) / 2) + p.x;
+                canvas.drawText(c.name.substring(0,n), (int) txtX, (int) txtY, textPaint);
 
-                    textPaint.getTextBounds(p.crop2.name, 0, p.crop2.name.length(), txtBounds2);
+                txtY+=25;
 
-                    int n2=p.crop2.name.length();
-                    while(txtBounds2.width()>(p.w)){
-                        n2--;
-                        textPaint.getTextBounds(p.crop2.name, 0, n2, txtBounds2);
-                    }
-
-                    txtX = ((p.w - txtBounds1.width()) / 2) + p.x;
-                    txtY = p.y + txtBounds1.height() + ((p.h - ((txtBounds1.height()*2) + txtBounds2.height()))/2);
-                    canvas.drawText(p.crop1.name.substring(0,n1), (int) txtX, (int) txtY, textPaint);
-
-                    txtX = ((p.w - txtBounds2.width()) / 2) + p.x;
-                    canvas.drawText(p.crop2.name.substring(0,n2), (int) txtX, (int) txtY + (txtBounds1.height()*1.5f), textPaint);
-
-                } else {
-                    txtX = ((p.w - txtBounds1.width()) / 2) + p.x;
-                    txtY = ((p.h - (txtBounds1.height()/2)) / 2) + p.y + (txtBounds1.height()/2);
-                    canvas.drawText(p.crop1.name.substring(0,n1), (int) txtX, (int) txtY, textPaint);
-                }
             }
         }
 
