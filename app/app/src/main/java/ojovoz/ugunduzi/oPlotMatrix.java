@@ -52,17 +52,21 @@ public class oPlotMatrix {
         oPlot plot;
         oCrop crop = new oCrop(c);
         oTreatment treatment = new oTreatment(c);
-        for(int i=2;i<matrixItems.length;i+=9){
+        for(int i=2;i<matrixItems.length;i+=8){
             plot=new oPlot();
             plot.id=Integer.parseInt(matrixItems[i]);
             plot.x=Integer.parseInt(matrixItems[i+1])*(int)(displayWidth/4);
             plot.y=Integer.parseInt(matrixItems[i+2])*(int)(displayHeight/4);
             plot.w=Integer.parseInt(matrixItems[i+3])*(int)(displayWidth/4);
             plot.h=Integer.parseInt(matrixItems[i+4])*(int)(displayHeight/4);
-            plot.crop1=crop.getCropFromId(Integer.parseInt(matrixItems[i+5]));
-            plot.crop2=crop.getCropFromId(Integer.parseInt(matrixItems[i+6]));
-            plot.treatment1=treatment.getTreatmentFromId(Integer.parseInt(matrixItems[i+7]));
-            plot.treatment2=treatment.getTreatmentFromId(Integer.parseInt(matrixItems[i+8]));
+            String crops=matrixItems[i+5];
+            String plotCropsList[] = crops.split(",");
+            for(int j=0;j<plotCropsList.length;j++){
+                oCrop pc = crop.getCropFromId(Integer.parseInt(plotCropsList[j]));
+                plot.crops.add(pc);
+            }
+            plot.treatment1=treatment.getTreatmentFromId(Integer.parseInt(matrixItems[i+6]));
+            plot.treatment2=treatment.getTreatmentFromId(Integer.parseInt(matrixItems[i+7]));
             plot.addAreas(iMoveW, iMoveH, iResizeW, iResizeH, iContentsW, iContentsH, iActionsW, iActionsH);
             plots.add(plot);
             addPlotToMatrix(plot,plot.x,plot.y,(int)(plot.w/(displayWidth/4)),(int)(plot.h/(displayHeight/4)));
@@ -73,13 +77,17 @@ public class oPlotMatrix {
         String matrixItems[] = matrixString.split(separator);
         oCrop crop = new oCrop(c);
         oTreatment treatment = new oTreatment(c);
-        for(int i=2;i<matrixItems.length;i+=9){
+        for(int i=2;i<matrixItems.length;i+=8){
             oPlot plot=new oPlot();
             plot.id=Integer.parseInt(matrixItems[i]);
-            plot.crop1=crop.getCropFromId(Integer.parseInt(matrixItems[i+5]));
-            plot.crop2=crop.getCropFromId(Integer.parseInt(matrixItems[i+6]));
-            plot.treatment1=treatment.getTreatmentFromId(Integer.parseInt(matrixItems[i+7]));
-            plot.treatment2=treatment.getTreatmentFromId(Integer.parseInt(matrixItems[i+8]));
+            String crops=matrixItems[i+5];
+            String plotCropsList[] = crops.split(",");
+            for(int j=0;j<plotCropsList.length;j++){
+                oCrop pc = crop.getCropFromId(Integer.parseInt(plotCropsList[j]));
+                plot.crops.add(pc);
+            }
+            plot.treatment1=treatment.getTreatmentFromId(Integer.parseInt(matrixItems[i+6]));
+            plot.treatment2=treatment.getTreatmentFromId(Integer.parseInt(matrixItems[i+7]));
             plots.add(plot);
         }
     }
@@ -416,11 +424,15 @@ public class oPlotMatrix {
                 }
             }
             plotString = plotString + String.valueOf(Math.round(plot.w/(displayWidth/4))) + ";" + String.valueOf(Math.round(plot.h/(displayHeight/4))) + ";";
-            String crop1 = (plot.crop1!=null) ? String.valueOf(plot.crop1.id) : "0";
-            String crop2 = (plot.crop2!=null) ? String.valueOf(plot.crop2.id) : "0";
+            String crops="";
+            Iterator<oCrop> iteratorCrops = plot.crops.iterator();
+            while (iteratorCrops.hasNext()) {
+                oCrop crop = iteratorCrops.next();
+                crops = (crops.isEmpty()) ? String.valueOf(crop.id) : crops + "," + String.valueOf(crop.id);
+            }
             String treatment1 = (plot.treatment1!=null) ? String.valueOf(plot.treatment1.id) : "0";
             String treatment2 = (plot.treatment2!=null) ? String.valueOf(plot.treatment2.id) : "0";
-            plotString = plotString + crop1 + ";" + crop2 + ";" + treatment1 + ";" + treatment2;
+            plotString = plotString + crops + ";" + treatment1 + ";" + treatment2;
             if(ret.isEmpty()){
                 ret=plotString;
             } else {

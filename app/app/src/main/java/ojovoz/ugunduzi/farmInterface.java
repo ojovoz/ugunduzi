@@ -133,7 +133,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     fName=getString(R.string.defaultFarmNamePrefix)+" "+String.valueOf(n);
                 }
             }
-            defineFarmNameAcres(n,true);
+            defineFarmNameAcres(n,true,false);
         } else {
             state=1;
             farmName=getIntent().getExtras().getString("farmName");
@@ -272,7 +272,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     break;
                 case 2:
                     int n = (newFarm) ? 1 : prefs.getNumberOfValueItems(user + "_farms", ";") + 1;
-                    defineFarmNameAcres(n, true);
+                    defineFarmNameAcres(n, true,false);
                     break;
                 case 3:
                     saveFarm();
@@ -346,7 +346,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             n++;
             farmName = getString(R.string.defaultFarmNamePrefix)+" "+String.valueOf(n+1);
         }
-        defineFarmNameAcres(1,true);
+        defineFarmNameAcres(1,true,false);
     }
 
     public void cancelNewFarm(){
@@ -572,13 +572,20 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     */
 
-    public void defineFarmNameAcres(int n, boolean cancellable){
+    public void defineFarmNameAcres(int n, boolean cancellable, final boolean isSaving){
 
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_define_new_farm);
         dialog.setCanceledOnTouchOutside(cancellable);
         dialog.setCancelable(cancellable);
+
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                farmName="";
+            }
+        });
 
         EditText et = (EditText)dialog.findViewById(R.id.newFarm);
         String defaultFarmName="";
@@ -615,6 +622,9 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                         } else {
                             updateFarmData(fName, farmSize);
                             dialog.dismiss();
+                            if(isSaving){
+                                saveFarm();
+                            }
                         }
                     }
                 }
@@ -633,16 +643,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
         TextView tt = (TextView)dialog.findViewById(R.id.plotLabel);
 
-        String title="";
-        if(plotMatrix.currentPlot.crop1==null && plotMatrix.currentPlot.crop2==null){
-            title=getString(R.string.plotCropLabel)+" "+getString(R.string.textNone);
-        } else {
-            if(plotMatrix.currentPlot.crop1!=null && plotMatrix.currentPlot.crop2==null){
-                title=getString(R.string.plotCropLabel)+": "+plotMatrix.currentPlot.crop1.name;
-            } else if(plotMatrix.currentPlot.crop1!=null && plotMatrix.currentPlot.crop2!=null){
-                title=getString(R.string.plotCropLabel)+" "+plotMatrix.currentPlot.crop1.name+", "+plotMatrix.currentPlot.crop2.name;
-            }
-        }
+        String title= plotMatrix.currentPlot.getCropNames(this);
         title+="\n";
         if(plotMatrix.currentPlot.treatment1==null && plotMatrix.currentPlot.treatment2==null){
             title+=getString(R.string.plotTreatmentLabel)+" "+getString(R.string.textNone);
@@ -817,42 +818,48 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
         sMatrix = plotMatrix.toString();
 
-        farmName = farmName.replaceAll("'", "");
-        String fName = farmName;
-
-        Date farmDate = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        sdf.setTimeZone(TimeZone.getDefault());
-        farmDateString = sdf.format(farmDate);
-
-        String saveString = user + ";" + userPass + ";" + fName + ";" + String.valueOf(farmSize) + ";" + farmDateString + ";" + sMatrix;
-        httpConnection http = new httpConnection(this, this);
-        if (http.isOnline()) {
-            CharSequence dialogTitle = getString(R.string.createNewFarmLabel);
-
-            createFarmDialog = new ProgressDialog(this);
-            createFarmDialog.setCancelable(true);
-            createFarmDialog.setCanceledOnTouchOutside(false);
-            createFarmDialog.setMessage(dialogTitle);
-            createFarmDialog.setIndeterminate(true);
-            createFarmDialog.show();
-            createFarmDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface d) {
-                    bConnecting = false;
-                    createFarmDialog.dismiss();
-                }
-            });
-            doCreateNewFarm(saveString);
+        if(farmName.isEmpty()){
+            int n = (newFarm) ? 1 : prefs.getNumberOfValueItems(user + "_farms", ";") + 1;
+            defineFarmNameAcres(n,false,true);
         } else {
-            prefs.appendIfNewValue(user+"_farms","*"+fName,";");
-            prefs.savePreference(user+"_"+fName,String.valueOf(farmSize)+";"+farmDateString+";"+sMatrix);
-            prefs.savePreference("farm",farmName);
-            Toast.makeText(this, R.string.farmSavedMessage, Toast.LENGTH_SHORT).show();
-            state=1;
-            canvasView.invalidate();
-            firstFarm=false;
-            this.setTitle(farmName);
+
+            farmName = farmName.replaceAll("'", "");
+            String fName = farmName;
+
+            Date farmDate = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            sdf.setTimeZone(TimeZone.getDefault());
+            farmDateString = sdf.format(farmDate);
+
+            String saveString = user + ";" + userPass + ";" + fName + ";" + String.valueOf(farmSize) + ";" + farmDateString + ";" + sMatrix;
+            httpConnection http = new httpConnection(this, this);
+            if (http.isOnline()) {
+                CharSequence dialogTitle = getString(R.string.createNewFarmLabel);
+
+                createFarmDialog = new ProgressDialog(this);
+                createFarmDialog.setCancelable(true);
+                createFarmDialog.setCanceledOnTouchOutside(false);
+                createFarmDialog.setMessage(dialogTitle);
+                createFarmDialog.setIndeterminate(true);
+                createFarmDialog.show();
+                createFarmDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface d) {
+                        bConnecting = false;
+                        createFarmDialog.dismiss();
+                    }
+                });
+                doCreateNewFarm(saveString);
+            } else {
+                prefs.appendIfNewValue(user + "_farms", "*" + fName, ";");
+                prefs.savePreference(user + "_" + fName, String.valueOf(farmSize) + ";" + farmDateString + ";" + sMatrix);
+                prefs.savePreference("farm", farmName);
+                Toast.makeText(this, R.string.farmSavedMessage, Toast.LENGTH_SHORT).show();
+                state = 1;
+                canvasView.invalidate();
+                firstFarm = false;
+                this.setTitle(farmName);
+            }
         }
     }
 

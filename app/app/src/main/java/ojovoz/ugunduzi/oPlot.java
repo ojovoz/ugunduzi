@@ -1,6 +1,9 @@
 package ojovoz.ugunduzi;
 
+import android.content.Context;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by Eugenio on 15/03/2018.
@@ -86,5 +89,16 @@ public class oPlot {
         iContentsY = y+2;
         iActionsX = (int)(x+(w/2))-(iActionsW/2);
         iActionsY = y+2;
+    }
+
+    public String getCropNames(Context ctxt){
+        String ret="";
+        Iterator<oCrop> iterator = crops.iterator();
+        while (iterator.hasNext()) {
+            oCrop c = iterator.next();
+            ret = (ret.isEmpty()) ? c.name : ret + ", " + c.name;
+        }
+        ret = (ret.isEmpty()) ? ctxt.getString(R.string.textNone) : ret;
+        return ret;
     }
 }
