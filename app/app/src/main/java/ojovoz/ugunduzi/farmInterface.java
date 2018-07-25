@@ -992,8 +992,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             //canvas.drawBitmap(iMove,p.iMoveX,p.iMoveY,paint);
             canvas.drawBitmap(iResize,p.iResizeX,p.iResizeY,paint);
             canvas.drawBitmap(iContents,p.iContentsX,p.iContentsY,paint);
-
-            drawPlotCropLabels(canvas, p, p.iContentsY+p.iContentsH+30);
+            float yOffset = (((p.h/(displayHeight/4))-1)*30)+(20-p.crops.size());
+            drawPlotCropLabels(canvas, p, p.iContentsY+p.iContentsH+yOffset);
         }
 
         private void drawPlot(Canvas canvas, oPlot p, int border, int fill, Bitmap iActions){
@@ -1004,8 +1004,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             paint.setColor(border);
             canvas.drawRect(p.x,p.y,p.x+p.w,p.y+p.h,paint);
             canvas.drawBitmap(iActions,p.iActionsX,p.iActionsY,paint);
-
-            drawPlotCropLabels(canvas, p, p.iActionsY+p.iActionsH+30);
+            float yOffset = (((p.h/(displayHeight/4))-1)*30)+(20-p.crops.size());
+            drawPlotCropLabels(canvas, p, p.iActionsY+p.iActionsH+yOffset);
         }
 
         private void drawPlotCropLabels(Canvas canvas, oPlot p, float txtY){
@@ -1026,7 +1026,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 txtX = ((p.w - txtBounds.width()) / 2) + p.x;
                 canvas.drawText(c.name.substring(0,n), (int) txtX, (int) txtY, textPaint);
 
-                txtY+=25;
+                txtY+=24;
 
             }
         }
