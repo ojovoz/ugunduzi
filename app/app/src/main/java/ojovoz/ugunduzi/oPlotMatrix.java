@@ -51,6 +51,7 @@ public class oPlotMatrix {
         String matrixItems[] = matrixString.split(separator);
         oPlot plot;
         oCrop crop = new oCrop(c);
+        oTreatmentIngredient treatmentIngredient = new oTreatmentIngredient(c);
         oTreatment treatment = new oTreatment(c);
         for(int i=2;i<matrixItems.length;i+=8){
             plot=new oPlot();
@@ -60,13 +61,29 @@ public class oPlotMatrix {
             plot.w=Integer.parseInt(matrixItems[i+3])*(int)(displayWidth/4);
             plot.h=Integer.parseInt(matrixItems[i+4])*(int)(displayHeight/4);
             String crops=matrixItems[i+5];
-            String plotCropsList[] = crops.split(",");
-            for(int j=0;j<plotCropsList.length;j++){
-                oCrop pc = crop.getCropFromId(Integer.parseInt(plotCropsList[j]));
-                plot.crops.add(pc);
+            if(!crops.equals("-1")) {
+                String plotCropsList[] = crops.split(",");
+                for (int j = 0; j < plotCropsList.length; j++) {
+                    oCrop pc = crop.getCropFromId(Integer.parseInt(plotCropsList[j]));
+                    plot.crops.add(pc);
+                }
             }
-            plot.treatment1=treatment.getTreatmentFromId(Integer.parseInt(matrixItems[i+6]));
-            plot.treatment2=treatment.getTreatmentFromId(Integer.parseInt(matrixItems[i+7]));
+            String pestControl=matrixItems[i+6];
+            if(!pestControl.equals("-1")) {
+                String plotPestControlList[] = pestControl.split(",");
+                for (int j = 0; j < plotPestControlList.length; j++) {
+                    oTreatmentIngredient ti = treatmentIngredient.getTreatmentIngredientFromId(Integer.parseInt(plotPestControlList[j]));
+                    plot.pestControlIngredients.add(ti);
+                }
+            }
+            String soilManagement=matrixItems[i+7];
+            if(!soilManagement.equals("-1")) {
+                String plotSoilManagementList[] = soilManagement.split(",");
+                for (int j = 0; j < plotSoilManagementList.length; j++) {
+                    oTreatmentIngredient ti = treatmentIngredient.getTreatmentIngredientFromId(Integer.parseInt(plotSoilManagementList[j]));
+                    plot.soilManagementIngredients.add(ti);
+                }
+            }
             plot.addAreas(iMoveW, iMoveH, iResizeW, iResizeH, iContentsW, iContentsH, iActionsW, iActionsH);
             plots.add(plot);
             addPlotToMatrix(plot,plot.x,plot.y,(int)(plot.w/(displayWidth/4)),(int)(plot.h/(displayHeight/4)));
@@ -76,18 +93,35 @@ public class oPlotMatrix {
     public void fromString(Context c,String matrixString, String separator){
         String matrixItems[] = matrixString.split(separator);
         oCrop crop = new oCrop(c);
+        oTreatmentIngredient treatmentIngredient = new oTreatmentIngredient(c);
         oTreatment treatment = new oTreatment(c);
         for(int i=2;i<matrixItems.length;i+=8){
             oPlot plot=new oPlot();
             plot.id=Integer.parseInt(matrixItems[i]);
             String crops=matrixItems[i+5];
-            String plotCropsList[] = crops.split(",");
-            for(int j=0;j<plotCropsList.length;j++){
-                oCrop pc = crop.getCropFromId(Integer.parseInt(plotCropsList[j]));
-                plot.crops.add(pc);
+            if(!crops.equals("-1")) {
+                String plotCropsList[] = crops.split(",");
+                for (int j = 0; j < plotCropsList.length; j++) {
+                    oCrop pc = crop.getCropFromId(Integer.parseInt(plotCropsList[j]));
+                    plot.crops.add(pc);
+                }
             }
-            plot.treatment1=treatment.getTreatmentFromId(Integer.parseInt(matrixItems[i+6]));
-            plot.treatment2=treatment.getTreatmentFromId(Integer.parseInt(matrixItems[i+7]));
+            String pestControl=matrixItems[i+6];
+            if(!pestControl.equals("-1")) {
+                String plotPestControlList[] = pestControl.split(",");
+                for (int j = 0; j < plotPestControlList.length; j++) {
+                    oTreatmentIngredient ti = treatmentIngredient.getTreatmentIngredientFromId(Integer.parseInt(plotPestControlList[j]));
+                    plot.pestControlIngredients.add(ti);
+                }
+            }
+            String soilManagement=matrixItems[i+7];
+            if(!soilManagement.equals("-1")) {
+                String plotSoilManagementList[] = soilManagement.split(",");
+                for (int j = 0; j < plotSoilManagementList.length; j++) {
+                    oTreatmentIngredient ti = treatmentIngredient.getTreatmentIngredientFromId(Integer.parseInt(plotSoilManagementList[j]));
+                    plot.soilManagementIngredients.add(ti);
+                }
+            }
             plots.add(plot);
         }
     }
@@ -424,15 +458,25 @@ public class oPlotMatrix {
                 }
             }
             plotString = plotString + String.valueOf(Math.round(plot.w/(displayWidth/4))) + ";" + String.valueOf(Math.round(plot.h/(displayHeight/4))) + ";";
-            String crops="";
+            String crops="-1";
             Iterator<oCrop> iteratorCrops = plot.crops.iterator();
             while (iteratorCrops.hasNext()) {
                 oCrop crop = iteratorCrops.next();
-                crops = (crops.isEmpty()) ? String.valueOf(crop.id) : crops + "," + String.valueOf(crop.id);
+                crops = (crops.equals("-1")) ? String.valueOf(crop.id) : crops + "," + String.valueOf(crop.id);
             }
-            String treatment1 = (plot.treatment1!=null) ? String.valueOf(plot.treatment1.id) : "0";
-            String treatment2 = (plot.treatment2!=null) ? String.valueOf(plot.treatment2.id) : "0";
-            plotString = plotString + crops + ";" + treatment1 + ";" + treatment2;
+            String pestControl="-1";
+            Iterator<oTreatmentIngredient> iteratorPestControl = plot.pestControlIngredients.iterator();
+            while (iteratorPestControl.hasNext()) {
+                oTreatmentIngredient ti = iteratorPestControl.next();
+                pestControl = (pestControl.equals("-1")) ? String.valueOf(ti.id) : pestControl + "," + String.valueOf(ti.id);
+            }
+            String soilManagement="-1";
+            Iterator<oTreatmentIngredient> iteratorSoilManagement = plot.soilManagementIngredients.iterator();
+            while (iteratorSoilManagement.hasNext()) {
+                oTreatmentIngredient ti = iteratorSoilManagement.next();
+                soilManagement = (soilManagement.equals("-1")) ? String.valueOf(ti.id) : soilManagement + "," + String.valueOf(ti.id);
+            }
+            plotString = plotString + crops + ";" + pestControl + ";" + soilManagement;
             if(ret.isEmpty()){
                 ret=plotString;
             } else {

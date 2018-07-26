@@ -101,4 +101,26 @@ public class oPlot {
         ret = (ret.isEmpty()) ? ctxt.getString(R.string.textNone) : ret;
         return ret;
     }
+
+    public String getPestControlNames(Context ctxt){
+        String ret="";
+        Iterator<oTreatmentIngredient> iterator = pestControlIngredients.iterator();
+        while (iterator.hasNext()) {
+            oTreatmentIngredient ti = iterator.next();
+            ret = (ret.isEmpty()) ? ti.name : ret + ", " + ti.name;
+        }
+        ret = (ret.isEmpty()) ? ctxt.getString(R.string.textNone) : ret;
+        return ret;
+    }
+
+    public String getSoilManagementNames(Context ctxt){
+        String ret="";
+        Iterator<oTreatmentIngredient> iterator = soilManagementIngredients.iterator();
+        while (iterator.hasNext()) {
+            oTreatmentIngredient ti = iterator.next();
+            ret = (ret.isEmpty()) ? ti.name : ret + ", " + ti.name;
+        }
+        ret = (ret.isEmpty()) ? ctxt.getString(R.string.textNone) : ret;
+        return ret;
+    }
 }

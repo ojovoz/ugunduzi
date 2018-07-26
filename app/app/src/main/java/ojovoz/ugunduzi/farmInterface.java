@@ -85,8 +85,10 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     ArrayList<oCrop> cropList;
     public CharSequence cropNamesArray[];
 
-    ArrayList<oTreatment> treatmentList;
-    public CharSequence treatmentNamesArray[];
+    ArrayList<oTreatmentIngredient> pestControlList;
+    public CharSequence pestControlNamesArray[];
+    ArrayList<oTreatmentIngredient> soilManagementList;
+    public CharSequence soilManagementNamesArray[];
 
     preferenceManager prefs;
 
@@ -114,9 +116,12 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         cropList = seed.getCrops();
         cropNamesArray = seed.getCropNames(false).toArray(new CharSequence[cropList.size()]);
 
-        oTreatment start = new oTreatment(this);
-        treatmentList = start.getTreatments();
-        treatmentNamesArray = start.getTreatmentNames(true).toArray(new CharSequence[treatmentList.size()]);
+        oTreatmentIngredient start = new oTreatmentIngredient(this);
+        pestControlList = start.getTreatmentIngredients(0);
+        pestControlNamesArray = start.getTreatmentIngredientNames(pestControlList).toArray(new CharSequence[pestControlList.size()]);
+
+        soilManagementList = start.getTreatmentIngredients(1);
+        soilManagementNamesArray = start.getTreatmentIngredientNames(soilManagementList).toArray(new CharSequence[soilManagementList.size()]);
 
         if(newFarm){
             bFarmSaved=false;
@@ -415,7 +420,6 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         dialog.setContentView(R.layout.dialog_define_plot_contents);
         dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(true);
-        //dialog.getWindow().setLayout(displayWidth-50,300);
 
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
@@ -448,7 +452,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.cropButton:
-                        showCropSelector(dialog);
+                        showCropSelector();
                         break;
                     default:
                         break;
@@ -462,7 +466,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.pestControlButton:
-                        //showPestControlIngredientSelector(dialog);
+                        showPestControlIngredientSelector();
                         break;
                     default:
                         break;
@@ -476,7 +480,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.soilManagementButton:
-                        //showSoilManagementIngredientSelector(dialog);
+                        showSoilManagementIngredientSelector();
                         break;
                     default:
                         break;
@@ -487,8 +491,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         dialog.show();
     }
 
-    public void showCropSelector(Dialog d){
-        final Dialog parentDialog = d;
+    public void showCropSelector(){
         boolean[] checkedCrops = new boolean[cropNamesArray.length];
         for(int i=0;i<cropNamesArray.length;i++){
             checkedCrops[i]=(plotMatrix.currentPlot.crops.contains(cropList.get(i)));
@@ -509,7 +512,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         builder.setMultiChoiceItems(cropNamesArray, checkedCrops, cropsDialogListener);
         builder.setPositiveButton(R.string.okButtonText, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                parentDialog.dismiss();
+                plotMatrix.currentPlot.state=1;
                 canvasView.invalidate();
             }
         });
@@ -518,59 +521,65 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     }
 
-    /*
+    public void showPestControlIngredientSelector(){
+        boolean[] checkedIngredients = new boolean[pestControlNamesArray.length];
+        for(int i=0;i<pestControlNamesArray.length;i++){
+            checkedIngredients[i]=(plotMatrix.currentPlot.pestControlIngredients.contains(pestControlList.get(i)));
+        }
 
-    public void showTreatmentSelector(Dialog d){
-        final Dialog dialog = d;
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(true);
-        builder.setNegativeButton(R.string.cancelButtonText, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        final ListAdapter adapter = new ArrayAdapter<>(this,R.layout.checked_list_template,treatmentNamesArray);
-        builder.setSingleChoiceItems(adapter,-1,new DialogInterface.OnClickListener() {
+        DialogInterface.OnMultiChoiceClickListener ingredientsDialogListener = new DialogInterface.OnMultiChoiceClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if(i>=0) {
-                    String chosenTreatment=treatmentNamesArray[i].toString();
-                    Button treatmentButton;
-                    switch(editingTreatment){
-                        case 1:
-                            treatmentButton = (Button)dialog.findViewById(R.id.treatment1Button);
-                            treatmentButton.setText(chosenTreatment);
-                            if(i>0) {
-                                editTreatment1 = treatmentList.get(i-1);
-                                treatmentButton.setTextColor(ContextCompat.getColor(dialog.getContext(),R.color.colorBlack));
-                            } else {
-                                editTreatment1 = null;
-                                treatmentButton.setTextColor(ContextCompat.getColor(dialog.getContext(),R.color.colorWhite));
-                            }
-                            break;
-                        case 2:
-                            treatmentButton = (Button)dialog.findViewById(R.id.treatment2Button);
-                            treatmentButton.setText(chosenTreatment);
-                            if(i>0) {
-                                editTreatment2 = treatmentList.get(i-1);
-                                treatmentButton.setTextColor(ContextCompat.getColor(dialog.getContext(),R.color.colorBlack));
-                            } else {
-                                editTreatment2 = null;
-                                treatmentButton.setTextColor(ContextCompat.getColor(dialog.getContext(),R.color.colorWhite));
-                            }
-                            break;
-                    }
-
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                if (isChecked) {
+                    plotMatrix.currentPlot.pestControlIngredients.add(pestControlList.get(which));
+                } else {
+                    plotMatrix.currentPlot.pestControlIngredients.remove(pestControlList.get(which));
                 }
-                dialogInterface.dismiss();
-
+            }
+        };
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.selectPestControlIngredientsTitle);
+        builder.setMultiChoiceItems(pestControlNamesArray, checkedIngredients, ingredientsDialogListener);
+        builder.setPositiveButton(R.string.okButtonText, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                plotMatrix.currentPlot.state=1;
+                canvasView.invalidate();
             }
         });
-        AlertDialog dialogTreatments = builder.create();
-        dialogTreatments.show();
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
     }
 
-    */
+    public void showSoilManagementIngredientSelector(){
+        boolean[] checkedIngredients = new boolean[soilManagementNamesArray.length];
+        for(int i=0;i<soilManagementNamesArray.length;i++){
+            checkedIngredients[i]=(plotMatrix.currentPlot.soilManagementIngredients.contains(soilManagementList.get(i)));
+        }
+
+        DialogInterface.OnMultiChoiceClickListener ingredientsDialogListener = new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                if (isChecked) {
+                    plotMatrix.currentPlot.soilManagementIngredients.add(soilManagementList.get(which));
+                } else {
+                    plotMatrix.currentPlot.soilManagementIngredients.remove(soilManagementList.get(which));
+                }
+            }
+        };
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.selectSoilManagementIngredientsTitle);
+        builder.setMultiChoiceItems(soilManagementNamesArray, checkedIngredients, ingredientsDialogListener);
+        builder.setPositiveButton(R.string.okButtonText, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                plotMatrix.currentPlot.state=1;
+                canvasView.invalidate();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+    }
 
     public void defineFarmNameAcres(int n, boolean cancellable, final boolean isSaving){
 
@@ -645,30 +654,20 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
         String title= plotMatrix.currentPlot.getCropNames(this);
         title+="\n";
-        if(plotMatrix.currentPlot.treatment1==null && plotMatrix.currentPlot.treatment2==null){
-            title+=getString(R.string.plotTreatmentLabel)+" "+getString(R.string.textNone);
-            tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorFillDefault));
+        title+=getString(R.string.pestControlTitle) + ": " + plotMatrix.currentPlot.getPestControlNames(this);
+        title+="\n";
+        title+=getString(R.string.soilManagementTitle) + ": " + plotMatrix.currentPlot.getSoilManagementNames(this);
+
+        if(plotMatrix.currentPlot.pestControlIngredients.size()>0 && plotMatrix.currentPlot.soilManagementIngredients.size()>0) {
+            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControl));
+        } else if(plotMatrix.currentPlot.pestControlIngredients.size()>0 && plotMatrix.currentPlot.soilManagementIngredients.size()==0) {
+            tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorFillPestControl));
+        } else if(plotMatrix.currentPlot.pestControlIngredients.size()==0 && plotMatrix.currentPlot.soilManagementIngredients.size()>0) {
+            tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorFillSoilManagement));
         } else {
-            if(plotMatrix.currentPlot.treatment1!=null && plotMatrix.currentPlot.treatment2==null){
-                title+=getString(R.string.plotTreatmentLabel)+": "+plotMatrix.currentPlot.treatment1.name;
-                if(plotMatrix.currentPlot.treatment1.category==0) {
-                    tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillPestControl));
-                } else {
-                    tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagement));
-                }
-            } else if(plotMatrix.currentPlot.treatment1!=null && plotMatrix.currentPlot.treatment2!=null){
-                title+=getString(R.string.plotTreatmentLabel)+" "+plotMatrix.currentPlot.treatment1.name+", "+plotMatrix.currentPlot.treatment2.name;
-                if(plotMatrix.currentPlot.treatment1.category!=plotMatrix.currentPlot.treatment2.category){
-                    tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControl));
-                } else {
-                    if(plotMatrix.currentPlot.treatment1.category==0) {
-                        tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillPestControl));
-                    } else {
-                        tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagement));
-                    }
-                }
-            }
+            tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorFillDefault));
         }
+
         tt.setText(title);
 
         Button dataButton = (Button)dialog.findViewById(R.id.dataButton);
@@ -961,28 +960,12 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
         public int getFillColor(oPlot p, boolean strong){
             int ret;
-            if(!(p.treatment1==null) && !(p.treatment2==null)){
-                if(p.treatment1.category!=p.treatment2.category){
-                    ret = (strong) ? ContextCompat.getColor(context,R.color.colorFillSoilManagementAndPestControl) : ContextCompat.getColor(context,R.color.colorFillSoilManagementAndPestControlFaded);
-                } else {
-                    if(p.treatment1.category==0){
-                        ret = (strong) ? ContextCompat.getColor(context,R.color.colorFillPestControl) : ContextCompat.getColor(context,R.color.colorFillPestControlFaded);
-                    } else {
-                        ret = (strong) ? ContextCompat.getColor(context,R.color.colorFillSoilManagement) : ContextCompat.getColor(context,R.color.colorFillSoilManagementFaded);
-                    }
-                }
-            } else if(!(p.treatment1==null)){
-                if(p.treatment1.category==0){
-                    ret = (strong) ? ContextCompat.getColor(context,R.color.colorFillPestControl) : ContextCompat.getColor(context,R.color.colorFillPestControlFaded);
-                } else {
-                    ret = (strong) ? ContextCompat.getColor(context,R.color.colorFillSoilManagement) : ContextCompat.getColor(context,R.color.colorFillSoilManagementFaded);
-                }
-            } else if(!(p.treatment2==null)){
-                if(p.treatment2.category==0){
-                    ret = (strong) ? ContextCompat.getColor(context,R.color.colorFillPestControl) : ContextCompat.getColor(context,R.color.colorFillPestControlFaded);
-                } else {
-                    ret = (strong) ? ContextCompat.getColor(context,R.color.colorFillSoilManagement) : ContextCompat.getColor(context,R.color.colorFillSoilManagementFaded);
-                }
+            if(p.pestControlIngredients.size()>0 && p.soilManagementIngredients.size()>0) {
+                ret = (strong) ? ContextCompat.getColor(context, R.color.colorFillSoilManagementAndPestControl) : ContextCompat.getColor(context, R.color.colorFillSoilManagementAndPestControlFaded);
+            } else if(p.pestControlIngredients.size()>0 && p.soilManagementIngredients.size()==0) {
+                ret = (strong) ? ContextCompat.getColor(context,R.color.colorFillPestControl) : ContextCompat.getColor(context,R.color.colorFillPestControlFaded);
+            } else if(p.pestControlIngredients.size()==0 && p.soilManagementIngredients.size()>0) {
+                ret = (strong) ? ContextCompat.getColor(context,R.color.colorFillSoilManagement) : ContextCompat.getColor(context,R.color.colorFillSoilManagementFaded);
             } else {
                 ret = (strong) ? ContextCompat.getColor(context,R.color.colorFillDefault) : ContextCompat.getColor(context,R.color.colorFillFaded);
             }

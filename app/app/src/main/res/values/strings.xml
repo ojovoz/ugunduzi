@@ -105,4 +105,8 @@
     <string name="selectPestControlIngredients">PEST CONTROL</string>
     <string name="selectSoilManagementIngredients">SOIL MANAGEMENT</string>
     <string name="selectCropsTitle">Select crops</string>
+    <string name="selectPestControlIngredientsTitle">Select pest control ingredients</string>
+    <string name="selectSoilManagementIngredientsTitle">Select soil management ingredients</string>
+    <string name="pestControlTitle">Pest control</string>
+    <string name="soilManagementTitle">Soil management</string>
 </resources>

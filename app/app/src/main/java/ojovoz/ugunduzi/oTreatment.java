@@ -80,4 +80,18 @@ public class oTreatment {
         }
         return ret;
     }
+
+    public int getTreatmentCategoryFromId(int id){
+        int ret = -1;
+        ArrayList<oTreatment> treatmentList = getTreatments();
+        Iterator<oTreatment> iterator = treatmentList.iterator();
+        while (iterator.hasNext()) {
+            oTreatment t = iterator.next();
+            if (t.id == id) {
+                ret = t.category;
+                break;
+            }
+        }
+        return ret;
+    }
 }
