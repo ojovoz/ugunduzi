@@ -76,6 +76,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     float farmSize;
     String farmDateString;
 
+    String parentFarm;
+
     int state; //0 = new farm; 1 = actions; 2 = edit farm
 
 
@@ -126,6 +128,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         if(newFarm){
             bFarmSaved=false;
             state=0;
+            parentFarm="0";
             this.setTitle(R.string.drawNewFarmTitle);
             int n;
             if(firstFarm){
@@ -253,11 +256,12 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         } else if(state==1){
             menu.add(0, 0, 0, R.string.opManageFarmRecords);
-            menu.add(1, 1, 1, R.string.opCreateNewFarm);
+            menu.add(1, 1, 1, R.string.opEditFarm);
+            menu.add(2, 2, 2, R.string.opCreateNewFarm);
             if(prefs.getNumberOfActiveFarms(user,";")>1) {
-                menu.add(2, 2, 2, R.string.opGoToOtherFarm);
+                menu.add(3, 3, 3, R.string.opGoToOtherFarm);
             }
-            menu.add(3, 3, 3, R.string.opSwitchUser);
+            menu.add(4, 4, 4, R.string.opSwitchUser);
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -291,12 +295,14 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     goToRecords(true);
                     break;
                 case 1:
-                    createNewFarm();
                     break;
                 case 2:
-                    goToFarmChooser();
+                    createNewFarm();
                     break;
                 case 3:
+                    goToFarmChooser();
+                    break;
+                case 4:
                     confirmExit();
             }
         }
@@ -345,6 +351,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         bFarmSaved=false;
         canvasView.invalidate();
         prevFarmName=farmName;
+        parentFarm="0";
         int n = prefs.getNumberOfValueItems(user+"_farms",";");
         farmName = getString(R.string.defaultFarmNamePrefix)+" "+String.valueOf(n+1);
         while(prefs.farmExists(user+"_farms",farmName,";")){
@@ -652,7 +659,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
         TextView tt = (TextView)dialog.findViewById(R.id.plotLabel);
 
-        String title= plotMatrix.currentPlot.getCropNames(this);
+        String title= getString(R.string.cropsTitle) + ": " + plotMatrix.currentPlot.getCropNames(this);
         title+="\n";
         title+=getString(R.string.pestControlTitle) + ": " + plotMatrix.currentPlot.getPestControlNames(this);
         title+="\n";
@@ -979,7 +986,6 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(border);
             canvas.drawRect(p.x,p.y,p.x+p.w,p.y+p.h,paint);
-            //canvas.drawBitmap(iMove,p.iMoveX,p.iMoveY,paint);
             canvas.drawBitmap(iResize,p.iResizeX,p.iResizeY,paint);
             canvas.drawBitmap(iContents,p.iContentsX,p.iContentsY,paint);
             float yOffset = (((p.h/(displayHeight/4))-1)*30)+(20-p.crops.size());
@@ -1001,6 +1007,10 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         private void drawPlotCropLabels(Canvas canvas, oPlot p, float txtY){
             Rect txtBounds = new Rect();
             float txtX;
+
+            float fontSize = ((((p.w/(displayWidth/4)+(p.h/(displayHeight/4)))-2)*10)/14)+21;
+
+            textPaint.setTextSize(fontSize);
 
             Iterator<oCrop> iterator = p.crops.iterator();
             while (iterator.hasNext()) {

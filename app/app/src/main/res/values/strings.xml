@@ -109,4 +109,6 @@
     <string name="selectSoilManagementIngredientsTitle">Select soil management ingredients</string>
     <string name="pestControlTitle">Pest control</string>
     <string name="soilManagementTitle">Soil management</string>
+    <string name="opEditFarm">Edit farm</string>
+    <string name="cropsTitle">Crops</string>
 </resources>
