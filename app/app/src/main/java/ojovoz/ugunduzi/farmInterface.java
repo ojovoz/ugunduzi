@@ -822,6 +822,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     public void saveFarm(){
 
+        dateHelper dH = new dateHelper();
+
         sMatrix = plotMatrix.toString();
 
         if(farmName.isEmpty()){
@@ -833,9 +835,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             String fName = farmName;
 
             Date farmDate = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            sdf.setTimeZone(TimeZone.getDefault());
-            farmDateString = sdf.format(farmDate);
+            farmDateString = dH.dateToString(farmDate);
 
             String saveString = user + ";" + userPass + ";" + fName + ";" + String.valueOf(farmSize) + ";" + farmDateString + ";" + sMatrix;
             httpConnection http = new httpConnection(this, this);
@@ -1026,7 +1026,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 txtX = ((p.w - txtBounds.width()) / 2) + p.x;
                 canvas.drawText(c.name.substring(0,n), (int) txtX, (int) txtY, textPaint);
 
-                txtY+=24;
+                txtY+=(((p.h/(displayHeight/4))-1)*3)+24;
 
             }
         }

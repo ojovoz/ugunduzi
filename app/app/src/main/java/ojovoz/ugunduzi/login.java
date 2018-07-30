@@ -358,50 +358,30 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
         }
 
         if(bProceed) {
-            String userFarms = prefs.getActiveFarms(user,";");
-            if (!userFarms.isEmpty()) {
-                String[] userFarmsList = userFarms.split(";");
-                if (userFarmsList.length > 1) {
-                    //farm chooser
-
+            oFarm f = new oFarm(this);
+            ArrayList<oFarm> userFarms = f.getActiveFarms(userId);
+            if(userFarms.size()>0){
+                if(userFarms.size()>1){
                     Intent i = new Intent(context, farmChooser.class);
                     i.putExtra("user", user);
                     i.putExtra("userId", userId);
                     i.putExtra("userPass", userPass);
                     startActivity(i);
                     finish();
-
                 } else {
-                    if (!userFarmsList[0].isEmpty()) {
-                        //go to single farm
-
-                        String fName = userFarmsList[0];
-                        fName = fName.replaceAll("\\*","");
-                        prefs.savePreference("farm",fName);
-                        Intent i = new Intent(context, farmInterface.class);
-                        i.putExtra("user", user);
-                        i.putExtra("userId", userId);
-                        i.putExtra("userPass", userPass);
-                        i.putExtra("newFarm", false);
-                        i.putExtra("firstFarm", false);
-                        i.putExtra("farmName", fName);
-                        startActivity(i);
-                        finish();
-
-                    } else {
-
-                        Intent i = new Intent(context, farmInterface.class);
-                        i.putExtra("user", user);
-                        i.putExtra("userId", userId);
-                        i.putExtra("userPass", userPass);
-                        i.putExtra("newFarm", true);
-                        i.putExtra("firstFarm", true);
-                        startActivity(i);
-                        finish();
-                    }
+                    String fName = userFarms.get(0).name;
+                    prefs.savePreference("farm",fName);
+                    Intent i = new Intent(context, farmInterface.class);
+                    i.putExtra("user", user);
+                    i.putExtra("userId", userId);
+                    i.putExtra("userPass", userPass);
+                    i.putExtra("newFarm", false);
+                    i.putExtra("firstFarm", false);
+                    i.putExtra("farmName", fName);
+                    startActivity(i);
+                    finish();
                 }
             } else {
-
                 Intent i = new Intent(context, farmInterface.class);
                 i.putExtra("user", user);
                 i.putExtra("userId", userId);
@@ -412,6 +392,5 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                 finish();
             }
         }
-
     }
 }
