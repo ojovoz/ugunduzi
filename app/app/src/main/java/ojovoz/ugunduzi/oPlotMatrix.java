@@ -52,7 +52,7 @@ public class oPlotMatrix {
         oPlot plot;
         oCrop crop = new oCrop(c);
         oTreatmentIngredient treatmentIngredient = new oTreatmentIngredient(c);
-        for(int i=2;i<matrixItems.length;i+=8){
+        for(int i=0;i<matrixItems.length;i+=8){
             plot=new oPlot();
             plot.id=Integer.parseInt(matrixItems[i]);
             plot.x=Integer.parseInt(matrixItems[i+1])*(int)(displayWidth/4);
@@ -93,7 +93,7 @@ public class oPlotMatrix {
         String matrixItems[] = matrixString.split(separator);
         oCrop crop = new oCrop(c);
         oTreatmentIngredient treatmentIngredient = new oTreatmentIngredient(c);
-        for(int i=2;i<matrixItems.length;i+=8){
+        for(int i=0;i<matrixItems.length;i+=8){
             oPlot plot=new oPlot();
             plot.id=Integer.parseInt(matrixItems[i]);
             String crops=matrixItems[i+5];

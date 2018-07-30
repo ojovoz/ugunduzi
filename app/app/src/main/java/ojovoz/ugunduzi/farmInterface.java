@@ -22,21 +22,17 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.TimeZone;
 
 /**
  * Created by Eugenio on 13/03/2018.
@@ -76,10 +72,9 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     float farmSize;
     String farmDateString;
 
-    String parentFarm;
+    oFarm currentFarm;
 
     int state; //0 = new farm; 1 = actions; 2 = edit farm
-
 
     oPlotMatrix plotMatrix;
     String sMatrix;
@@ -105,6 +100,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
         final Context ctxt=this;
 
+        currentFarm=new oFarm(this);
+
         user=getIntent().getExtras().getString("user");
         userPass=getIntent().getExtras().getString("userPass");
         userId=getIntent().getExtras().getInt("userId");
@@ -128,18 +125,14 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         if(newFarm){
             bFarmSaved=false;
             state=0;
-            parentFarm="0";
             this.setTitle(R.string.drawNewFarmTitle);
             int n;
-            if(firstFarm){
+            if(firstFarm || farmName.isEmpty()){
                 n=1;
             } else {
-                n=prefs.getNumberOfValueItems(user + "_farms", ";") + 1;
-                String fName=getString(R.string.defaultFarmNamePrefix)+" "+String.valueOf(n);
-                while(prefs.farmExists(user + "_farms",fName,";")){
-                    n++;
-                    fName=getString(R.string.defaultFarmNamePrefix)+" "+String.valueOf(n);
-                }
+                oFarm f = new oFarm(this);
+                n = f.getLatestActiveVersion(userId,farmName).version+1;
+                farmName=getString(R.string.defaultFarmNamePrefix)+" "+String.valueOf(n);
             }
             defineFarmNameAcres(n,true,false);
         } else {
@@ -149,6 +142,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 prefs.deletePreference("farm");
                 prefs.deletePreference("user");
                 goToLogin();
+            } else {
+                currentFarm=currentFarm.getLatestActiveVersion(userId,farmName);
             }
             this.setTitle(farmName);
         }
@@ -218,7 +213,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         if(newFarm){
             plotMatrix.addPlot(mw, mh, rw, rh, cw, ch, aw, ah);
         } else if(state==1){
-            plotMatrix.fromString(this,prefs.getPreference(user+"_"+farmName),";",mw,mh,rw,rh,cw,ch,aw,ah);
+            plotMatrix.fromString(this,currentFarm.plotMatrix,";",mw,mh,rw,rh,cw,ch,aw,ah);
         }
     }
 
@@ -351,7 +346,6 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         bFarmSaved=false;
         canvasView.invalidate();
         prevFarmName=farmName;
-        parentFarm="0";
         int n = prefs.getNumberOfValueItems(user+"_farms",";");
         farmName = getString(R.string.defaultFarmNamePrefix)+" "+String.valueOf(n+1);
         while(prefs.farmExists(user+"_farms",farmName,";")){
@@ -381,7 +375,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             if(!farmName.isEmpty()){
                 plotMatrix = new oPlotMatrix();
                 plotMatrix.createMatrix(displayWidth,displayHeight);
-                plotMatrix.fromString(this,prefs.getPreference(user+"_"+farmName),";",iconMove.getWidth(), iconMove.getHeight(), iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight());
+                currentFarm = currentFarm.getLatestActiveVersion(userId,farmName);
+                plotMatrix.fromString(this,currentFarm.plotMatrix,";",iconMove.getWidth(), iconMove.getHeight(), iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight());
                 state=1;
                 this.setTitle(farmName);
                 canvasView.invalidate();
