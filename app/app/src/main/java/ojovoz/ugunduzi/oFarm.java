@@ -57,7 +57,7 @@ public class oFarm {
                 f.version = Integer.parseInt(record[6]);
                 f.status = Integer.parseInt(record[7]);
 
-                if((userId==-1 && id==-1)||(f.userId==userId || f.id==id)){
+                if((userId==-1 && id==-1)||(f.userId==userId && id==-1)||(userId==-1 && f.id==id)||(f.userId==userId && f.id==id)){
                     ret.add(f);
                 }
             }
@@ -133,7 +133,7 @@ public class oFarm {
         return ret;
     }
 
-    public oFarm getLatestActiveVersion(int userId, int id){
+    public oFarm getLatestActiveVersion(int userId, int id, Context c){
         oFarm ret = null;
         ArrayList<oFarm> farms = getFarms(userId, id);
 
@@ -145,6 +145,10 @@ public class oFarm {
                 ret=f;
                 maxVersion=f.version;
             }
+        }
+
+        if(ret!=null){
+            ret.context=c;
         }
         return ret;
     }

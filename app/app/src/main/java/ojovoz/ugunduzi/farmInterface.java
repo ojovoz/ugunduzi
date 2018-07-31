@@ -140,7 +140,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 prefs.deletePreference("user");
                 goToLogin();
             } else {
-                currentFarm=currentFarm.getLatestActiveVersion(userId,farmId);
+                currentFarm=currentFarm.getLatestActiveVersion(userId,farmId,this);
                 farmName=currentFarm.name;
             }
             this.setTitle(farmName);
@@ -338,11 +338,11 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     public String getDefaultFarmName(){
         String ret = "";
 
-        if(firstFarm || farmId==-1){
-            ret = getString(R.string.defaultFarmNamePrefix);
+        if(firstFarm){
+            ret = getString(R.string.defaultFarmNamePrefix)+" 1";
         } else {
             int n=1;
-            ret = getString(R.string.defaultFarmNamePrefix);
+            ret = getString(R.string.defaultFarmNamePrefix)+" "+Integer.toString(n);
             do{
                 if(!currentFarm.farmNameExists(userId,ret)){
                     break;
@@ -362,6 +362,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         state=0;
         bFarmSaved=false;
         canvasView.invalidate();
+        farmId=-1;
         farmName = getDefaultFarmName();
         defineFarmNameAcres(true,false);
     }
@@ -382,11 +383,11 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     public void doCancelNewFarm(){
         if(prefs.preferenceExists("farmId")){
-            farmName=prefs.getPreference("farm");
-            if(!farmName.isEmpty()){
+            farmId=prefs.getPreferenceInt("farmId");
+            if(farmId>=0){
                 plotMatrix = new oPlotMatrix();
                 plotMatrix.createMatrix(displayWidth,displayHeight);
-                currentFarm = currentFarm.getLatestActiveVersion(userId,farmId);
+                currentFarm = currentFarm.getLatestActiveVersion(userId,farmId,this);
                 plotMatrix.fromString(this,currentFarm.plotMatrix,";",iconMove.getWidth(), iconMove.getHeight(), iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight());
                 state=1;
                 this.setTitle(farmName);
@@ -815,8 +816,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     }
 
     public void updateFarmData(String fName, float fSize){
-        fName = fName.replaceAll(";", " ");
-        fName = fName.replaceAll("\\*", "");
+        fName = fName.replaceAll("[^A-Za-z0-9 ]", "");
+        fName = fName.trim();
         this.setTitle(getString(R.string.drawNewFarmTitle)+ ": " + fName);
         farmName = fName;
         farmSize = fSize;
@@ -832,8 +833,6 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             farmName=getDefaultFarmName();
             defineFarmNameAcres(false,true);
         } else {
-
-            farmName = farmName.replaceAll("'", "");
 
             Date farmDate = new Date();
             farmDateString = dH.dateToString(farmDate);
@@ -871,7 +870,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 canvasView.invalidate();
                 firstFarm = false;
                 this.setTitle(farmName);
-                currentFarm = currentFarm.getLatestActiveVersion(userId,farmId);
+                currentFarm = currentFarm.getLatestActiveVersion(userId,farmId,this);
             }
         }
     }
@@ -897,7 +896,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             currentFarm.addNewFarm(farmId,userId,farmName,farmSize,farmDate,sMatrix,farmVersion,0);
         }
         prefs.savePreferenceInt("farmId", farmId);
-        currentFarm = currentFarm.getLatestActiveVersion(userId,farmId);
+        currentFarm = currentFarm.getLatestActiveVersion(userId,farmId,this);
         if(state==0){
             state=1;
             firstFarm=false;
