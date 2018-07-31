@@ -338,10 +338,10 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
         boolean bProceed=true;
         final Context context = this;
 
-        if (prefs.preferenceExists("farm")) {
+        if (prefs.preferenceExists("farmId")) {
 
-            String fName = prefs.getPreference("farm");
-            if (!fName.isEmpty()) {
+            int farmId = prefs.getPreferenceInt("farmId");
+            if (farmId>=0) {
 
                 Intent i = new Intent(context, farmInterface.class);
                 i.putExtra("user", user);
@@ -349,7 +349,7 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                 i.putExtra("userPass", userPass);
                 i.putExtra("newFarm", false);
                 i.putExtra("firstFarm", false);
-                i.putExtra("farmName", fName);
+                i.putExtra("farmId", farmId);
                 startActivity(i);
                 finish();
                 bProceed=false;
@@ -369,15 +369,15 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                     startActivity(i);
                     finish();
                 } else {
-                    String fName = userFarms.get(0).name;
-                    prefs.savePreference("farm",fName);
+                    int farmId = userFarms.get(0).id;
+                    prefs.savePreferenceInt("farmId",farmId);
                     Intent i = new Intent(context, farmInterface.class);
                     i.putExtra("user", user);
                     i.putExtra("userId", userId);
                     i.putExtra("userPass", userPass);
                     i.putExtra("newFarm", false);
                     i.putExtra("firstFarm", false);
-                    i.putExtra("farmName", fName);
+                    i.putExtra("farmId", farmId);
                     startActivity(i);
                     finish();
                 }

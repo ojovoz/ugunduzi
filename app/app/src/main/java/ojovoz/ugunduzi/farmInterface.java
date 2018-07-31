@@ -67,14 +67,17 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     boolean newFarm;
     boolean firstFarm;
     boolean bFarmSaved;
+
+    int farmId=-1;
     String farmName="";
-    String prevFarmName="";
     float farmSize;
     String farmDateString;
 
     oFarm currentFarm;
 
     int state; //0 = new farm; 1 = actions; 2 = edit farm
+
+    int farmVersion;
 
     oPlotMatrix plotMatrix;
     String sMatrix;
@@ -123,27 +126,22 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         soilManagementNamesArray = start.getTreatmentIngredientNames(soilManagementList).toArray(new CharSequence[soilManagementList.size()]);
 
         if(newFarm){
+            farmId=-1;
             bFarmSaved=false;
             state=0;
             this.setTitle(R.string.drawNewFarmTitle);
-            int n;
-            if(firstFarm || farmName.isEmpty()){
-                n=1;
-            } else {
-                oFarm f = new oFarm(this);
-                n = f.getLatestActiveVersion(userId,farmName).version+1;
-                farmName=getString(R.string.defaultFarmNamePrefix)+" "+String.valueOf(n);
-            }
-            defineFarmNameAcres(n,true,false);
+            farmName = getDefaultFarmName();
+            defineFarmNameAcres(true,false);
         } else {
             state=1;
-            farmName=getIntent().getExtras().getString("farmName");
-            if(farmName.isEmpty()){
-                prefs.deletePreference("farm");
+            farmId=getIntent().getExtras().getInt("farmId");
+            if(farmId==-1){
+                prefs.deletePreference("farmId");
                 prefs.deletePreference("user");
                 goToLogin();
             } else {
-                currentFarm=currentFarm.getLatestActiveVersion(userId,farmName);
+                currentFarm=currentFarm.getLatestActiveVersion(userId,farmId);
+                farmName=currentFarm.name;
             }
             this.setTitle(farmName);
         }
@@ -275,8 +273,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     canvasView.invalidate();
                     break;
                 case 2:
-                    int n = (newFarm) ? 1 : prefs.getNumberOfValueItems(user + "_farms", ";") + 1;
-                    defineFarmNameAcres(n, true,false);
+                    defineFarmNameAcres(true,false);
                     break;
                 case 3:
                     saveFarm();
@@ -321,7 +318,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     public void goToLogin(){
         prefs.savePreference("user","");
-        prefs.deletePreference("farm");
+        prefs.deletePreference("farmId");
         final Context context = this;
         Intent i = new Intent(context, login.class);
         startActivity(i);
@@ -338,6 +335,26 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         finish();
     }
 
+    public String getDefaultFarmName(){
+        String ret = "";
+
+        if(firstFarm || farmId==-1){
+            ret = getString(R.string.defaultFarmNamePrefix);
+        } else {
+            int n=1;
+            ret = getString(R.string.defaultFarmNamePrefix);
+            do{
+                if(!currentFarm.farmNameExists(userId,ret)){
+                    break;
+                } else{
+                    ret=getString(R.string.defaultFarmNamePrefix)+" "+Integer.toString(n);
+                    n++;
+                }
+            } while(true);
+        }
+        return ret;
+    }
+
     public void createNewFarm(){
         plotMatrix=new oPlotMatrix();
         plotMatrix.createMatrix(displayWidth,displayHeight);
@@ -345,14 +362,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         state=0;
         bFarmSaved=false;
         canvasView.invalidate();
-        prevFarmName=farmName;
-        int n = prefs.getNumberOfValueItems(user+"_farms",";");
-        farmName = getString(R.string.defaultFarmNamePrefix)+" "+String.valueOf(n+1);
-        while(prefs.farmExists(user+"_farms",farmName,";")){
-            n++;
-            farmName = getString(R.string.defaultFarmNamePrefix)+" "+String.valueOf(n+1);
-        }
-        defineFarmNameAcres(1,true,false);
+        farmName = getDefaultFarmName();
+        defineFarmNameAcres(true,false);
     }
 
     public void cancelNewFarm(){
@@ -370,12 +381,12 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     }
 
     public void doCancelNewFarm(){
-        if(prefs.preferenceExists("farm")){
+        if(prefs.preferenceExists("farmId")){
             farmName=prefs.getPreference("farm");
             if(!farmName.isEmpty()){
                 plotMatrix = new oPlotMatrix();
                 plotMatrix.createMatrix(displayWidth,displayHeight);
-                currentFarm = currentFarm.getLatestActiveVersion(userId,farmName);
+                currentFarm = currentFarm.getLatestActiveVersion(userId,farmId);
                 plotMatrix.fromString(this,currentFarm.plotMatrix,";",iconMove.getWidth(), iconMove.getHeight(), iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight());
                 state=1;
                 this.setTitle(farmName);
@@ -583,7 +594,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     }
 
-    public void defineFarmNameAcres(int n, boolean cancellable, final boolean isSaving){
+    public void defineFarmNameAcres(boolean cancellable, final boolean isSaving){
 
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -599,12 +610,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         });
 
         EditText et = (EditText)dialog.findViewById(R.id.newFarm);
-        String defaultFarmName="";
-        if(!farmName.isEmpty()){
-            defaultFarmName = farmName;
-        } else {
-            defaultFarmName = getString(R.string.defaultFarmNamePrefix) + " " + String.valueOf(n);
-        }
+        String defaultFarmName = farmName;
+
         et.setText(defaultFarmName);
 
         EditText fSize = (EditText)dialog.findViewById(R.id.acres);
@@ -623,7 +630,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 if(fName.isEmpty()){
                     Toast.makeText(view.getContext(), R.string.farmNameCannotBeEmptyMessage, Toast.LENGTH_SHORT).show();
                 } else {
-                    if(prefs.farmExists(user+"_farms",fName,";")){
+                    if(currentFarm.farmNameExists(userId,fName)){
                         Toast.makeText(view.getContext(), R.string.farmNameRepeated, Toast.LENGTH_SHORT).show();
                     } else {
                         EditText fSize = (EditText) dialog.findViewById(R.id.acres);
@@ -822,17 +829,22 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         sMatrix = plotMatrix.toString();
 
         if(farmName.isEmpty()){
-            int n = (newFarm) ? 1 : prefs.getNumberOfValueItems(user + "_farms", ";") + 1;
-            defineFarmNameAcres(n,false,true);
+            farmName=getDefaultFarmName();
+            defineFarmNameAcres(false,true);
         } else {
 
             farmName = farmName.replaceAll("'", "");
-            String fName = farmName;
 
             Date farmDate = new Date();
             farmDateString = dH.dateToString(farmDate);
 
-            String saveString = user + ";" + userPass + ";" + fName + ";" + String.valueOf(farmSize) + ";" + farmDateString + ";" + sMatrix;
+            if(farmId==-1){
+                farmId=currentFarm.getFarmIdFromNameUser(userId, farmName);
+            }
+
+            farmVersion = (newFarm) ? 0 : currentFarm.version+1;
+
+            String saveString = user + ";" + userPass + ";" + farmName + ";" + String.valueOf(farmSize) + ";" + farmDateString + ";" + sMatrix + ";" + farmId;
             httpConnection http = new httpConnection(this, this);
             if (http.isOnline()) {
                 CharSequence dialogTitle = getString(R.string.createNewFarmLabel);
@@ -852,14 +864,14 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 });
                 doCreateNewFarm(saveString);
             } else {
-                prefs.appendIfNewValue(user + "_farms", "*" + fName, ";");
-                prefs.savePreference(user + "_" + fName, String.valueOf(farmSize) + ";" + farmDateString + ";" + sMatrix);
-                prefs.savePreference("farm", farmName);
+                currentFarm.addNewFarm(farmId,userId,farmName,farmSize,farmDate,sMatrix,farmVersion,0);
+                prefs.savePreferenceInt("farmId", farmId);
                 Toast.makeText(this, R.string.farmSavedMessage, Toast.LENGTH_SHORT).show();
                 state = 1;
                 canvasView.invalidate();
                 firstFarm = false;
                 this.setTitle(farmName);
+                currentFarm = currentFarm.getLatestActiveVersion(userId,farmId);
             }
         }
     }
@@ -878,13 +890,14 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     public void processFinish(String output) {
         bConnecting=false;
         createFarmDialog.dismiss();
-        String fName = farmName;
+        Date farmDate = new Date();
         if(!output.equals("ko") && !output.isEmpty()){
-            prefs.appendIfNewValue(user+"_farms",farmName,";");
+            currentFarm.addNewFarm(farmId,userId,farmName,farmSize,farmDate,sMatrix,farmVersion,2);
         } else {
-            prefs.appendIfNewValue(user+"_farms","*"+farmName,";");
+            currentFarm.addNewFarm(farmId,userId,farmName,farmSize,farmDate,sMatrix,farmVersion,0);
         }
-        prefs.savePreference(user+"_"+fName,String.valueOf(farmSize)+";"+farmDateString+";"+sMatrix);
+        prefs.savePreferenceInt("farmId", farmId);
+        currentFarm = currentFarm.getLatestActiveVersion(userId,farmId);
         if(state==0){
             state=1;
             firstFarm=false;
