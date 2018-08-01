@@ -195,4 +195,10 @@ public class oFarm {
         farms.updateStatus(context, delete, status);
     }
 
+    public boolean hasRecords(){
+        oLog l = new oLog(context);
+        ArrayList<oLog> logList = l.createLog(id,-1,0);
+        return (logList.size()>0);
+    }
+
 }

@@ -196,7 +196,7 @@ public class oPlotMatrix {
             } else {
                 return false;
             }
-        } else if (e.getActionMasked() == MotionEvent.ACTION_MOVE && state==0) {
+        } else if (e.getActionMasked() == MotionEvent.ACTION_MOVE && (state==0 || state==2)) {
             if (currentPlot != null && ghostPlot != null) {
                 if (currentPlot.state == 2) {
                     moveGhostPlot((int) e.getX(), (int) e.getY(), (int) ghostPlot.w, (int) ghostPlot.h);
@@ -221,7 +221,7 @@ public class oPlotMatrix {
         while (iterator.hasNext()) {
             oPlot plot = iterator.next();
             if (isWithin(plot, x, y)) {
-                if(state==0) {
+                if(state==0 || state==2) {
                     if (isMoving(plot, x, y)) {
                         plot.state = 2;
                     } else if (isResizing(plot, x, y)) {

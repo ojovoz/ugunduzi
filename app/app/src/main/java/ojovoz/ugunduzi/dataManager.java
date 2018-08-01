@@ -60,6 +60,7 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
     public String userPass;
     public int userId;
     public String farmName;
+    public int farmId;
     public int plot;
 
     public ArrayList<oLog> logList;
@@ -184,7 +185,7 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
         setTitle(activityTitle);
 
         oLog log = new oLog(this);
-        logList = (plot >= 0) ? log.sortLogByDate(log.createLog(farmName, userId, plot, 2), true, -1) : log.sortLogByDate(log.createLog(farmName, userId, 2), true, -1);
+        logList = (plot >= 0) ? log.sortLogByDate(log.createLog(farmName, userId, plot, 2), true, -1) : log.sortLogByDate(log.createLog(farmId, userId, 2), true, -1);
 
         soundPlaying = false;
         soundPlayer = new MediaPlayer();
@@ -765,7 +766,7 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
         oLog l = new oLog(this);
         l.deleteLogItems(delete);
         deleteImgSndFiles(deleteFiles);
-        logList = (plot >= 0) ? l.sortLogByDate(l.createLog(farmName, userId, plot, 2), true, -1) : l.sortLogByDate(l.createLog(farmName, userId, 2), true, -1);
+        logList = (plot >= 0) ? l.sortLogByDate(l.createLog(farmName, userId, plot, 2), true, -1) : l.sortLogByDate(l.createLog(farmId, userId, 2), true, -1);
         adapter.list = cardDataFromLog();
         adapter.setList(adapter.list);
         adapter.notifyDataSetChanged();
@@ -1120,7 +1121,7 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
 
                 l.deleteLogItems(multimediaCleanUpList);
 
-                logList = (plot >= 0) ? l.sortLogByDate(l.createLog(farmName, userId, plot, 2), true, -1) : l.sortLogByDate(l.createLog(farmName, userId, 2), true, -1);
+                logList = (plot >= 0) ? l.sortLogByDate(l.createLog(farmName, userId, plot, 2), true, -1) : l.sortLogByDate(l.createLog(farmId, userId, 2), true, -1);
                 adapter.list = cardDataFromLog();
                 adapter.setList(adapter.list);
                 adapter.notifyDataSetChanged();

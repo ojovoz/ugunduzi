@@ -68,6 +68,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     boolean firstFarm;
     boolean bFarmSaved;
 
+    boolean bSaveEditedFarmAsNew;
+
     int farmId=-1;
     String farmName="";
     float farmSize;
@@ -210,14 +212,14 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
         if(newFarm){
             plotMatrix.addPlot(mw, mh, rw, rh, cw, ch, aw, ah);
-        } else if(state==1){
+        } else if(state==1 || state==2){
             plotMatrix.fromString(this,currentFarm.plotMatrix,";",mw,mh,rw,rh,cw,ch,aw,ah);
         }
     }
 
     @Override
     public void onBackPressed () {
-        if(!bFarmSaved && state==0) {
+        if(!bFarmSaved && (state==0||state==2)) {
             AlertDialog.Builder logoutDialog = new AlertDialog.Builder(this);
             logoutDialog.setMessage(R.string.farmHasNotBeenSavedMessage);
             logoutDialog.setNegativeButton(R.string.noButtonText,null);
@@ -239,13 +241,15 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
         menu.clear();
 
-        if(state==0) {
+        if(state==0||state==2) {
             menu.add(0, 0, 0, R.string.opAddPlot);
             menu.add(1, 1, 1, R.string.opDeletePlot);
             menu.add(2, 2, 2, R.string.opEditFarmNameSize);
             menu.add(3, 3, 3, R.string.opSaveFarm);
-            if(!firstFarm) {
+            if(!firstFarm && state==0) {
                 menu.add(4, 4, 4, R.string.opCancelNewFarm);
+            } else if(state==2){
+                menu.add(4, 4, 4, R.string.opCancelEditing);
             }
         } else if(state==1){
             menu.add(0, 0, 0, R.string.opManageFarmRecords);
@@ -262,7 +266,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(state==0) {
+        if(state==0 || state==2) {
             switch (item.getItemId()) {
                 case 0:
                     addPlot();
@@ -276,10 +280,18 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     defineFarmNameAcres(true,false);
                     break;
                 case 3:
-                    saveFarm();
+                    if(state==0) {
+                        saveFarm();
+                    } else {
+
+                    }
                     break;
                 case 4:
-                    cancelNewFarm();
+                    if(state==0) {
+                        cancelNewFarm();
+                    } else {
+                        cancelEditedFarm();
+                    }
             }
         } else if (state==1){
             switch(item.getItemId()){
@@ -287,6 +299,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     goToRecords(true);
                     break;
                 case 1:
+                    startEditFarm();
                     break;
                 case 2:
                     createNewFarm();
@@ -381,6 +394,31 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         logoutDialog.show();
     }
 
+    public void cancelEditedFarm(){
+        AlertDialog.Builder logoutDialog = new AlertDialog.Builder(this);
+        logoutDialog.setMessage(R.string.cancelEditedFarmMessage);
+        logoutDialog.setNegativeButton(R.string.noButtonText,null);
+        logoutDialog.setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                doCancelEditedFarm();
+            }
+        });
+        logoutDialog.create();
+        logoutDialog.show();
+    }
+
+    public void doCancelEditedFarm(){
+        currentFarm=currentFarm.getLatestActiveVersion(userId,farmId,this);
+        farmName=currentFarm.name;
+        farmSize=currentFarm.size;
+        plotMatrix = new oPlotMatrix();
+        plotMatrix.createMatrix(displayWidth,displayHeight);
+        createFarm();
+        state=1;
+        canvasView.invalidate();
+    }
+
     public void doCancelNewFarm(){
         if(prefs.preferenceExists("farmId")){
             farmId=prefs.getPreferenceInt("farmId");
@@ -398,6 +436,13 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         } else {
             goToFarmChooser();
         }
+    }
+
+    public void startEditFarm(){
+        bSaveEditedFarmAsNew = currentFarm.hasRecords();
+        state=2;
+        bFarmSaved=false;
+        canvasView.invalidate();
     }
 
     public void addPlot(){
@@ -508,7 +553,14 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     public void showCropSelector(){
         boolean[] checkedCrops = new boolean[cropNamesArray.length];
         for(int i=0;i<cropNamesArray.length;i++){
-            checkedCrops[i]=(plotMatrix.currentPlot.crops.contains(cropList.get(i)));
+            Iterator<oCrop> iterator = plotMatrix.currentPlot.crops.iterator();
+            while(iterator.hasNext()){
+                oCrop pc = iterator.next();
+                if(pc.name.equals(cropNamesArray[i])){
+                    checkedCrops[i]=true;
+                    break;
+                }
+            }
         }
 
         DialogInterface.OnMultiChoiceClickListener cropsDialogListener = new DialogInterface.OnMultiChoiceClickListener() {
@@ -538,7 +590,14 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     public void showPestControlIngredientSelector(){
         boolean[] checkedIngredients = new boolean[pestControlNamesArray.length];
         for(int i=0;i<pestControlNamesArray.length;i++){
-            checkedIngredients[i]=(plotMatrix.currentPlot.pestControlIngredients.contains(pestControlList.get(i)));
+            Iterator<oTreatmentIngredient> iterator = plotMatrix.currentPlot.pestControlIngredients.iterator();
+            while(iterator.hasNext()){
+                oTreatmentIngredient pt = iterator.next();
+                if(pt.name.equals(pestControlNamesArray[i])){
+                    checkedIngredients[i]=true;
+                    break;
+                }
+            }
         }
 
         DialogInterface.OnMultiChoiceClickListener ingredientsDialogListener = new DialogInterface.OnMultiChoiceClickListener() {
@@ -568,7 +627,14 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     public void showSoilManagementIngredientSelector(){
         boolean[] checkedIngredients = new boolean[soilManagementNamesArray.length];
         for(int i=0;i<soilManagementNamesArray.length;i++){
-            checkedIngredients[i]=(plotMatrix.currentPlot.soilManagementIngredients.contains(soilManagementList.get(i)));
+            Iterator<oTreatmentIngredient> iterator = plotMatrix.currentPlot.soilManagementIngredients.iterator();
+            while(iterator.hasNext()){
+                oTreatmentIngredient pt = iterator.next();
+                if(pt.name.equals(soilManagementNamesArray[i])){
+                    checkedIngredients[i]=true;
+                    break;
+                }
+            }
         }
 
         DialogInterface.OnMultiChoiceClickListener ingredientsDialogListener = new DialogInterface.OnMultiChoiceClickListener() {
@@ -926,7 +992,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 invalidate();
                 boolean b = plotMatrix.passEvent(event,state);
                 if(plotMatrix.currentPlot!=null) {
-                    if (plotMatrix.currentPlot.state == 4 && state==0) {
+                    if (plotMatrix.currentPlot.state == 4 && (state==0 || state==2)) {
                         definePlotContents();
                     } else if (plotMatrix.currentPlot.state == 5 && state==1){
                         showActionChooser();
@@ -956,7 +1022,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 oPlot plot = iterator.next();
                 fillColor=getFillColor(plot,plot==plotMatrix.currentPlot);
                 borderColor= (plot==plotMatrix.currentPlot) ? ContextCompat.getColor(context, R.color.colorDraw) : ContextCompat.getColor(context, R.color.colorDrawFaded);
-                if(state==0) {
+                if(state==0 || state==2) {
                     iMove = (plot == plotMatrix.currentPlot) ? (plotMatrix.currentPlot.state == 2) ? iconMoveActive : iconMove : iconMoveFaded;
                     iResize = (plot == plotMatrix.currentPlot) ? (plotMatrix.currentPlot.state == 3) ? iconResizeActive : iconResize : iconResizeFaded;
                     iContents = (plot == plotMatrix.currentPlot) ? (plotMatrix.currentPlot.state == 4) ? iconContentsActive : iconContents : iconContentsFaded;
@@ -967,7 +1033,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 }
             }
 
-            if(plotMatrix.ghostPlot !=null && state==0){
+            if(plotMatrix.ghostPlot !=null && (state==0 || state==2)){
                 drawGhostRectangle(canvas, plotMatrix.ghostPlot, ContextCompat.getColor(context, R.color.colorDrawGhostRectangle));
             }
         }
