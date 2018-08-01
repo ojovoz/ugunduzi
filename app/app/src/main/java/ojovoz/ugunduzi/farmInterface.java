@@ -251,7 +251,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             menu.add(0, 0, 0, R.string.opManageFarmRecords);
             menu.add(1, 1, 1, R.string.opEditFarm);
             menu.add(2, 2, 2, R.string.opCreateNewFarm);
-            if(prefs.getNumberOfActiveFarms(user,";")>1) {
+            if(currentFarm.getNumberOfFarms(userId)>1) {
                 menu.add(3, 3, 3, R.string.opGoToOtherFarm);
             }
             menu.add(4, 4, 4, R.string.opSwitchUser);

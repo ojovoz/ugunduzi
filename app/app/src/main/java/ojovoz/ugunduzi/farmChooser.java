@@ -21,6 +21,8 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 
 /**
@@ -36,7 +38,7 @@ public class farmChooser extends AppCompatActivity implements httpConnection.Asy
     preferenceManager prefs;
 
     ArrayList<CheckBox> checkboxes;
-    ArrayList<String> farmsList;
+    ArrayList<oFarm> farms;
 
     String deleteList;
 
@@ -56,7 +58,7 @@ public class farmChooser extends AppCompatActivity implements httpConnection.Asy
         prefs = new preferenceManager(this);
         server = prefs.getPreference("server");
 
-        prefs.deletePreference("farm");
+        prefs.deletePreference("farmId");
 
         fillTable();
 
@@ -64,22 +66,30 @@ public class farmChooser extends AppCompatActivity implements httpConnection.Asy
 
     void fillTable() {
 
+        oFarm f = new oFarm(this);
+
         TableLayout farmTable = (TableLayout)findViewById(R.id.chooserTable);
         farmTable.removeAllViews();
         checkboxes = new ArrayList<>();
 
-        farmsList = prefs.getPreferenceAsArrayList(user+"_farms",";","-");
-        if(farmsList!=null){
+        farms = f.getActiveFarms(userId);
+
+        if(farms !=null){
+
+            Collections.sort(farms, new Comparator<oFarm>() {
+                @Override
+                public int compare(oFarm f1, oFarm f2) {
+                    return f1.name.compareTo(f2.name);
+                }
+            });
+
             int n=0;
-            Iterator<String> farmIterator = farmsList.iterator();
-            while (farmIterator.hasNext()) {
-                String farmName = farmIterator.next();
-                farmName = farmName.replaceAll("\\*","");
+            Iterator<oFarm> iterator = farms.iterator();
+            while (iterator.hasNext()) {
+                oFarm farm = iterator.next();
                 final TableRow trow = new TableRow(farmChooser.this);
                 TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT, 1.0f);
                 lp.setMargins(10, 10, 0, 10);
-                String farmDate = prefs.getFarmDate(user+"_"+farmName,";");
-                farmName = farmName + " (" + farmDate + ")";
 
                 if (n % 2 == 0) {
                     trow.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillFaded));
@@ -98,7 +108,7 @@ public class farmChooser extends AppCompatActivity implements httpConnection.Asy
                 tv.setId(n);
                 tv.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
                 tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20f);
-                tv.setText(farmName);
+                tv.setText(farm.name);
                 tv.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
                 tv.setPadding(0, 10, 0, 10);
                 tv.setMaxWidth(350);
@@ -126,7 +136,7 @@ public class farmChooser extends AppCompatActivity implements httpConnection.Asy
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
         super.onCreateOptionsMenu(menu);
         menu.add(0, 0, 0, R.string.opCreateNewFarm);
-        if(farmsList.size()>1) {
+        if(farms.size()>1) {
             menu.add(1, 1, 1, R.string.opDeleteSelectedFarms);
         }
         menu.add(2, 2, 2, R.string.opSwitchUser);
@@ -155,7 +165,7 @@ public class farmChooser extends AppCompatActivity implements httpConnection.Asy
         while (checkBoxIterator.hasNext()) {
             CheckBox cb = checkBoxIterator.next();
             if(cb.isChecked()){
-                deleteList = (deleteList.isEmpty()) ? farmsList.get(cb.getId()) : deleteList + ";" + farmsList.get(cb.getId());
+                deleteList = (deleteList.isEmpty()) ? Integer.toString(farms.get(cb.getId()).id) : deleteList + ";" + Integer.toString(farms.get(cb.getId()).id);
             }
         }
         if(!deleteList.isEmpty()){
@@ -198,15 +208,34 @@ public class farmChooser extends AppCompatActivity implements httpConnection.Asy
                 http.execute(server + "/mobile/delete_farm.php?user=" + userId + "&farm=" + deleteList.replaceAll(" ","_"), "");
             }
         } else {
-            prefs.markFarmsAsDeleted(user, deleteList, ";");
-            deleteFarmLogs();
+            markDeletedFarms();
             fillTable();
         }
     }
 
-    public void deleteFarmLogs(){
+    public void markDeletedFarms(){
+        oFarm f = new oFarm(this);
+        String[] ids = deleteList.split(";");
+        for(int i=0;i<ids.length;i++){
+            int[] idsToDelete = f.getFarmLineList(userId,Integer.valueOf(ids[i]));
+            f.updateFarmstatus(idsToDelete,1);
+            deleteFarmLogs(idsToDelete);
+        }
+    }
+
+    public void executeDeleteFarms(){
+        oFarm f = new oFarm(this);
+        String[] ids = deleteList.split(";");
+        for(int i=0;i<ids.length;i++){
+            int[] idsToDelete = f.getFarmLineList(userId,Integer.valueOf(ids[i]));
+            f.doDeleteFarm(idsToDelete);
+            deleteFarmLogs(idsToDelete);
+        }
+    }
+
+    public void deleteFarmLogs(int[] ids){
         oLog l = new oLog(this);
-        ArrayList<String> deleteFiles = l.deleteFarmItems(deleteList,userId);
+        ArrayList<String> deleteFiles = l.deleteFarmItems(ids);
         deleteImgSndFiles(deleteFiles);
     }
 
@@ -255,16 +284,17 @@ public class farmChooser extends AppCompatActivity implements httpConnection.Asy
     }
 
     public void goToFarm(View v){
-        String fName="";
         boolean newFarm=false;
+        int farmId;
         if(v!=null) {
             TextView tv = (TextView) v;
             tv.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight));
             int n = v.getId();
-            fName = farmsList.get(n).replaceAll("\\*","");
-            prefs.savePreference("farm",fName);
+            farmId = farms.get(n).id;
+            prefs.savePreferenceInt("farmId",farmId);
         } else {
             newFarm=true;
+            farmId=-1;
         }
         final Context context = this;
         Intent i = new Intent(context, farmInterface.class);
@@ -273,7 +303,7 @@ public class farmChooser extends AppCompatActivity implements httpConnection.Asy
         i.putExtra("userPass", userPass);
         i.putExtra("newFarm", newFarm);
         i.putExtra("firstFarm",false);
-        i.putExtra("farmName", fName);
+        i.putExtra("farmId", farmId);
         startActivity(i);
         finish();
     }
@@ -283,11 +313,10 @@ public class farmChooser extends AppCompatActivity implements httpConnection.Asy
         bConnecting=false;
         deletingFarmDialog.dismiss();
         if(output.equals("ok")){
-            prefs.deleteFarms(user, deleteList, ";");
+            executeDeleteFarms();
         } else {
-            prefs.markFarmsAsDeleted(user, deleteList, ";");
+            markDeletedFarms();
         }
-        deleteFarmLogs();
         fillTable();
     }
 

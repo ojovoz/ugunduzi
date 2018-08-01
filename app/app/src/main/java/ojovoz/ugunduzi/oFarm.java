@@ -153,6 +153,11 @@ public class oFarm {
         return ret;
     }
 
+    public int getNumberOfFarms(int userId){
+        ArrayList<oFarm> farms = getActiveFarms(userId);
+        return farms.size();
+    }
+
     public void addNewFarm(int id, int userId, String farmName, float size, Date date, String plotMatrix, int version, int status){
         dateHelper dH = new dateHelper();
 
@@ -186,7 +191,6 @@ public class oFarm {
     }
 
     public void updateFarmstatus(int[] delete, int status) {
-        dateHelper dH = new dateHelper();
         csvFileManager farms = new csvFileManager("farms");
         farms.updateStatus(context, delete, status);
     }

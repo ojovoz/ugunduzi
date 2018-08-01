@@ -21,7 +21,8 @@ public class oLog {
 
     public int line;
 
-    public String farmName;
+    public String farmName; //delete
+    public int farmId;
     public int userId;
 
     public int plotId;
@@ -340,9 +341,8 @@ public class oLog {
         log.sent(c,line);
     }
 
-    public ArrayList<String> deleteFarmItems(String deleteList, int userId){
+    public ArrayList<String> deleteFarmItems(int[] farmList){
         ArrayList<String> ret = new ArrayList<>();
-        String[] farmList = deleteList.split(";");
         ArrayList<oLog> log = createLog(2);
         int[] delete=new int[log.size()];
         Iterator<oLog> iterator = log.iterator();
@@ -351,7 +351,7 @@ public class oLog {
             oLog l = iterator.next();
             boolean bFound=false;
             for(int i=0;i<farmList.length;i++){
-                if(l.farmName.equals(farmList[i].replaceAll("\\*","")) && l.userId==userId){
+                if(l.farmId==farmList[i]){
                     bFound=true;
                     ret.add(l.picture);
                     ret.add(l.sound);
