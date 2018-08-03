@@ -85,7 +85,7 @@ public class oPlotMatrix {
             }
             plot.addAreas(iMoveW, iMoveH, iResizeW, iResizeH, iContentsW, iContentsH, iActionsW, iActionsH);
             plots.add(plot);
-            addPlotToMatrix(plot,plot.x,plot.y,(int)(plot.w/(displayWidth/4)),(int)(plot.h/(displayHeight/4)));
+            addPlotToMatrix(plot,(int)(plot.x/(displayWidth/4)),(int)(plot.y/(displayHeight/4)),(int)(plot.w/(displayWidth/4))+(int)(plot.x/(displayWidth/4)),(int)(plot.h/(displayHeight/4))+(int)(plot.y/(displayHeight/4)));
         }
     }
 
