@@ -167,6 +167,28 @@ public class oFarm {
         farms.append(context, newLine);
     }
 
+    public void updateFarm(int id, int userId, String farmName, float size, Date date, String plotMatrix, int version, int status){
+        dateHelper dH = new dateHelper();
+
+        csvFileManager farms = new csvFileManager("farms");
+        List<String[]> lines = farms.read(context);
+
+        if(lines!=null) {
+            Iterator<String[]> iterator = lines.iterator();
+            int line = 0;
+            while (iterator.hasNext()) {
+                String[] thisLine = iterator.next();
+                if(Integer.valueOf(thisLine[0])==id && Integer.valueOf(thisLine[6])==version){
+                    break;
+                }
+                line++;
+            }
+
+            String[] newLine = {Integer.toString(id), Integer.toString(userId), farmName, Float.toString(size), dH.dateToString(date), plotMatrix, Integer.toString(version), Integer.toString(status)};
+            farms.update(context, newLine, line);
+        }
+    }
+
     public int[] getFarmLineList(int userId, int id){
         ArrayList<oFarm> farms = getFarms(-1, -1);
         int[] delete=new int[farms.size()];

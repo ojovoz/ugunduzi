@@ -135,8 +135,8 @@ public class oPlotMatrix {
             oPlot p = new oPlot(cell.point.x, cell.point.y, displayWidth / 4, displayHeight / 4);
             p.addAreas(iMoveW, iMoveH, iResizeW, iResizeH, iContentsW, iContentsH, iActionsW, iActionsH);
             setCurrentPlot(p);
+            getPlotIndex();
             p.id=plotIndex;
-            plotIndex++;
             plots.add(p);
             cell.plot = p;
             ret=true;
@@ -144,6 +144,18 @@ public class oPlotMatrix {
             ret=false;
         }
         return ret;
+    }
+
+    public void getPlotIndex(){
+        int index=-1;
+        Iterator<oPlot> iterator = plots.iterator();
+        while(iterator.hasNext()){
+            oPlot p = iterator.next();
+            if(p.id>index){
+                index=p.id;
+            }
+        }
+        plotIndex=index+1;
     }
 
     public matrixContent findFirstAvailablePosition() {

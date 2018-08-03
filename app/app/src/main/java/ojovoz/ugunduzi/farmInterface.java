@@ -280,11 +280,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     defineFarmNameAcres(true,false);
                     break;
                 case 3:
-                    if(state==0) {
-                        saveFarm();
-                    } else {
-
-                    }
+                    saveFarm();
                     break;
                 case 4:
                     if(state==0) {
@@ -375,6 +371,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         state=0;
         bFarmSaved=false;
         canvasView.invalidate();
+        newFarm=true;
         farmId=-1;
         farmName = getDefaultFarmName();
         defineFarmNameAcres(true,false);
@@ -416,6 +413,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         plotMatrix.createMatrix(displayWidth,displayHeight);
         createFarm();
         state=1;
+        bFarmSaved=true;
+        this.setTitle(farmName);
         canvasView.invalidate();
     }
 
@@ -439,8 +438,12 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     }
 
     public void startEditFarm(){
-        bSaveEditedFarmAsNew = currentFarm.hasRecords();
         state=2;
+        newFarm=false;
+        bSaveEditedFarmAsNew = currentFarm.hasRecords();
+        plotMatrix = new oPlotMatrix();
+        plotMatrix.createMatrix(displayWidth,displayHeight);
+        createFarm();
         bFarmSaved=false;
         canvasView.invalidate();
     }
@@ -569,7 +572,17 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 if (isChecked) {
                     plotMatrix.currentPlot.crops.add(cropList.get(which));
                 } else {
-                    plotMatrix.currentPlot.crops.remove(cropList.get(which));
+                    oCrop removeCrop = cropList.get(which);
+                    Iterator<oCrop> iterator = plotMatrix.currentPlot.crops.iterator();
+                    int index=0;
+                    while(iterator.hasNext()){
+                        oCrop c = iterator.next();
+                        if(c.id==removeCrop.id){
+                            break;
+                        }
+                        index++;
+                    }
+                    plotMatrix.currentPlot.crops.remove(index);
                 }
             }
         };
@@ -606,7 +619,17 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 if (isChecked) {
                     plotMatrix.currentPlot.pestControlIngredients.add(pestControlList.get(which));
                 } else {
-                    plotMatrix.currentPlot.pestControlIngredients.remove(pestControlList.get(which));
+                    oTreatmentIngredient removeIngredient = pestControlList.get(which);
+                    Iterator<oTreatmentIngredient> iterator = plotMatrix.currentPlot.pestControlIngredients.iterator();
+                    int index=0;
+                    while(iterator.hasNext()){
+                        oTreatmentIngredient tp = iterator.next();
+                        if(tp.id==removeIngredient.id){
+                            break;
+                        }
+                        index++;
+                    }
+                    plotMatrix.currentPlot.pestControlIngredients.remove(index);
                 }
             }
         };
@@ -643,7 +666,17 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 if (isChecked) {
                     plotMatrix.currentPlot.soilManagementIngredients.add(soilManagementList.get(which));
                 } else {
-                    plotMatrix.currentPlot.soilManagementIngredients.remove(soilManagementList.get(which));
+                    oTreatmentIngredient removeIngredient = soilManagementList.get(which);
+                    Iterator<oTreatmentIngredient> iterator = plotMatrix.currentPlot.soilManagementIngredients.iterator();
+                    int index=0;
+                    while(iterator.hasNext()){
+                        oTreatmentIngredient tp = iterator.next();
+                        if(tp.id==removeIngredient.id){
+                            break;
+                        }
+                        index++;
+                    }
+                    plotMatrix.currentPlot.soilManagementIngredients.remove(index);
                 }
             }
         };
@@ -884,7 +917,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     public void updateFarmData(String fName, float fSize){
         fName = fName.replaceAll("[^A-Za-z0-9 ]", "");
         fName = fName.trim();
-        this.setTitle(getString(R.string.drawNewFarmTitle)+ ": " + fName);
+        this.setTitle(fName);
         farmName = fName;
         farmSize = fSize;
     }
@@ -907,9 +940,9 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 farmId=currentFarm.getFarmIdFromNameUser(userId, farmName);
             }
 
-            farmVersion = (newFarm) ? 0 : currentFarm.version+1;
+            farmVersion = (state==0) ? 0 : (bSaveEditedFarmAsNew) ? currentFarm.version+1 : currentFarm.version;
 
-            String saveString = user + ";" + userPass + ";" + farmName + ";" + String.valueOf(farmSize) + ";" + farmDateString + ";" + sMatrix + ";" + farmId;
+            String saveString = user + ";" + userPass + ";" + farmName + ";" + String.valueOf(farmSize) + ";" + farmDateString + ";" + sMatrix + ";" + farmId + ";" + String.valueOf(farmVersion);
             httpConnection http = new httpConnection(this, this);
             if (http.isOnline()) {
                 CharSequence dialogTitle = getString(R.string.createNewFarmLabel);
@@ -929,12 +962,23 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 });
                 doCreateNewFarm(saveString);
             } else {
-                currentFarm.addNewFarm(farmId,userId,farmName,farmSize,farmDate,sMatrix,farmVersion,0);
+                if(state==0) {
+                    currentFarm.addNewFarm(farmId, userId, farmName, farmSize, farmDate, sMatrix, farmVersion, 0);
+                    Toast.makeText(this, R.string.farmSavedMessage, Toast.LENGTH_SHORT).show();
+                } else {
+                    if(bSaveEditedFarmAsNew){
+                        currentFarm.addNewFarm(farmId, userId, farmName, farmSize, farmDate, sMatrix, farmVersion, 0);
+                    } else {
+                        currentFarm.updateFarm(farmId, userId, farmName, farmSize, farmDate, sMatrix, farmVersion, 0);
+                    }
+                    Toast.makeText(this, R.string.farmEditedMessage, Toast.LENGTH_SHORT).show();
+                }
                 prefs.savePreferenceInt("farmId", farmId);
-                Toast.makeText(this, R.string.farmSavedMessage, Toast.LENGTH_SHORT).show();
                 state = 1;
                 canvasView.invalidate();
                 firstFarm = false;
+                newFarm = false;
+                bFarmSaved=true;
                 this.setTitle(farmName);
                 currentFarm = currentFarm.getLatestActiveVersion(userId,farmId,this);
             }
@@ -956,20 +1000,28 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         bConnecting=false;
         createFarmDialog.dismiss();
         Date farmDate = new Date();
-        if(!output.equals("ko") && !output.isEmpty()){
-            currentFarm.addNewFarm(farmId,userId,farmName,farmSize,farmDate,sMatrix,farmVersion,2);
+        int status = (!output.equals("ko") && !output.isEmpty()) ? 2 : 0;
+        if(state==0) {
+            currentFarm.addNewFarm(farmId, userId, farmName, farmSize, farmDate, sMatrix, farmVersion, status);
+            Toast.makeText(this, R.string.farmSavedMessage, Toast.LENGTH_SHORT).show();
         } else {
-            currentFarm.addNewFarm(farmId,userId,farmName,farmSize,farmDate,sMatrix,farmVersion,0);
+            if(bSaveEditedFarmAsNew){
+                currentFarm.addNewFarm(farmId, userId, farmName, farmSize, farmDate, sMatrix, farmVersion, status);
+            } else {
+                currentFarm.updateFarm(farmId, userId, farmName, farmSize, farmDate, sMatrix, farmVersion, status);
+            }
+            Toast.makeText(this, R.string.farmEditedMessage, Toast.LENGTH_SHORT).show();
         }
         prefs.savePreferenceInt("farmId", farmId);
         currentFarm = currentFarm.getLatestActiveVersion(userId,farmId,this);
-        if(state==0){
-            state=1;
-            firstFarm=false;
-            canvasView.invalidate();
-            this.setTitle(farmName);
-        }
-        Toast.makeText(this, R.string.farmSavedMessage, Toast.LENGTH_SHORT).show();
+
+        state=1;
+        firstFarm=false;
+        newFarm=false;
+        bFarmSaved=true;
+        canvasView.invalidate();
+        this.setTitle(farmName);
+
     }
 
     class SketchSheetView extends View {
