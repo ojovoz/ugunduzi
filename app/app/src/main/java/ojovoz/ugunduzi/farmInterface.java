@@ -999,7 +999,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
                 farmVersion = (state == 0) ? 0 : (bSaveEditedFarmAsNew) ? currentFarm.version + 1 : currentFarm.version;
 
-                String saveString = user + ";" + userPass + ";" + farmName + ";" + String.valueOf(farmSize) + ";" + farmDateString + ";" + sMatrix + ";" + farmId + ";" + String.valueOf(farmVersion);
+                String saveString = user + ";" + userPass + ";" + farmName + ";" + String.valueOf(farmSize) + ";" + farmDateString + ";" + String.valueOf(farmId) + ";" + String.valueOf(farmVersion) + ";" + sMatrix;
                 httpConnection http = new httpConnection(this, this);
                 if (http.isOnline()) {
                     CharSequence dialogTitle = getString(R.string.createNewFarmLabel);
@@ -1017,7 +1017,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                             createFarmDialog.dismiss();
                         }
                     });
-                    doCreateNewFarm(saveString);
+                    doCreateUpdateFarm(saveString);
                 } else {
                     if (state == 0) {
                         currentFarm.addNewFarm(farmId, userId, farmName, farmSize, farmDate, sMatrix, farmVersion, 0);
@@ -1051,12 +1051,16 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         }
     }
 
-    public void doCreateNewFarm(String s){
+    public void doCreateUpdateFarm(String s){
         httpConnection http = new httpConnection(this, this);
         if (http.isOnline()) {
             if (!bConnecting) {
                 bConnecting = true;
-                http.execute(server + "/mobile/create_new_farm.php?farm=" + s.replaceAll(" ","_"), "");
+                if (bSaveEditedFarmAsNew || state==0) {
+                    http.execute(server + "/mobile/create_new_farm.php?farm=" + s.replaceAll(" ", "_"), "");
+                } else {
+                    http.execute(server + "/mobile/update_farm.php?farm=" + s.replaceAll(" ", "_"), "");
+                }
             }
         }
     }

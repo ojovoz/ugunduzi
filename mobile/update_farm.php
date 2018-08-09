@@ -22,9 +22,13 @@ if(isset($_GET['farm'])){
 		$farm_app_id=$farm_parts[5];
 		$farm_version=$farm_parts[6];
 		
-		$farm_id=createNewFarm($dbh,$farm_name,$farm_size,$farm_date_created,$user_id,$farm_app_id,$farm_version);
+		$farm_id=getFarmIDFromFarmAppId($dbh,$farm_app_id);
+		updateFarm($dbh,$farm_id,$farm_name,$farm_size,$farm_date_created,$farm_version);
 		
 		$output_part_2=$farm_id;
+		
+		deleteFarmPlots($dbh,$farm_id);
+		
 		for($i=7;$i<sizeof($farm_parts);$i+=8){
 			$plot_id=$farm_parts[$i];
 			$plot_x=$farm_parts[$i+1];

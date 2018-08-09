@@ -36,11 +36,26 @@ function getFarmIDFromNameUser($dbh,$farm_name,$user_id){
 	return $ret;
 }
 
-function createNewFarm($dbh,$farm_name,$farm_size,$farm_date_created,$user_id,$parent_id){
-	$query="INSERT INTO farm (user_id, farm_name, farm_size_acres, farm_date_created, parent_farm_id) VALUES($user_id, '$farm_name', $farm_size, '$farm_date_created', $parent_id)";
+function getFarmIDFromFarmAppId($dbh,$farm_app_id){
+	$ret=-1;
+	$query="SELECT farm_id FROM farm WHERE farm_app_id=$farm_app_id";
+	$result = mysqli_query($dbh,$query);
+	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$ret=$row[0];
+	}
+	return $ret;
+}
+
+function createNewFarm($dbh,$farm_name,$farm_size,$farm_date_created,$user_id,$farm_app_id,$farm_version){
+	$query="INSERT INTO farm (user_id, farm_name, farm_size_acres, farm_date_created, farm_app_id, farm_version) VALUES ($user_id, '$farm_name', $farm_size, '$farm_date_created', $farm_app_id, $farm_version)";
 	$result = mysqli_query($dbh,$query);
 	$id = mysqli_insert_id($dbh);
 	return $id;
+}
+
+function updateFarm($dbh,$farm_id,$farm_name,$farm_size,$farm_date_created,$farm_version){
+	$query="UPDATE farm SET farm_name='$farm_name', farm_size=$farm_size, farm_date_created='$farm_date_created' farm_version=$farm_version WHERE farm_id=$farm_id";
+	$result = mysqli_query($dbh,$query);
 }
 
 function farmHasData($dbh,$farm_id){
@@ -56,6 +71,12 @@ function farmHasData($dbh,$farm_id){
 }
 
 function deleteFarmPlots($dbh,$farm_id){
+	$query="DELETE FROM crop_x_plot WHERE plot_id IN (SELECT plot_id FROM plot WHERE farm_id=$farm_id)";
+	$result = mysqli_query($dbh,$query);
+	
+	$query="DELETE FROM treatment_ingredient_x_plot WHERE plot_id IN (SELECT plot_id FROM plot WHERE farm_id=$farm_id)";
+	$result = mysqli_query($dbh,$query);
+	
 	$query="DELETE FROM plot WHERE farm_id=$farm_id";
 	$result = mysqli_query($dbh,$query);
 }
@@ -65,9 +86,35 @@ function deleteFarmData($dbh,$farm_id){
 	$result = mysqli_query($dbh,$query);
 }
 
-function createNewPlot($dbh,$farm_id,$plot_id,$plot_x,$plot_y,$plot_w,$plot_h,$plot_c1,$plot_c2,$plot_t1,$plot_t2){
-	$query="INSERT INTO plot(internal_plot_id, farm_id, plot_x, plot_y, plot_w, plot_h, plot_crop1, plot_crop2, plot_treatment1, plot_treatment2) VALUES ($plot_id, $farm_id, $plot_x,$plot_y,$plot_w,$plot_h,$plot_c1,$plot_c2,$plot_t1,$plot_t2)";
+function createNewPlot($dbh,$farm_id,$plot_id,$plot_x,$plot_y,$plot_w,$plot_h,$plot_crops,$plot_pest_control,$plot_soil_management){
+	$query="INSERT INTO plot(internal_plot_id, farm_id, plot_x, plot_y, plot_w, plot_h) VALUES ($plot_id, $farm_id, $plot_x,$plot_y,$plot_w,$plot_h)";
 	$result = mysqli_query($dbh,$query);
+	$plot_id = mysqli_insert_id($dbh);
+	
+	
+	for($i=0;$i<sizeof($plot_crops);$i++){
+		$crop_id = $plot_crops[$i];
+		if($crop_id!="-1"){
+			$query="INSERT INTO crop_x_plot(plot_id, crop_id) VALUES ($plot_id, $crop_id)";
+			$result = mysqli_query($dbh,$query);
+		}
+	}
+	
+	for($i=0;$i<sizeof($plot_pest_control);$i++){
+		$pest_control_id = $plot_pest_control[$i];
+		if($pest_control_id!="-1"){
+			$query="INSERT INTO treatment_ingredient_x_plot(plot_id, treatment_ingredient_id) VALUES ($plot_id, $pest_control_id)";
+			$result = mysqli_query($dbh,$query);
+		}
+	}
+	
+	for($i=0;$i<sizeof($plot_soil_management);$i++){
+		$soil_management_id = $plot_soil_management[$i];
+		if($soil_management_id!="-1"){
+			$query="INSERT INTO treatment_ingredient_x_plot(plot_id, treatment_ingredient_id) VALUES ($plot_id, $soil_management_id)";
+			$result = mysqli_query($dbh,$query);
+		}
+	}
 }
 
 function getPlotIDFromFarm($dbh,$farm_id,$internal_plot_id){
