@@ -867,27 +867,11 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
         i.putExtra("farmName",farmName);
+        i.putExtra("farmId", farmId);
         i.putExtra("plot",plotMatrix.currentPlot.id);
-        if(plotMatrix.currentPlot.crop1!=null) {
-            i.putExtra("crop1", plotMatrix.currentPlot.crop1.id);
-        } else {
-            i.putExtra("crop1", -1);
-        }
-        if(plotMatrix.currentPlot.crop2!=null) {
-            i.putExtra("crop2", plotMatrix.currentPlot.crop2.id);
-        } else {
-            i.putExtra("crop2", -1);
-        }
-        if(plotMatrix.currentPlot.treatment1!=null) {
-            i.putExtra("treatment1", plotMatrix.currentPlot.treatment1.id);
-        } else {
-            i.putExtra("treatment1", -1);
-        }
-        if(plotMatrix.currentPlot.treatment2!=null) {
-            i.putExtra("treatment2", plotMatrix.currentPlot.treatment2.id);
-        } else {
-            i.putExtra("treatment2", -1);
-        }
+        i.putExtra("cropNames",plotMatrix.currentPlot.getCropNames(this));
+        i.putExtra("pestControlNames",plotMatrix.currentPlot.getPestControlNames(this));
+        i.putExtra("soilManagementNames",plotMatrix.currentPlot.getSoilManagementNames(this));
         startActivity(i);
         finish();
     }
@@ -899,27 +883,11 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
         i.putExtra("farmName",farmName);
+        i.putExtra("farmId", farmId);
         i.putExtra("plot",plotMatrix.currentPlot.id);
-        if(plotMatrix.currentPlot.crop1!=null) {
-            i.putExtra("crop1", plotMatrix.currentPlot.crop1.id);
-        } else {
-            i.putExtra("crop1", -1);
-        }
-        if(plotMatrix.currentPlot.crop2!=null) {
-            i.putExtra("crop2", plotMatrix.currentPlot.crop2.id);
-        } else {
-            i.putExtra("crop2", -1);
-        }
-        if(plotMatrix.currentPlot.treatment1!=null) {
-            i.putExtra("treatment1", plotMatrix.currentPlot.treatment1.id);
-        } else {
-            i.putExtra("treatment1", -1);
-        }
-        if(plotMatrix.currentPlot.treatment2!=null) {
-            i.putExtra("treatment2", plotMatrix.currentPlot.treatment2.id);
-        } else {
-            i.putExtra("treatment2", -1);
-        }
+        i.putExtra("cropNames",plotMatrix.currentPlot.getCropNames(this));
+        i.putExtra("pestControlNames",plotMatrix.currentPlot.getPestControlNames(this));
+        i.putExtra("soilManagementNames",plotMatrix.currentPlot.getSoilManagementNames(this));
         startActivity(i);
         finish();
     }
@@ -1002,7 +970,13 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 String saveString = user + ";" + userPass + ";" + farmName + ";" + String.valueOf(farmSize) + ";" + farmDateString + ";" + String.valueOf(farmId) + ";" + String.valueOf(farmVersion) + ";" + sMatrix;
                 httpConnection http = new httpConnection(this, this);
                 if (http.isOnline()) {
-                    CharSequence dialogTitle = getString(R.string.createNewFarmLabel);
+                    CharSequence dialogTitle;
+
+                    if(state==0) {
+                        dialogTitle = getString(R.string.createNewFarmLabel);
+                    } else {
+                        dialogTitle = getString(R.string.updatingFarmLabel);
+                    }
 
                     createFarmDialog = new ProgressDialog(this);
                     createFarmDialog.setCancelable(true);

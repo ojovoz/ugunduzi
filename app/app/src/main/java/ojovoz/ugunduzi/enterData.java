@@ -616,7 +616,7 @@ public class enterData extends AppCompatActivity {
                     if(!(treatment1!=null && treatment2!=null && chosenDataItem.isTreatmentSpecific && chosenTreatment==null)){
                         if(!(unitsList.size()>1 && chosenUnits==null)){
                             oLog l = new oLog(this);
-                            l.appendToLog(farmName,userId,plot,dataItemDate,chosenDataItem,chosenValue,chosenUnits,chosenCrop,chosenTreatment,"","");
+                            //l.appendToLog(farmName,userId,plot,dataItemDate,chosenDataItem,chosenValue,chosenUnits,chosenCrop,chosenTreatment,"","");
                             resetFields();
                             resetLogList();
                             fillTable();

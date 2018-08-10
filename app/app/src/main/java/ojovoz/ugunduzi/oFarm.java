@@ -219,7 +219,7 @@ public class oFarm {
 
     public boolean hasRecords(){
         oLog l = new oLog(context);
-        ArrayList<oLog> logList = l.createLog(id,-1,0);
+        ArrayList<oLog> logList = l.createLog(id,-1,2);
         return (logList.size()>0);
     }
 

@@ -114,4 +114,5 @@
     <string name="opCancelEditing">Cancel edited farm</string>
     <string name="cancelEditedFarmMessage">Cancel edited farm?</string>
     <string name="farmEditedMessage">Farm edited successfully</string>
+    <string name="updatingFarmLabel">Updating farm</string>
 </resources>

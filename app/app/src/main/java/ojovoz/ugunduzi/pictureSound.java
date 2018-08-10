@@ -56,14 +56,14 @@ public class pictureSound extends AppCompatActivity {
     public String userPass;
     public int userId;
     public String farmName;
+    public int farmId;
     public int plot;
 
-    boolean bChanges=false;
+    String cropNames;
+    String pestControlNames;
+    String soilManagementNames;
 
-    oCrop crop1;
-    oCrop crop2;
-    oTreatment treatment1;
-    oTreatment treatment2;
+    boolean bChanges=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,60 +72,36 @@ public class pictureSound extends AppCompatActivity {
 
         createDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath() + File.separator + getString(R.string.app_name) + File.separator);
 
-        crop1 = new oCrop(this);
-        crop2 = new oCrop(this);
-        treatment1 = new oTreatment(this);
-        treatment2 = new oTreatment(this);
-
         user = getIntent().getExtras().getString("user");
         userPass = getIntent().getExtras().getString("userPass");
         userId = getIntent().getExtras().getInt("userId");
         farmName = getIntent().getExtras().getString("farmName");
+        farmId = getIntent().getExtras().getInt("farmId");
         plot = getIntent().getExtras().getInt("plot");
 
-        crop1 = (getIntent().getExtras().getInt("crop1") > 0) ? crop1.getCropFromId(getIntent().getExtras().getInt("crop1")) : null;
-        crop2 = (getIntent().getExtras().getInt("crop2") > 0) ? crop2.getCropFromId(getIntent().getExtras().getInt("crop2")) : null;
-
-        treatment1 = (getIntent().getExtras().getInt("treatment1") > 0) ? treatment1.getTreatmentFromId(getIntent().getExtras().getInt("treatment1")) : null;
-        treatment2 = (getIntent().getExtras().getInt("treatment2") > 0) ? treatment2.getTreatmentFromId(getIntent().getExtras().getInt("treatment2")) : null;
+        cropNames = getIntent().getExtras().getString("cropNames");
+        pestControlNames = getIntent().getExtras().getString("pestControlNames");
+        soilManagementNames = getIntent().getExtras().getString("soilManagementNames");
 
         TextView tt = (TextView) findViewById(R.id.plotLabel);
         String title = "";
 
-        if (crop1 == null && crop2 == null) {
-            title = getString(R.string.plotCropLabel) + " " + getString(R.string.textNone);
+        title= getString(R.string.cropsTitle) + ": " + cropNames;
+        title+="\n";
+        title+=getString(R.string.pestControlTitle) + ": " + pestControlNames;
+        title+="\n";
+        title+=getString(R.string.soilManagementTitle) + ": " + soilManagementNames;
+
+        if(!pestControlNames.equals(getString(R.string.textNone)) && !soilManagementNames.equals(getString(R.string.textNone))) {
+            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControl));
+        } else if(!pestControlNames.equals(getString(R.string.textNone)) && soilManagementNames.equals(getString(R.string.textNone))) {
+            tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorFillPestControl));
+        } else if(pestControlNames.equals(getString(R.string.textNone)) && !soilManagementNames.equals(getString(R.string.textNone))) {
+            tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorFillSoilManagement));
         } else {
-            if (crop1 != null && crop2 == null) {
-                title = getString(R.string.plotCropLabel) + ": " + crop1.name;
-            } else if (crop1 != null && crop2 != null) {
-                title = getString(R.string.plotCropLabel) + " " + crop1.name + ", " + crop2.name;
-            }
+            tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorFillDefault));
         }
-        title += "\n";
-        if (treatment1 == null && treatment2 == null) {
-            title += getString(R.string.plotTreatmentLabel) + " " + getString(R.string.textNone);
-            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillDefault));
-        } else {
-            if (treatment1 != null && treatment2 == null) {
-                title += getString(R.string.plotTreatmentLabel) + ": " + treatment1.name;
-                if (treatment1.category == 0) {
-                    tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillPestControl));
-                } else {
-                    tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagement));
-                }
-            } else if (treatment1 != null && treatment2 != null) {
-                title += getString(R.string.plotTreatmentLabel) + " " + treatment1.name + ", " + treatment2.name;
-                if (treatment1.category != treatment2.category) {
-                    tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControl));
-                } else {
-                    if (treatment1.category == 0) {
-                        tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillPestControl));
-                    } else {
-                        tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagement));
-                    }
-                }
-            }
-        }
+
         tt.setText(title);
 
         photoDone=false;
@@ -214,6 +190,7 @@ public class pictureSound extends AppCompatActivity {
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
         i.putExtra("farmName", farmName);
+        i.putExtra("farmId", farmId);
         i.putExtra("newFarm", false);
         i.putExtra("firstFarm", false);
         startActivity(i);
@@ -226,27 +203,11 @@ public class pictureSound extends AppCompatActivity {
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
         i.putExtra("farmName", farmName);
+        i.putExtra("farmId", farmId);
         i.putExtra("plot", plot);
-        if(crop1!=null) {
-            i.putExtra("crop1", crop1.id);
-        } else {
-            i.putExtra("crop1", -1);
-        }
-        if(crop2!=null) {
-            i.putExtra("crop2", crop2.id);
-        } else {
-            i.putExtra("crop2", -1);
-        }
-        if(treatment1!=null) {
-            i.putExtra("treatment1", treatment1.id);
-        } else {
-            i.putExtra("treatment1", -1);
-        }
-        if(treatment2!=null) {
-            i.putExtra("treatment2", treatment2.id);
-        } else {
-            i.putExtra("treatment2", -1);
-        }
+        i.putExtra("cropNames",cropNames);
+        i.putExtra("pestControlNames",pestControlNames);
+        i.putExtra("soilManagementNames",soilManagementNames);
         startActivity(i);
         finish();
     }
@@ -257,27 +218,11 @@ public class pictureSound extends AppCompatActivity {
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
         i.putExtra("farmName", farmName);
+        i.putExtra("farmId", farmId);
         i.putExtra("plot", plot);
-        if(crop1!=null) {
-            i.putExtra("crop1", crop1.id);
-        } else {
-            i.putExtra("crop1", -1);
-        }
-        if(crop2!=null) {
-            i.putExtra("crop2", crop2.id);
-        } else {
-            i.putExtra("crop2", -1);
-        }
-        if(treatment1!=null) {
-            i.putExtra("treatment1", treatment1.id);
-        } else {
-            i.putExtra("treatment1", -1);
-        }
-        if(treatment2!=null) {
-            i.putExtra("treatment2", treatment2.id);
-        } else {
-            i.putExtra("treatment2", -1);
-        }
+        i.putExtra("cropNames",cropNames);
+        i.putExtra("pestControlNames",pestControlNames);
+        i.putExtra("soilManagementNames",soilManagementNames);
         startActivity(i);
         finish();
     }
@@ -469,7 +414,7 @@ public class pictureSound extends AppCompatActivity {
         }
 
         oLog log = new oLog(this);
-        log.appendToLog(farmName,userId,plot,messageDate,null,0f,null,null,null,photoFile,soundFile);
+        log.appendToLog(farmId,userId,plot,messageDate,null,0f,null,null,null,photoFile,soundFile);
 
         Button bs = (Button)findViewById(R.id.soundButton);
         bs.setText(R.string.soundButtonLabel);
