@@ -205,7 +205,7 @@ public class farmChooser extends AppCompatActivity implements httpConnection.Asy
                         deletingFarmDialog.dismiss();
                     }
                 });
-                http.execute(server + "/mobile/delete_farm.php?user=" + userId + "&farm=" + deleteList.replaceAll(" ","_"), "");
+                http.execute(server + "/mobile/delete_farm.php?user=" + userId + "&farm=" + deleteList, "");
             }
         } else {
             markDeletedFarms();
