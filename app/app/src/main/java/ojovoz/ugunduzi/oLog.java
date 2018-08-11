@@ -23,6 +23,7 @@ public class oLog {
 
     public String farmName; //delete
     public int farmId;
+    public int farmVersion;
     public int userId;
 
     public int plotId;
@@ -67,44 +68,45 @@ public class oLog {
                 oLog l = new oLog();
                 l.line=n;
                 l.farmId = Integer.parseInt(record[0]);
-                l.userId = Integer.parseInt(record[1]);
-                l.plotId = Integer.parseInt(record[2]);
-                l.date = dH.stringToDate(record[3]);
+                l.farmVersion = Integer.parseInt(record[1]);
+                l.userId = Integer.parseInt(record[2]);
+                l.plotId = Integer.parseInt(record[3]);
+                l.date = dH.stringToDate(record[4]);
                 oDataItem di = new oDataItem(context);
-                l.dataItem = di.getDataItemFromId(Integer.parseInt(record[4]));
+                l.dataItem = di.getDataItemFromId(Integer.parseInt(record[5]));
                 switch(mode){
                     case 0:
                         if(l.dataItem!=null){
-                            l.value = Float.parseFloat(record[5]);
+                            l.value = Float.parseFloat(record[6]);
                             oUnit u = new oUnit(context);
-                            l.units = u.getUnitFromId(Integer.parseInt(record[6]));
+                            l.units = u.getUnitFromId(Integer.parseInt(record[7]));
                             oCrop c = new oCrop(context);
-                            l.crop = c.getCropFromId(Integer.parseInt(record[7]));
+                            l.crop = c.getCropFromId(Integer.parseInt(record[8]));
                             oTreatment t = new oTreatment(context);
-                            l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
-                            l.sent = (record[1].equals("1"));
+                            l.treatment = t.getTreatmentFromId(Integer.parseInt(record[9]));
+                            l.sent = (record[12].equals("1"));
                             ret.add(l);
                         }
                         break;
                     case 1:
-                        if(!record[9].isEmpty()){
-                            l.picture = record[9];
-                            l.sound = record[10];
-                            l.sent = (record[1].equals("1"));
+                        if(!record[10].isEmpty()){
+                            l.picture = record[10];
+                            l.sound = record[11];
+                            l.sent = (record[12].equals("1"));
                             ret.add(l);
                         }
                         break;
                     case 2:
-                        l.value = Float.parseFloat(record[5]);
+                        l.value = Float.parseFloat(record[6]);
                         oUnit u = new oUnit(context);
-                        l.units = u.getUnitFromId(Integer.parseInt(record[6]));
+                        l.units = u.getUnitFromId(Integer.parseInt(record[7]));
                         oCrop c = new oCrop(context);
-                        l.crop = c.getCropFromId(Integer.parseInt(record[7]));
+                        l.crop = c.getCropFromId(Integer.parseInt(record[8]));
                         oTreatment t = new oTreatment(context);
-                        l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
-                        l.picture = record[9];
-                        l.sound = record[10];
-                        l.sent = (record[11].equals("1"));
+                        l.treatment = t.getTreatmentFromId(Integer.parseInt(record[9]));
+                        l.picture = record[10];
+                        l.sound = record[11];
+                        l.sent = (record[12].equals("1"));
                         ret.add(l);
                 }
                 n++;
@@ -113,6 +115,7 @@ public class oLog {
         return ret;
     }
 
+    /*
     public ArrayList<oLog> createLog(int userId, int mode){
         ArrayList<oLog> ret = new ArrayList<>();
         csvFileManager log;
@@ -124,48 +127,49 @@ public class oLog {
             int n=0;
             while (iterator.hasNext()) {
                 String[] record = iterator.next();
-                if(Integer.parseInt(record[1])==userId) {
+                if(Integer.parseInt(record[2])==userId) {
                     oLog l = new oLog();
                     l.line=n;
                     l.farmId = Integer.parseInt(record[0]);
-                    l.userId = Integer.parseInt(record[1]);
-                    l.plotId = Integer.parseInt(record[2]);
-                    l.date = dH.stringToDate(record[3]);
+                    l.farmVersion = Integer.parseInt(record[1]);
+                    l.userId = Integer.parseInt(record[2]);
+                    l.plotId = Integer.parseInt(record[3]);
+                    l.date = dH.stringToDate(record[4]);
                     oDataItem di = new oDataItem(context);
-                    l.dataItem = di.getDataItemFromId(Integer.parseInt(record[4]));
+                    l.dataItem = di.getDataItemFromId(Integer.parseInt(record[5]));
                     switch(mode){
                         case 0:
                             if(l.dataItem!=null){
-                                l.value = Float.parseFloat(record[5]);
+                                l.value = Float.parseFloat(record[6]);
                                 oUnit u = new oUnit(context);
-                                l.units = u.getUnitFromId(Integer.parseInt(record[6]));
+                                l.units = u.getUnitFromId(Integer.parseInt(record[7]));
                                 oCrop c = new oCrop(context);
-                                l.crop = c.getCropFromId(Integer.parseInt(record[7]));
+                                l.crop = c.getCropFromId(Integer.parseInt(record[8]));
                                 oTreatment t = new oTreatment(context);
-                                l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
-                                l.sent = (record[11].equals("1"));
+                                l.treatment = t.getTreatmentFromId(Integer.parseInt(record[9]));
+                                l.sent = (record[12].equals("1"));
                                 ret.add(l);
                             }
                             break;
                         case 1:
-                            if(!record[9].isEmpty()){
-                                l.picture = record[9];
-                                l.sound = record[10];
-                                l.sent = (record[11].equals("1"));
+                            if(!record[10].isEmpty()){
+                                l.picture = record[10];
+                                l.sound = record[11];
+                                l.sent = (record[12].equals("1"));
                                 ret.add(l);
                             }
                             break;
                         case 2:
-                            l.value = Float.parseFloat(record[5]);
+                            l.value = Float.parseFloat(record[6]);
                             oUnit u = new oUnit(context);
-                            l.units = u.getUnitFromId(Integer.parseInt(record[6]));
+                            l.units = u.getUnitFromId(Integer.parseInt(record[7]));
                             oCrop c = new oCrop(context);
-                            l.crop = c.getCropFromId(Integer.parseInt(record[7]));
+                            l.crop = c.getCropFromId(Integer.parseInt(record[8]));
                             oTreatment t = new oTreatment(context);
-                            l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
-                            l.picture = record[9];
-                            l.sound = record[10];
-                            l.sent = (record[11].equals("1"));
+                            l.treatment = t.getTreatmentFromId(Integer.parseInt(record[9]));
+                            l.picture = record[10];
+                            l.sound = record[11];
+                            l.sent = (record[12].equals("1"));
                             ret.add(l);
                     }
                 }
@@ -174,6 +178,7 @@ public class oLog {
         }
         return ret;
     }
+    */
 
     public ArrayList<oLog> createLog(int farmId, int userId, int mode){
         ArrayList<oLog> ret = new ArrayList<>();
@@ -186,48 +191,49 @@ public class oLog {
             int n=0;
             while (iterator.hasNext()) {
                 String[] record = iterator.next();
-                if(Integer.parseInt(record[0])==(farmId) && (Integer.parseInt(record[1])==userId || userId==-1)) {
+                if(Integer.parseInt(record[0])==(farmId) && (Integer.parseInt(record[2])==userId || userId==-1)) {
                     oLog l = new oLog();
                     l.line=n;
                     l.farmId = Integer.parseInt(record[0]);
-                    l.userId = Integer.parseInt(record[1]);
-                    l.plotId = Integer.parseInt(record[2]);
-                    l.date = dH.stringToDate(record[3]);
+                    l.farmVersion = Integer.parseInt(record[1]);
+                    l.userId = Integer.parseInt(record[2]);
+                    l.plotId = Integer.parseInt(record[3]);
+                    l.date = dH.stringToDate(record[4]);
                     oDataItem di = new oDataItem(context);
-                    l.dataItem = di.getDataItemFromId(Integer.parseInt(record[4]));
+                    l.dataItem = di.getDataItemFromId(Integer.parseInt(record[5]));
                     switch(mode){
                         case 0:
                             if(l.dataItem!=null){
-                                l.value = Float.parseFloat(record[5]);
+                                l.value = Float.parseFloat(record[6]);
                                 oUnit u = new oUnit(context);
-                                l.units = u.getUnitFromId(Integer.parseInt(record[6]));
+                                l.units = u.getUnitFromId(Integer.parseInt(record[7]));
                                 oCrop c = new oCrop(context);
-                                l.crop = c.getCropFromId(Integer.parseInt(record[7]));
+                                l.crop = c.getCropFromId(Integer.parseInt(record[8]));
                                 oTreatment t = new oTreatment(context);
-                                l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
-                                l.sent = (record[11].equals("1"));
+                                l.treatment = t.getTreatmentFromId(Integer.parseInt(record[9]));
+                                l.sent = (record[12].equals("1"));
                                 ret.add(l);
                             }
                             break;
                         case 1:
-                            if(!record[9].isEmpty()){
-                                l.picture = record[9];
-                                l.sound = record[10];
-                                l.sent = (record[11].equals("1"));
+                            if(!record[10].isEmpty()){
+                                l.picture = record[10];
+                                l.sound = record[11];
+                                l.sent = (record[12].equals("1"));
                                 ret.add(l);
                             }
                             break;
                         case 2:
-                            l.value = Float.parseFloat(record[5]);
+                            l.value = Float.parseFloat(record[6]);
                             oUnit u = new oUnit(context);
-                            l.units = u.getUnitFromId(Integer.parseInt(record[6]));
+                            l.units = u.getUnitFromId(Integer.parseInt(record[7]));
                             oCrop c = new oCrop(context);
-                            l.crop = c.getCropFromId(Integer.parseInt(record[7]));
+                            l.crop = c.getCropFromId(Integer.parseInt(record[8]));
                             oTreatment t = new oTreatment(context);
-                            l.treatment = t.getTreatmentFromId(Integer.parseInt(record[8]));
-                            l.picture = record[9];
-                            l.sound = record[10];
-                            l.sent = (record[11].equals("1"));
+                            l.treatment = t.getTreatmentFromId(Integer.parseInt(record[9]));
+                            l.picture = record[10];
+                            l.sound = record[11];
+                            l.sent = (record[12].equals("1"));
                             ret.add(l);
                     }
                 }
@@ -237,6 +243,8 @@ public class oLog {
         return ret;
     }
 
+
+    //TODO: substitute farmName with farmId
     public ArrayList<oLog> createLog(String fName, int userId, int plot, int mode){
 
         //mode: 0=data only; 1=picture + sound only; 2=both
@@ -303,7 +311,7 @@ public class oLog {
     }
 
 
-    public void appendToLog(int farmId, int userId, int plot, Date date, oDataItem dataItem, float value, oUnit units, oCrop crop, oTreatment treatment, String picture, String sound){
+    public void appendToLog(int farmId, int farmVersion, int userId, int plot, Date date, oDataItem dataItem, float value, oUnit units, oCrop crop, oTreatment treatment, String picture, String sound){
         dateHelper dH = new dateHelper();
 
         csvFileManager log = new csvFileManager("log");
@@ -315,7 +323,7 @@ public class oLog {
         unitsId = (units == null) ? "0" : Integer.toString(units.id);
         cropId = (crop == null) ? "0" : Integer.toString(crop.id);
         treatmentId = (treatment == null) ? "0" : Integer.toString(treatment.id);
-        String[] newLine = {Integer.toString(farmId), Integer.toString(userId), Integer.toString(plot), dH.dateToString(date), dataItemId, Float.toString(value), unitsId, cropId, treatmentId, picture, sound, "0"};
+        String[] newLine = {Integer.toString(farmId), Integer.toString(farmVersion), Integer.toString(userId), Integer.toString(plot), dH.dateToString(date), dataItemId, Float.toString(value), unitsId, cropId, treatmentId, picture, sound, "0"};
 
         log.append(context, newLine);
     }

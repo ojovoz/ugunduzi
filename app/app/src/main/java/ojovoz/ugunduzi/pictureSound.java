@@ -57,6 +57,7 @@ public class pictureSound extends AppCompatActivity {
     public int userId;
     public String farmName;
     public int farmId;
+    public int farmVersion;
     public int plot;
 
     String cropNames;
@@ -77,6 +78,7 @@ public class pictureSound extends AppCompatActivity {
         userId = getIntent().getExtras().getInt("userId");
         farmName = getIntent().getExtras().getString("farmName");
         farmId = getIntent().getExtras().getInt("farmId");
+        farmVersion = getIntent().getExtras().getInt("farmVersion");
         plot = getIntent().getExtras().getInt("plot");
 
         cropNames = getIntent().getExtras().getString("cropNames");
@@ -204,6 +206,7 @@ public class pictureSound extends AppCompatActivity {
         i.putExtra("userPass", userPass);
         i.putExtra("farmName", farmName);
         i.putExtra("farmId", farmId);
+        i.putExtra("farmVersion", farmVersion);
         i.putExtra("plot", plot);
         i.putExtra("cropNames",cropNames);
         i.putExtra("pestControlNames",pestControlNames);
@@ -219,6 +222,7 @@ public class pictureSound extends AppCompatActivity {
         i.putExtra("userPass", userPass);
         i.putExtra("farmName", farmName);
         i.putExtra("farmId", farmId);
+        i.putExtra("farmVersion", farmVersion);
         i.putExtra("plot", plot);
         i.putExtra("cropNames",cropNames);
         i.putExtra("pestControlNames",pestControlNames);
@@ -414,7 +418,7 @@ public class pictureSound extends AppCompatActivity {
         }
 
         oLog log = new oLog(this);
-        log.appendToLog(farmId,userId,plot,messageDate,null,0f,null,null,null,photoFile,soundFile);
+        log.appendToLog(farmId,farmVersion,userId,plot,messageDate,null,0f,null,null,null,photoFile,soundFile);
 
         Button bs = (Button)findViewById(R.id.soundButton);
         bs.setText(R.string.soundButtonLabel);

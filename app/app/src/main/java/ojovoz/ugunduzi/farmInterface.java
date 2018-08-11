@@ -868,6 +868,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         i.putExtra("userPass", userPass);
         i.putExtra("farmName",farmName);
         i.putExtra("farmId", farmId);
+        i.putExtra("farmVersion", currentFarm.version);
         i.putExtra("plot",plotMatrix.currentPlot.id);
         i.putExtra("cropNames",plotMatrix.currentPlot.getCropNames(this));
         i.putExtra("pestControlNames",plotMatrix.currentPlot.getPestControlNames(this));
@@ -884,6 +885,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         i.putExtra("userPass", userPass);
         i.putExtra("farmName",farmName);
         i.putExtra("farmId", farmId);
+        i.putExtra("farmVersion", currentFarm.version);
         i.putExtra("plot",plotMatrix.currentPlot.id);
         i.putExtra("cropNames",plotMatrix.currentPlot.getCropNames(this));
         i.putExtra("pestControlNames",plotMatrix.currentPlot.getPestControlNames(this));
