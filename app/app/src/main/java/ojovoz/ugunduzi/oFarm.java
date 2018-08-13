@@ -153,6 +153,24 @@ public class oFarm {
         return ret;
     }
 
+    public oFarm getVersion(int userId, int id, int version, Context c){
+        oFarm ret = null;
+        ArrayList<oFarm> farms = getFarms(userId, id);
+        Iterator<oFarm> iterator = farms.iterator();
+        while(iterator.hasNext()) {
+            oFarm f = iterator.next();
+            if(f.version==version && f.status!=1){
+                ret=f;
+                break;
+            }
+        }
+
+        if(ret!=null){
+            ret.context=c;
+        }
+        return ret;
+    }
+
     public int getNumberOfFarms(int userId){
         ArrayList<oFarm> farms = getActiveFarms(userId);
         return farms.size();
@@ -219,7 +237,7 @@ public class oFarm {
 
     public boolean hasRecords(){
         oLog l = new oLog(context);
-        ArrayList<oLog> logList = l.createLog(id,-1,2);
+        ArrayList<oLog> logList = l.createLog(id,version,-1,2);
         return (logList.size()>0);
     }
 

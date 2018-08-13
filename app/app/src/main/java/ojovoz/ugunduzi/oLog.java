@@ -115,71 +115,7 @@ public class oLog {
         return ret;
     }
 
-    /*
-    public ArrayList<oLog> createLog(int userId, int mode){
-        ArrayList<oLog> ret = new ArrayList<>();
-        csvFileManager log;
-
-        log = new csvFileManager("log");
-        List<String[]> logCSV = log.read(context);
-        if(logCSV!=null) {
-            Iterator<String[]> iterator = logCSV.iterator();
-            int n=0;
-            while (iterator.hasNext()) {
-                String[] record = iterator.next();
-                if(Integer.parseInt(record[2])==userId) {
-                    oLog l = new oLog();
-                    l.line=n;
-                    l.farmId = Integer.parseInt(record[0]);
-                    l.farmVersion = Integer.parseInt(record[1]);
-                    l.userId = Integer.parseInt(record[2]);
-                    l.plotId = Integer.parseInt(record[3]);
-                    l.date = dH.stringToDate(record[4]);
-                    oDataItem di = new oDataItem(context);
-                    l.dataItem = di.getDataItemFromId(Integer.parseInt(record[5]));
-                    switch(mode){
-                        case 0:
-                            if(l.dataItem!=null){
-                                l.value = Float.parseFloat(record[6]);
-                                oUnit u = new oUnit(context);
-                                l.units = u.getUnitFromId(Integer.parseInt(record[7]));
-                                oCrop c = new oCrop(context);
-                                l.crop = c.getCropFromId(Integer.parseInt(record[8]));
-                                oTreatment t = new oTreatment(context);
-                                l.treatment = t.getTreatmentFromId(Integer.parseInt(record[9]));
-                                l.sent = (record[12].equals("1"));
-                                ret.add(l);
-                            }
-                            break;
-                        case 1:
-                            if(!record[10].isEmpty()){
-                                l.picture = record[10];
-                                l.sound = record[11];
-                                l.sent = (record[12].equals("1"));
-                                ret.add(l);
-                            }
-                            break;
-                        case 2:
-                            l.value = Float.parseFloat(record[6]);
-                            oUnit u = new oUnit(context);
-                            l.units = u.getUnitFromId(Integer.parseInt(record[7]));
-                            oCrop c = new oCrop(context);
-                            l.crop = c.getCropFromId(Integer.parseInt(record[8]));
-                            oTreatment t = new oTreatment(context);
-                            l.treatment = t.getTreatmentFromId(Integer.parseInt(record[9]));
-                            l.picture = record[10];
-                            l.sound = record[11];
-                            l.sent = (record[12].equals("1"));
-                            ret.add(l);
-                    }
-                }
-                n++;
-            }
-        }
-        return ret;
-    }
-    */
-
+    //TODO: delete this method, use createLog(int farmId, int version, int userId, int mode) instead
     public ArrayList<oLog> createLog(int farmId, int userId, int mode){
         ArrayList<oLog> ret = new ArrayList<>();
         csvFileManager log;
@@ -243,8 +179,71 @@ public class oLog {
         return ret;
     }
 
+    public ArrayList<oLog> createLog(int farmId, int version, int userId, int mode){
+        ArrayList<oLog> ret = new ArrayList<>();
+        csvFileManager log;
 
-    //TODO: substitute farmName with farmId
+        log = new csvFileManager("log");
+        List<String[]> logCSV = log.read(context);
+        if(logCSV!=null) {
+            Iterator<String[]> iterator = logCSV.iterator();
+            int n=0;
+            while (iterator.hasNext()) {
+                String[] record = iterator.next();
+                if(Integer.parseInt(record[0])==farmId && Integer.parseInt(record[1])==version && (Integer.parseInt(record[2])==userId || userId==-1)) {
+                    oLog l = new oLog();
+                    l.line=n;
+                    l.farmId = Integer.parseInt(record[0]);
+                    l.farmVersion = Integer.parseInt(record[1]);
+                    l.userId = Integer.parseInt(record[2]);
+                    l.plotId = Integer.parseInt(record[3]);
+                    l.date = dH.stringToDate(record[4]);
+                    oDataItem di = new oDataItem(context);
+                    l.dataItem = di.getDataItemFromId(Integer.parseInt(record[5]));
+                    switch(mode){
+                        case 0:
+                            if(l.dataItem!=null){
+                                l.value = Float.parseFloat(record[6]);
+                                oUnit u = new oUnit(context);
+                                l.units = u.getUnitFromId(Integer.parseInt(record[7]));
+                                oCrop c = new oCrop(context);
+                                l.crop = c.getCropFromId(Integer.parseInt(record[8]));
+                                oTreatment t = new oTreatment(context);
+                                l.treatment = t.getTreatmentFromId(Integer.parseInt(record[9]));
+                                l.sent = (record[12].equals("1"));
+                                ret.add(l);
+                            }
+                            break;
+                        case 1:
+                            if(!record[10].isEmpty()){
+                                l.picture = record[10];
+                                l.sound = record[11];
+                                l.sent = (record[12].equals("1"));
+                                ret.add(l);
+                            }
+                            break;
+                        case 2:
+                            l.value = Float.parseFloat(record[6]);
+                            oUnit u = new oUnit(context);
+                            l.units = u.getUnitFromId(Integer.parseInt(record[7]));
+                            oCrop c = new oCrop(context);
+                            l.crop = c.getCropFromId(Integer.parseInt(record[8]));
+                            oTreatment t = new oTreatment(context);
+                            l.treatment = t.getTreatmentFromId(Integer.parseInt(record[9]));
+                            l.picture = record[10];
+                            l.sound = record[11];
+                            l.sent = (record[12].equals("1"));
+                            ret.add(l);
+                    }
+                }
+                n++;
+            }
+        }
+        return ret;
+    }
+
+
+    //TODO: substitute farmName with farmId, add version
     public ArrayList<oLog> createLog(String fName, int userId, int plot, int mode){
 
         //mode: 0=data only; 1=picture + sound only; 2=both

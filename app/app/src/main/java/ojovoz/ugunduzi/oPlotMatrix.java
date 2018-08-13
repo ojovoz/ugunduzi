@@ -27,10 +27,14 @@ public class oPlotMatrix {
 
     int plotIndex=0;
 
+    boolean bGoNext;
+    boolean bGoPrev;
+
     oPlotMatrix() {
         plots = new ArrayList<>();
         matrix = new matrixContent[4][4];
         currentPlot = new oPlot();
+        bGoNext = bGoPrev = false;
     }
 
     public void createMatrix(int w, int h) {
@@ -180,21 +184,29 @@ public class oPlotMatrix {
     public boolean passEvent(MotionEvent e, int state) {
         if (e.getActionMasked() == MotionEvent.ACTION_DOWN) {
             currentPlot = getTouchedPlot((int) e.getX(), (int) e.getY(), state);
+            startX = (int) e.getX();
+            startY = (int) e.getY();
             if (currentPlot != null) {
                 if (currentPlot.state == 2 || currentPlot.state == 3) {
                     ghostPlot = new oPlot(currentPlot.x, currentPlot.y, (int) currentPlot.w, (int) currentPlot.h);
                     offsetX = (int) (e.getX() - ghostPlot.x);
                     offsetY = (int) (e.getY() - ghostPlot.y);
-                    startX = (int) e.getX();
-                    startY = (int) e.getY();
                     return true;
                 } else {
                     ghostPlot = null;
-                    return false;
+                    if(state==1 && currentPlot.state==1){
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
             } else {
                 ghostPlot = null;
-                return false;
+                if(state==1){
+                    return true;
+                } else {
+                    return false;
+                }
             }
 
         } else if (e.getActionMasked() == MotionEvent.ACTION_UP) {
@@ -203,10 +215,17 @@ public class oPlotMatrix {
                     snapToGrid();
                     currentPlot.state = 0;
                     ghostPlot = null;
+                } else {
+                    calculateXDelta((int)e.getX(),(int)e.getY());
                 }
                 return true;
             } else {
-                return false;
+                if(state==1){
+                    calculateXDelta((int)e.getX(),(int)e.getY());
+                    return true;
+                } else {
+                    return false;
+                }
             }
         } else if (e.getActionMasked() == MotionEvent.ACTION_MOVE && (state==0 || state==2)) {
             if (currentPlot != null && ghostPlot != null) {
@@ -420,6 +439,17 @@ public class oPlotMatrix {
 
     public ArrayList<oPlot> getPlots() {
         return plots;
+    }
+
+    public void calculateXDelta(int x, int y){
+        double xDelta = startX - x;
+        double yDelta = startY - y;
+        if(Math.abs(xDelta)>=(displayWidth/2) && (Math.abs(yDelta)<Math.abs(xDelta))){
+            bGoPrev = (xDelta<0);
+            bGoNext = !bGoPrev;
+        } else {
+            bGoPrev = bGoNext = false;
+        }
     }
 
     public oPlot getPlotFromId(int id){

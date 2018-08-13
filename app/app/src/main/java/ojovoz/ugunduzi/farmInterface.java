@@ -80,6 +80,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     int state; //0 = new farm; 1 = actions; 2 = edit farm
 
     int farmVersion;
+    int maxVersion;
 
     oPlotMatrix plotMatrix;
     String sMatrix;
@@ -146,6 +147,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             } else {
                 currentFarm=currentFarm.getLatestActiveVersion(userId,farmId,this);
                 farmName=currentFarm.name;
+                maxVersion=farmVersion=currentFarm.version;
             }
             this.setTitle(farmName);
         }
@@ -255,12 +257,19 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         } else if(state==1){
             menu.add(0, 0, 0, R.string.opManageFarmRecords);
-            menu.add(1, 1, 1, R.string.opEditFarm);
-            menu.add(2, 2, 2, R.string.opCreateNewFarm);
-            if(currentFarm.getNumberOfFarms(userId)>1) {
-                menu.add(3, 3, 3, R.string.opGoToOtherFarm);
+            if(farmVersion==maxVersion) {
+                menu.add(1, 1, 1, R.string.opEditFarm);
+            } else {
+                menu.add(1, 1, 1, R.string.opGoToCurrentState);
             }
-            menu.add(4, 4, 4, R.string.opSwitchUser);
+            if(farmVersion==maxVersion){
+                menu.add(2, 2, 2, R.string.opDeleteFarm);
+            }
+            menu.add(3, 3, 3, R.string.opCreateNewFarm);
+            if(currentFarm.getNumberOfFarms(userId)>1) {
+                menu.add(4, 4, 4, R.string.opGoToOtherFarm);
+            }
+            menu.add(5, 5, 5, R.string.opSwitchUser);
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -297,15 +306,21 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     goToRecords(true);
                     break;
                 case 1:
-                    startEditFarm();
+                    if(farmVersion==maxVersion) {
+                        startEditFarm();
+                    } else {
+                        goToLatestFarm();
+                    }
                     break;
                 case 2:
+                    //TODO: delete farm. If only farm, restart. If other farm, go to it. If more than 2 farms, go to farmChooser
+                case 3:
                     createNewFarm();
                     break;
-                case 3:
+                case 4:
                     goToFarmChooser();
                     break;
-                case 4:
+                case 5:
                     confirmExit();
             }
         }
@@ -447,6 +462,18 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         plotMatrix.createMatrix(displayWidth,displayHeight);
         createFarm();
         bFarmSaved=false;
+        canvasView.invalidate();
+    }
+
+    public void goToLatestFarm(){
+        currentFarm=currentFarm.getLatestActiveVersion(userId,farmId,this);
+        farmName=currentFarm.name;
+        farmSize=currentFarm.size;
+        farmVersion=currentFarm.version;
+        plotMatrix = new oPlotMatrix();
+        plotMatrix.createMatrix(displayWidth,displayHeight);
+        createFarm();
+        this.setTitle(farmName);
         canvasView.invalidate();
     }
 
@@ -860,6 +887,28 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         dialog.show();
     }
 
+    public void farmHistory(boolean bNext,boolean bPrev){
+        dateHelper dH = new dateHelper();
+        plotMatrix.bGoPrev = plotMatrix.bGoNext = false;
+        if(bNext && farmVersion<maxVersion){
+            farmVersion++;
+        } else if(bPrev && farmVersion>0){
+            farmVersion--;
+        }
+        currentFarm = currentFarm.getVersion(userId,farmId,farmVersion,this);
+        farmName=currentFarm.name;
+        farmSize=currentFarm.size;
+        plotMatrix = new oPlotMatrix();
+        plotMatrix.createMatrix(displayWidth,displayHeight);
+        createFarm();
+        if(farmVersion<maxVersion) {
+            this.setTitle(farmName + ": " + dH.dateToString(currentFarm.dateCreated));
+        } else {
+            this.setTitle(farmName);
+        }
+        invalidateOptionsMenu();
+    }
+
     public void goToDataEntry(){
         final Context context = this;
         Intent i = new Intent(context, enterData.class);
@@ -967,7 +1016,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
             if(bChangesMade) {
 
-                farmVersion = (state == 0) ? 0 : (bSaveEditedFarmAsNew) ? currentFarm.version + 1 : currentFarm.version;
+                maxVersion = farmVersion = (state == 0) ? 0 : (bSaveEditedFarmAsNew) ? currentFarm.version + 1 : currentFarm.version;
 
                 String saveString = user + ";" + userPass + ";" + farmName + ";" + String.valueOf(farmSize) + ";" + farmDateString + ";" + String.valueOf(farmId) + ";" + String.valueOf(farmVersion) + ";" + sMatrix;
                 httpConnection http = new httpConnection(this, this);
@@ -1095,6 +1144,9 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     } else if (plotMatrix.currentPlot.state == 5 && state==1){
                         showActionChooser();
                     }
+                }
+                if(state==1 && (plotMatrix.bGoNext || plotMatrix.bGoPrev)) {
+                    farmHistory(plotMatrix.bGoNext, plotMatrix.bGoPrev);
                 }
                 return b;
             } else {
