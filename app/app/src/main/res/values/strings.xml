@@ -115,6 +115,6 @@
     <string name="cancelEditedFarmMessage">Cancel edited farm?</string>
     <string name="farmEditedMessage">Farm edited successfully</string>
     <string name="updatingFarmLabel">Updating farm</string>
-    <string name="opGoToCurrentState">Go to current farm state</string>
+    <string name="opGoToCurrentState">Go to present </string>
     <string name="opDeleteFarm">Delete farm</string>
 </resources>

@@ -223,18 +223,26 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     @Override
     public void onBackPressed () {
+        boolean bProceed=true;
         if(!bFarmSaved && (state==0||state==2)) {
-            AlertDialog.Builder logoutDialog = new AlertDialog.Builder(this);
-            logoutDialog.setMessage(R.string.farmHasNotBeenSavedMessage);
-            logoutDialog.setNegativeButton(R.string.noButtonText,null);
-            logoutDialog.setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    finish();
-                }
-            });
-            logoutDialog.create();
-            logoutDialog.show();
+            if(state==2){
+                bProceed=farmHasBeenEdited();
+            }
+            if(bProceed) {
+                AlertDialog.Builder logoutDialog = new AlertDialog.Builder(this);
+                logoutDialog.setMessage(R.string.farmHasNotBeenSavedMessage);
+                logoutDialog.setNegativeButton(R.string.noButtonText, null);
+                logoutDialog.setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        finish();
+                    }
+                });
+                logoutDialog.create();
+                logoutDialog.show();
+            } else {
+                doCancelEditedFarm();
+            }
         } else {
             super.onBackPressed();
         }
@@ -409,17 +417,21 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     }
 
     public void cancelEditedFarm(){
-        AlertDialog.Builder logoutDialog = new AlertDialog.Builder(this);
-        logoutDialog.setMessage(R.string.cancelEditedFarmMessage);
-        logoutDialog.setNegativeButton(R.string.noButtonText,null);
-        logoutDialog.setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                doCancelEditedFarm();
-            }
-        });
-        logoutDialog.create();
-        logoutDialog.show();
+        if(farmHasBeenEdited()) {
+            AlertDialog.Builder logoutDialog = new AlertDialog.Builder(this);
+            logoutDialog.setMessage(R.string.cancelEditedFarmMessage);
+            logoutDialog.setNegativeButton(R.string.noButtonText, null);
+            logoutDialog.setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    doCancelEditedFarm();
+                }
+            });
+            logoutDialog.create();
+            logoutDialog.show();
+        } else {
+            doCancelEditedFarm();
+        }
     }
 
     public void doCancelEditedFarm(){
@@ -889,24 +901,29 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     public void farmHistory(boolean bNext,boolean bPrev){
         dateHelper dH = new dateHelper();
+        boolean bChange=false;
         plotMatrix.bGoPrev = plotMatrix.bGoNext = false;
         if(bNext && farmVersion<maxVersion){
             farmVersion++;
+            bChange=true;
         } else if(bPrev && farmVersion>0){
             farmVersion--;
+            bChange=true;
         }
-        currentFarm = currentFarm.getVersion(userId,farmId,farmVersion,this);
-        farmName=currentFarm.name;
-        farmSize=currentFarm.size;
-        plotMatrix = new oPlotMatrix();
-        plotMatrix.createMatrix(displayWidth,displayHeight);
-        createFarm();
-        if(farmVersion<maxVersion) {
-            this.setTitle(farmName + ": " + dH.dateToString(currentFarm.dateCreated));
-        } else {
-            this.setTitle(farmName);
+        if(bChange) {
+            currentFarm = currentFarm.getVersion(userId, farmId, farmVersion, this);
+            farmName = currentFarm.name;
+            farmSize = currentFarm.size;
+            plotMatrix = new oPlotMatrix();
+            plotMatrix.createMatrix(displayWidth, displayHeight);
+            createFarm();
+            if (farmVersion < maxVersion) {
+                this.setTitle(farmName + ": " + dH.dateToString(currentFarm.dateCreated));
+            } else {
+                this.setTitle(farmName);
+            }
+            invalidateOptionsMenu();
         }
-        invalidateOptionsMenu();
     }
 
     public void goToDataEntry(){
@@ -987,9 +1004,20 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         farmSize = fSize;
     }
 
+    public boolean farmHasBeenEdited(){
+        boolean ret=true;
+        oFarm pastFarm = new oFarm(this);
+        pastFarm = pastFarm.getLatestActiveVersion(userId,farmId,this);
+        String newMatrix=plotMatrix.toString();
+        if(pastFarm.name.equals(farmName) && pastFarm.size==farmSize && pastFarm.plotMatrix.equals(newMatrix)){
+            ret=false;
+        }
+        return ret;
+    }
+
     public void saveFarm(){
 
-        boolean bChangesMade=true;
+        boolean bChangesMade;
         dateHelper dH = new dateHelper();
         sMatrix = plotMatrix.toString();
 
@@ -1005,14 +1033,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 farmId=currentFarm.getFarmIdFromNameUser(userId, farmName);
             }
 
-            if(state==2){
-                oFarm pastFarm = new oFarm(this);
-                pastFarm = pastFarm.getLatestActiveVersion(userId,farmId,this);
-
-                if(pastFarm.name.equals(farmName) && pastFarm.size==farmSize && pastFarm.plotMatrix.equals(sMatrix)){
-                    bChangesMade=false;
-                }
-            }
+            bChangesMade = (state==2) ? farmHasBeenEdited() : true;
 
             if(bChangesMade) {
 
