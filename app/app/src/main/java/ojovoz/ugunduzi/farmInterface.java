@@ -12,6 +12,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +31,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -98,8 +100,10 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     preferenceManager prefs;
 
     boolean bConnecting=false;
+    int connectionTask; //0=create new farm, 1=delete farm
     String server;
     ProgressDialog createFarmDialog;
+    ProgressDialog deleteFarmDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -272,12 +276,13 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
             if(farmVersion==maxVersion){
                 menu.add(2, 2, 2, R.string.opDeleteFarm);
+                menu.add(3, 3, 3, R.string.opCreateNewFarm);
+                if(currentFarm.getNumberOfFarms(userId)>1) {
+                    menu.add(4, 4, 4, R.string.opGoToOtherFarm);
+                }
+                menu.add(5, 5, 5, R.string.opSwitchUser);
             }
-            menu.add(3, 3, 3, R.string.opCreateNewFarm);
-            if(currentFarm.getNumberOfFarms(userId)>1) {
-                menu.add(4, 4, 4, R.string.opGoToOtherFarm);
-            }
-            menu.add(5, 5, 5, R.string.opSwitchUser);
+
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -321,7 +326,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     }
                     break;
                 case 2:
-                    //TODO: delete farm. If only farm, restart. If other farm, go to it. If more than 2 farms, go to farmChooser
+                    deleteFarm();
+                    break;
                 case 3:
                     createNewFarm();
                     break;
@@ -348,6 +354,120 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         });
         logoutDialog.create();
         logoutDialog.show();
+    }
+
+    public void deleteFarm(){
+        AlertDialog.Builder deleteFarmDialog = new AlertDialog.Builder(this);
+
+        deleteFarmDialog.setMessage(getString(R.string.deleteThisFarmConfirmMessage));
+        deleteFarmDialog.setNegativeButton(R.string.noButtonText,null);
+        deleteFarmDialog.setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                doDeleteFarm();
+            }
+        });
+        deleteFarmDialog.create();
+        deleteFarmDialog.show();
+    }
+
+    public void doDeleteFarm(){
+
+        httpConnection http = new httpConnection(this, this);
+        if (http.isOnline()) {
+            bConnecting=true;
+            connectionTask=1;
+            CharSequence dialogTitle = getString(R.string.deletingFarmLabel);
+
+            deleteFarmDialog = new ProgressDialog(this);
+            deleteFarmDialog.setCancelable(true);
+            deleteFarmDialog.setCanceledOnTouchOutside(false);
+            deleteFarmDialog.setMessage(dialogTitle);
+            deleteFarmDialog.setIndeterminate(true);
+            deleteFarmDialog.show();
+            deleteFarmDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface d) {
+                    bConnecting = false;
+                    deleteFarmDialog.dismiss();
+                }
+            });
+            http.execute(server + "/mobile/delete_farm.php?user=" + userId + "&farm=" + Integer.toString(farmId), "");
+        } else {
+            markDeletedFarm();
+            afterFarmDeletion();
+        }
+    }
+
+    public void markDeletedFarm(){
+        oFarm f = new oFarm(this);
+        int[] idsToDelete = f.getFarmLineList(userId,farmId);
+        f.updateFarmstatus(idsToDelete,1);
+        deleteFarmLogs(idsToDelete);
+    }
+
+    public void deleteFarmLogs(int[] ids){
+        oLog l = new oLog(this);
+        ArrayList<String> deleteFiles = l.deleteFarmItems(ids);
+        deleteImgSndFiles(deleteFiles);
+    }
+
+    public void deleteImgSndFiles(ArrayList<String> deleteFiles){
+        Iterator<String> iterator = deleteFiles.iterator();
+        while (iterator.hasNext()) {
+            String f = iterator.next();
+            File fileX = new File(f);
+            long imgFileDate = fileX.lastModified();
+            fileX.delete();
+            if (f.contains("jpg")) {
+                String defaultGalleryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + File.separator + "Camera";
+                File imgs = new File(defaultGalleryPath);
+                File imgsArray[] = imgs.listFiles();
+                for (int i = 0; i < imgsArray.length; i++) {
+                    if (Math.abs(imgsArray[i].lastModified() - imgFileDate) <= 3000) {
+                        imgsArray[i].delete();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public void executeDeleteFarm(){
+        oFarm f = new oFarm(this);
+        int[] idsToDelete = f.getFarmLineList(userId,farmId);
+        f.doDeleteFarm(idsToDelete);
+        deleteFarmLogs(idsToDelete);
+    }
+
+    public void afterFarmDeletion(){
+        oFarm f = new oFarm(this);
+        ArrayList<oFarm> userFarms = f.getActiveFarms(userId);
+        if(userFarms.size()>0) {
+            if (userFarms.size() > 1) {
+                goToFarmChooser();
+            } else {
+                currentFarm = userFarms.get(0);
+                farmId = currentFarm.id;
+                prefs.savePreferenceInt("farmId", farmId);
+                farmName = currentFarm.name;
+                maxVersion = farmVersion = currentFarm.version;
+                this.setTitle(farmName);
+                state = 1;
+                firstFarm = false;
+                newFarm = false;
+                bFarmSaved = true;
+                plotMatrix = new oPlotMatrix();
+                plotMatrix.createMatrix(displayWidth, displayHeight);
+                createFarm();
+                invalidateOptionsMenu();
+                canvasView.invalidate();
+            }
+        } else {
+            prefs.deletePreference("farmId");
+            firstFarm=true;
+            createNewFarm();
+        }
     }
 
     public void goToLogin(){
@@ -911,14 +1031,16 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             bChange=true;
         }
         if(bChange) {
+            String date = dH.dateToString(currentFarm.dateCreated);
             currentFarm = currentFarm.getVersion(userId, farmId, farmVersion, this);
             farmName = currentFarm.name;
+            Toast.makeText(this, farmName + ": " + date, Toast.LENGTH_SHORT).show();
             farmSize = currentFarm.size;
             plotMatrix = new oPlotMatrix();
             plotMatrix.createMatrix(displayWidth, displayHeight);
             createFarm();
             if (farmVersion < maxVersion) {
-                this.setTitle(farmName + ": " + dH.dateToString(currentFarm.dateCreated));
+                this.setTitle(farmName + ": " + date);
             } else {
                 this.setTitle(farmName);
             }
@@ -1042,6 +1164,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 String saveString = user + ";" + userPass + ";" + farmName + ";" + String.valueOf(farmSize) + ";" + farmDateString + ";" + String.valueOf(farmId) + ";" + String.valueOf(farmVersion) + ";" + sMatrix;
                 httpConnection http = new httpConnection(this, this);
                 if (http.isOnline()) {
+
                     CharSequence dialogTitle;
 
                     if(state==0) {
@@ -1102,6 +1225,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         if (http.isOnline()) {
             if (!bConnecting) {
                 bConnecting = true;
+                connectionTask=0;
                 if (bSaveEditedFarmAsNew || state==0) {
                     http.execute(server + "/mobile/create_new_farm.php?farm=" + s.replaceAll(" ", "_"), "");
                 } else {
@@ -1113,31 +1237,46 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     @Override
     public void processFinish(String output) {
-        bConnecting=false;
-        createFarmDialog.dismiss();
-        Date farmDate = new Date();
-        int status = (!output.equals("ko") && !output.isEmpty()) ? 2 : 0;
-        if(state==0) {
-            currentFarm.addNewFarm(farmId, userId, farmName, farmSize, farmDate, sMatrix, farmVersion, status);
-            Toast.makeText(this, R.string.farmSavedMessage, Toast.LENGTH_SHORT).show();
-        } else {
-            if(bSaveEditedFarmAsNew){
-                currentFarm.addNewFarm(farmId, userId, farmName, farmSize, farmDate, sMatrix, farmVersion, status);
-            } else {
-                currentFarm.updateFarm(farmId, userId, farmName, farmSize, farmDate, sMatrix, farmVersion, status);
-            }
-            Toast.makeText(this, R.string.farmEditedMessage, Toast.LENGTH_SHORT).show();
+        switch(connectionTask){
+            case 0:
+                bConnecting=false;
+                createFarmDialog.dismiss();
+                Date farmDate = new Date();
+                int status = (!output.equals("ko") && !output.isEmpty()) ? 2 : 0;
+                if(state==0) {
+                    currentFarm.addNewFarm(farmId, userId, farmName, farmSize, farmDate, sMatrix, farmVersion, status);
+                    Toast.makeText(this, R.string.farmSavedMessage, Toast.LENGTH_SHORT).show();
+                } else {
+                    if(bSaveEditedFarmAsNew){
+                        currentFarm.addNewFarm(farmId, userId, farmName, farmSize, farmDate, sMatrix, farmVersion, status);
+                    } else {
+                        currentFarm.updateFarm(farmId, userId, farmName, farmSize, farmDate, sMatrix, farmVersion, status);
+                    }
+                    Toast.makeText(this, R.string.farmEditedMessage, Toast.LENGTH_SHORT).show();
+                }
+                prefs.savePreferenceInt("farmId", farmId);
+                currentFarm = currentFarm.getLatestActiveVersion(userId,farmId,this);
+
+                state=1;
+                firstFarm=false;
+                newFarm=false;
+                bFarmSaved=true;
+                canvasView.invalidate();
+                this.setTitle(farmName);
+                break;
+
+            case 1:
+                bConnecting=false;
+                deleteFarmDialog.dismiss();
+
+                if(output.equals("ok")){
+                    executeDeleteFarm();
+                } else {
+                    markDeletedFarm();
+                }
+                afterFarmDeletion();
+                break;
         }
-        prefs.savePreferenceInt("farmId", farmId);
-        currentFarm = currentFarm.getLatestActiveVersion(userId,farmId,this);
-
-        state=1;
-        firstFarm=false;
-        newFarm=false;
-        bFarmSaved=true;
-        canvasView.invalidate();
-        this.setTitle(farmName);
-
     }
 
     class SketchSheetView extends View {

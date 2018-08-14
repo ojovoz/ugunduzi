@@ -53,6 +53,7 @@
     <string name="deleteFarmConfirmMessage">Do you really want to delete the selected farms?</string>
     <string name="deleteItemsConfirmMessage">Do you really want to delete the selected items?</string>
     <string name="deletingFarmsLabel">Deleting farms</string>
+    <string name="deletingFarmLabel">Deleting farm</string>
     <string name="pictureSoundButtonText">PICTURE + SOUND</string>
     <string name="dataButtonText">DATA</string>
     <string name="manageRecordsButton">PLOT RECORDS</string>
@@ -117,4 +118,5 @@
     <string name="updatingFarmLabel">Updating farm</string>
     <string name="opGoToCurrentState">Go to present </string>
     <string name="opDeleteFarm">Delete farm</string>
+    <string name="deleteThisFarmConfirmMessage">Do you really want to delete this farm?</string>
 </resources>
