@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
@@ -127,20 +128,23 @@ public class farmChooser extends AppCompatActivity implements httpConnection.Asy
 
                 n++;
             }
+            if(n==0){
+                goToFarm(null);
+            }
         } else {
             goToLogin();
         }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(android.view.Menu menu) {
-        super.onCreateOptionsMenu(menu);
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
         menu.add(0, 0, 0, R.string.opCreateNewFarm);
-        if(farms.size()>1) {
+        if(anyCheckboxChecked()) {
             menu.add(1, 1, 1, R.string.opDeleteSelectedFarms);
         }
         menu.add(2, 2, 2, R.string.opSwitchUser);
-        return true;
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -157,6 +161,21 @@ public class farmChooser extends AppCompatActivity implements httpConnection.Asy
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean anyCheckboxChecked(){
+        boolean ret=false;
+
+        Iterator<CheckBox> checkBoxIterator = checkboxes.iterator();
+        while (checkBoxIterator.hasNext()) {
+            CheckBox cb = checkBoxIterator.next();
+            if (cb.isChecked()) {
+                ret=true;
+                break;
+            }
+        }
+
+        return ret;
     }
 
     public void deleteSelectedFarms(){
