@@ -15,7 +15,7 @@
     <string name="createNewUserLabel">Creating new user</string>
     <string name="drawNewFarmTitle">Draw new farm</string>
     <string name="defineNewFarmDialogTitle">New farm</string>
-    <string name="newFarmNameLabel">Enter name of new farm</string>
+    <string name="newFarmNameLabel">Enter name of farm</string>
     <string name="enterAcresLabel">Size (acres)</string>
     <string name="defaultFarmNamePrefix">Shamba </string>
     <string name="farmNameCannotBeEmptyMessage">Farm name cannot be empty</string>

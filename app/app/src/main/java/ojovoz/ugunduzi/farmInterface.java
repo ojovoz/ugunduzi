@@ -448,6 +448,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 goToFarmChooser();
             } else {
                 currentFarm = userFarms.get(0);
+                currentFarm.context = this;
                 farmId = currentFarm.id;
                 prefs.savePreferenceInt("farmId", farmId);
                 farmName = currentFarm.name;
@@ -460,7 +461,6 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 plotMatrix = new oPlotMatrix();
                 plotMatrix.createMatrix(displayWidth, displayHeight);
                 createFarm();
-                invalidateOptionsMenu();
                 canvasView.invalidate();
             }
         } else {
@@ -907,12 +907,14 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         dialog.setCanceledOnTouchOutside(cancellable);
         dialog.setCancelable(cancellable);
 
+        /*
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
                 farmName="";
             }
         });
+        */
 
         EditText et = (EditText)dialog.findViewById(R.id.newFarm);
         String defaultFarmName = farmName;

@@ -22,7 +22,7 @@ if(isset($_GET['farm'])){
 		$farm_app_id=$farm_parts[5];
 		$farm_version=$farm_parts[6];
 		
-		$farm_id=getFarmIDFromFarmAppId($dbh,$farm_app_id);
+		$farm_id=getFarmIDFromFarmAppIdVersion($dbh,$farm_app_id,$farm_version);
 		updateFarm($dbh,$farm_id,$farm_name,$farm_size,$farm_date_created,$farm_version);
 		
 		$output_part_2=$farm_id;

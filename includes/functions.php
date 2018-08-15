@@ -36,9 +36,21 @@ function getFarmIDFromNameUser($dbh,$farm_name,$user_id){
 	return $ret;
 }
 
-function getFarmIDFromFarmAppId($dbh,$farm_app_id){
-	$ret=-1;
+function getFarmIDsFromFarmAppId($dbh,$farm_app_id){
+	$ret=array();
 	$query="SELECT farm_id FROM farm WHERE farm_app_id=$farm_app_id";
+	$result = mysqli_query($dbh,$query);
+	$n=0;
+	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$ret[$n]=$row[0];
+		$n++;
+	}
+	return $ret;
+}
+
+function getFarmIDFromFarmAppIdVersion($dbh,$farm_app_id,$farm_version){
+	$ret=-1;
+	$query="SELECT farm_id FROM farm WHERE farm_app_id=$farm_app_id AND farm_version=$farm_version";
 	$result = mysqli_query($dbh,$query);
 	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
 		$ret=$row[0];
@@ -54,7 +66,7 @@ function createNewFarm($dbh,$farm_name,$farm_size,$farm_date_created,$user_id,$f
 }
 
 function updateFarm($dbh,$farm_id,$farm_name,$farm_size,$farm_date_created,$farm_version){
-	$query="UPDATE farm SET farm_name='$farm_name', farm_size=$farm_size, farm_date_created='$farm_date_created' farm_version=$farm_version WHERE farm_id=$farm_id";
+	$query="UPDATE farm SET farm_name='$farm_name', farm_size_acres=$farm_size, farm_date_created='$farm_date_created' WHERE farm_id=$farm_id";
 	$result = mysqli_query($dbh,$query);
 }
 

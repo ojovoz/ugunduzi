@@ -22,7 +22,7 @@ public class oFarm {
     public int status; // 0 = not saved remotely, 1 = not deleted remotely, 2 = ok
 
     private dateHelper dH;
-    private Context context;
+    public Context context;
 
     oFarm(){
         dH = new dateHelper();
@@ -80,6 +80,23 @@ public class oFarm {
 
                 oFarm f = new oFarm();
                 f.id = Integer.parseInt(record[0]);
+
+                boolean bFound = false;
+                oFarm pf = new oFarm();
+
+                Iterator<oFarm> previousFarms = ret.iterator();
+                while (previousFarms.hasNext()) {
+                    pf = previousFarms.next();
+                    if (f.id == pf.id) {
+                        bFound = true;
+                        break;
+                    }
+                }
+
+                if (bFound) {
+                    ret.remove(pf);
+                }
+
                 f.userId = Integer.parseInt(record[1]);
                 f.name = record[2];
                 f.size = Float.parseFloat(record[3]);
@@ -88,7 +105,7 @@ public class oFarm {
                 f.version = Integer.parseInt(record[6]);
                 f.status = Integer.parseInt(record[7]);
 
-                if(f.userId==userId &&f.status!=1){
+                if(f.userId==userId && f.status!=1){
                     ret.add(f);
                 }
             }
