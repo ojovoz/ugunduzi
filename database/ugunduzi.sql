@@ -2,8 +2,8 @@
 -- version 4.4.15.10
 -- https://www.phpmyadmin.net
 --
--- Servidor: 192.168.86.55
--- Tiempo de generación: 09-08-2018 a las 18:09:37
+-- Servidor: 192.168.86.197
+-- Tiempo de generación: 16-08-2018 a las 19:18:49
 -- Versión del servidor: 5.5.57-0+deb7u1-log
 -- Versión de PHP: 5.3.29-1~dotdeb.0
 
@@ -96,6 +96,15 @@ CREATE TABLE IF NOT EXISTS `crop_x_plot` (
   `plot_id` int(10) unsigned NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
+--
+-- Volcado de datos para la tabla `crop_x_plot`
+--
+
+INSERT INTO `crop_x_plot` (`crop_x_plot_id`, `crop_id`, `plot_id`) VALUES
+(1, 1, 1),
+(2, 3, 1),
+(3, 4, 2);
+
 -- --------------------------------------------------------
 
 --
@@ -146,7 +155,14 @@ CREATE TABLE IF NOT EXISTS `farm` (
   `farm_size_acres` float unsigned NOT NULL,
   `farm_date_created` date NOT NULL,
   `farm_version` int(10) unsigned NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+--
+-- Volcado de datos para la tabla `farm`
+--
+
+INSERT INTO `farm` (`farm_id`, `farm_app_id`, `user_id`, `farm_name`, `farm_size_acres`, `farm_date_created`, `farm_version`) VALUES
+(1, 0, 2, 'Shamba 1', 1, '2018-08-16', 0);
 
 -- --------------------------------------------------------
 
@@ -164,6 +180,7 @@ CREATE TABLE IF NOT EXISTS `log` (
   `log_units_id` int(10) unsigned NOT NULL,
   `log_crop_id` int(10) unsigned NOT NULL,
   `log_treatment_id` int(10) unsigned NOT NULL,
+  `log_comments` text NOT NULL,
   `log_picture` varchar(100) NOT NULL,
   `log_sound` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -182,7 +199,15 @@ CREATE TABLE IF NOT EXISTS `plot` (
   `plot_y` int(10) unsigned NOT NULL,
   `plot_w` int(10) unsigned NOT NULL,
   `plot_h` int(10) unsigned NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=202 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+
+--
+-- Volcado de datos para la tabla `plot`
+--
+
+INSERT INTO `plot` (`plot_id`, `internal_plot_id`, `farm_id`, `plot_x`, `plot_y`, `plot_w`, `plot_h`) VALUES
+(1, 0, 1, 0, 0, 4, 2),
+(2, 1, 1, 0, 2, 4, 2);
 
 -- --------------------------------------------------------
 
@@ -254,6 +279,14 @@ CREATE TABLE IF NOT EXISTS `treatment_ingredient_x_plot` (
   `treatment_ingredient_id` int(10) unsigned NOT NULL,
   `plot_id` int(10) unsigned NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+
+--
+-- Volcado de datos para la tabla `treatment_ingredient_x_plot`
+--
+
+INSERT INTO `treatment_ingredient_x_plot` (`treatment_ingredient_x_plot`, `treatment_ingredient_id`, `plot_id`) VALUES
+(1, 3, 1),
+(2, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -428,7 +461,7 @@ ALTER TABLE `data_item`
 -- AUTO_INCREMENT de la tabla `farm`
 --
 ALTER TABLE `farm`
-  MODIFY `farm_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=75;
+  MODIFY `farm_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT de la tabla `log`
 --
@@ -438,7 +471,7 @@ ALTER TABLE `log`
 -- AUTO_INCREMENT de la tabla `plot`
 --
 ALTER TABLE `plot`
-  MODIFY `plot_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=202;
+  MODIFY `plot_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT de la tabla `treatment`
 --

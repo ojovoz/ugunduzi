@@ -55,7 +55,7 @@
     <string name="deletingFarmsLabel">Deleting farms</string>
     <string name="deletingFarmLabel">Deleting farm</string>
     <string name="pictureSoundButtonText">PICTURE + SOUND</string>
-    <string name="dataButtonText">DATA</string>
+    <string name="financeButtonText">FINANCE</string>
     <string name="manageRecordsButton">PLOT RECORDS</string>
     <string name="plotCropLabel">Crop</string>
     <string name="plotTreatmentLabel">Treatment</string>

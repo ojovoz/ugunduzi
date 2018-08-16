@@ -48,7 +48,7 @@
                 android:layout_marginTop="20dp"
                 android:height="40dp"
                 android:background="@drawable/button_background"
-                android:text="@string/dataButtonText"
+                android:text="@string/financeButtonText"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:textColor="@color/colorWhite"

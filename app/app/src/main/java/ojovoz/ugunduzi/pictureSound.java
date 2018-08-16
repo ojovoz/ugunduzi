@@ -418,7 +418,7 @@ public class pictureSound extends AppCompatActivity {
         }
 
         oLog log = new oLog(this);
-        log.appendToLog(farmId,farmVersion,userId,plot,messageDate,null,0f,null,null,null,photoFile,soundFile);
+        log.appendToLog(farmId,farmVersion,userId,plot,messageDate,null,0f,0f,null,null,null,0f,"",photoFile,soundFile);
 
         Button bs = (Button)findViewById(R.id.soundButton);
         bs.setText(R.string.soundButtonLabel);

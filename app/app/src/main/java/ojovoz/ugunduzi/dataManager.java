@@ -701,7 +701,7 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
                             adapter.list = cardDataFromLog();
                             adapter.setList(adapter.list);
                             adapter.notifyDataSetChanged();
-                            l.updateLogItem(editing.line, editing.farmName, editing.userId, editing.plotId, editing.date, editing.dataItem, editing.value, editing.units, editing.crop, editing.treatment);
+                            //l.updateLogItem(editing.line, editing.farmName, editing.userId, editing.plotId, editing.date, editing.dataItem, editing.value, editing.units, editing.crop, editing.treatment);
                             dialog.dismiss();
                             nSelected = 0;
                             setTitle(activityTitle);
