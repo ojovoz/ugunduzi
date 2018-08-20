@@ -134,28 +134,6 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         soilManagementList = start.getTreatmentIngredients(1);
         soilManagementNamesArray = start.getTreatmentIngredientNames(soilManagementList).toArray(new CharSequence[soilManagementList.size()]);
 
-        if(newFarm){
-            farmId=-1;
-            bFarmSaved=false;
-            state=0;
-            this.setTitle(R.string.drawNewFarmTitle);
-            farmName = getDefaultFarmName();
-            defineFarmNameAcres(true,false);
-        } else {
-            state=1;
-            farmId=getIntent().getExtras().getInt("farmId");
-            if(farmId==-1){
-                prefs.deletePreference("farmId");
-                prefs.deletePreference("user");
-                goToLogin();
-            } else {
-                currentFarm=currentFarm.getLatestActiveVersion(userId,farmId,this);
-                farmName=currentFarm.name;
-                maxVersion=farmVersion=currentFarm.version;
-            }
-            this.setTitle(farmName);
-        }
-
         iconMove=BitmapFactory.decodeResource(this.getResources(),R.drawable.move);
         iconResize=BitmapFactory.decodeResource(this.getResources(),R.drawable.resize);
         iconContents=BitmapFactory.decodeResource(this.getResources(),R.drawable.contents);
@@ -170,6 +148,27 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         iconActionsActive=BitmapFactory.decodeResource(this.getResources(),R.drawable.actions_active);
 
         plotMatrix = new oPlotMatrix();
+
+        if(newFarm){
+            state=0;
+            farmId=-1;
+            bFarmSaved=false;
+            this.setTitle(R.string.drawNewFarmTitle);
+            farmName = getDefaultFarmName();
+        } else {
+            state=1;
+            farmId=getIntent().getExtras().getInt("farmId");
+            if(farmId==-1){
+                prefs.deletePreference("farmId");
+                prefs.deletePreference("user");
+                goToLogin();
+            } else {
+                currentFarm=currentFarm.getLatestActiveVersion(userId,farmId,this);
+                farmName=currentFarm.name;
+                maxVersion=farmVersion=currentFarm.version;
+            }
+            this.setTitle(farmName);
+        }
 
         LinearLayout root = (LinearLayout) findViewById(R.id.mainRoot);
         root.post(new Runnable() {
@@ -202,6 +201,9 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 textPaint.setTypeface(Typeface.create("Arial", Typeface.NORMAL));
 
                 plotMatrix.createMatrix(displayWidth,displayHeight);
+                if(newFarm){
+                    defineFarmNameAcres(true,false);
+                }
                 createFarm();
 
             }
@@ -907,15 +909,6 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         dialog.setCanceledOnTouchOutside(cancellable);
         dialog.setCancelable(cancellable);
 
-        /*
-        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialogInterface) {
-                farmName="";
-            }
-        });
-        */
-
         EditText et = (EditText)dialog.findViewById(R.id.newFarm);
         String defaultFarmName = farmName;
 
@@ -1052,7 +1045,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     public void goToDataEntry(){
         final Context context = this;
-        Intent i = new Intent(context, enterData.class);
+        Intent i = new Intent(context, finance.class);
         i.putExtra("user", user);
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
@@ -1063,6 +1056,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         i.putExtra("cropNames",plotMatrix.currentPlot.getCropNames(this));
         i.putExtra("pestControlNames",plotMatrix.currentPlot.getPestControlNames(this));
         i.putExtra("soilManagementNames",plotMatrix.currentPlot.getSoilManagementNames(this));
+        i.putExtra("displayWidth",displayWidth);
+        i.putExtra("displayHeight",displayHeight);
         startActivity(i);
         finish();
     }
@@ -1080,6 +1075,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         i.putExtra("cropNames",plotMatrix.currentPlot.getCropNames(this));
         i.putExtra("pestControlNames",plotMatrix.currentPlot.getPestControlNames(this));
         i.putExtra("soilManagementNames",plotMatrix.currentPlot.getSoilManagementNames(this));
+        i.putExtra("displayWidth",displayWidth);
         startActivity(i);
         finish();
     }

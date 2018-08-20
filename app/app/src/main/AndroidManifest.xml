@@ -56,6 +56,12 @@
             android:label="@string/dataManagerActivity"
             android:launchMode="singleTop">
         </activity>
+        <activity
+            android:name=".finance"
+            android:screenOrientation="portrait"
+            android:label="@string/financeActivity"
+            android:launchMode="singleTop">
+        </activity>
     </application>
 
 </manifest>

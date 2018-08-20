@@ -66,6 +66,8 @@ public class pictureSound extends AppCompatActivity {
 
     boolean bChanges=false;
 
+    int displayWidth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +86,8 @@ public class pictureSound extends AppCompatActivity {
         cropNames = getIntent().getExtras().getString("cropNames");
         pestControlNames = getIntent().getExtras().getString("pestControlNames");
         soilManagementNames = getIntent().getExtras().getString("soilManagementNames");
+
+        displayWidth = getIntent().getExtras().getInt("displayWidth");
 
         TextView tt = (TextView) findViewById(R.id.plotLabel);
         String title = "";
@@ -105,6 +109,12 @@ public class pictureSound extends AppCompatActivity {
         }
 
         tt.setText(title);
+
+        ImageView i = (ImageView)findViewById(R.id.thumbnail);
+        int w = (displayWidth*400)/540;
+        i.getLayoutParams().width = w;
+        i.getLayoutParams().height = (int)(w/1.5);
+        i.requestLayout();
 
         photoDone=false;
         recording = false;
@@ -193,6 +203,7 @@ public class pictureSound extends AppCompatActivity {
         i.putExtra("userPass", userPass);
         i.putExtra("farmName", farmName);
         i.putExtra("farmId", farmId);
+        i.putExtra("farmVersion",farmVersion);
         i.putExtra("newFarm", false);
         i.putExtra("firstFarm", false);
         startActivity(i);
