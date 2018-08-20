@@ -1,20 +1,14 @@
 package ojovoz.ugunduzi;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.support.v4.content.ContextCompat;
 
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TimeZone;
 
 /**
  * Created by Eugenio on 13/04/2018.
@@ -38,7 +32,7 @@ public class oLog {
     public String comments;
 
     public oCrop crop;
-    public oTreatment treatment;
+    public oTreatmentIngredient treatmentIngredient;
 
     public String picture;
     public String sound;
@@ -87,8 +81,8 @@ public class oLog {
                             l.units = u.getUnitFromId(Integer.parseInt(record[8]));
                             oCrop c = new oCrop(context);
                             l.crop = c.getCropFromId(Integer.parseInt(record[9]));
-                            oTreatment t = new oTreatment(context);
-                            l.treatment = t.getTreatmentFromId(Integer.parseInt(record[10]));
+                            oTreatmentIngredient t = new oTreatmentIngredient(context);
+                            l.treatmentIngredient = t.getTreatmentIngredientFromId(Integer.parseInt(record[10]));
                             l.cost = Float.parseFloat(record[11]);
                             l.comments = record[12];
                             l.sent = (record[15].equals("1"));
@@ -110,8 +104,8 @@ public class oLog {
                         l.units = u.getUnitFromId(Integer.parseInt(record[8]));
                         oCrop c = new oCrop(context);
                         l.crop = c.getCropFromId(Integer.parseInt(record[9]));
-                        oTreatment t = new oTreatment(context);
-                        l.treatment = t.getTreatmentFromId(Integer.parseInt(record[10]));
+                        oTreatmentIngredient t = new oTreatmentIngredient(context);
+                        l.treatmentIngredient = t.getTreatmentIngredientFromId(Integer.parseInt(record[10]));
                         l.cost = Float.parseFloat(record[11]);
                         l.comments = record[12];
                         l.picture = record[13];
@@ -155,8 +149,8 @@ public class oLog {
                                 l.units = u.getUnitFromId(Integer.parseInt(record[7]));
                                 oCrop c = new oCrop(context);
                                 l.crop = c.getCropFromId(Integer.parseInt(record[8]));
-                                oTreatment t = new oTreatment(context);
-                                l.treatment = t.getTreatmentFromId(Integer.parseInt(record[9]));
+                                oTreatmentIngredient t = new oTreatmentIngredient(context);
+                                l.treatmentIngredient = t.getTreatmentIngredientFromId(Integer.parseInt(record[10]));
                                 l.sent = (record[12].equals("1"));
                                 ret.add(l);
                             }
@@ -175,8 +169,8 @@ public class oLog {
                             l.units = u.getUnitFromId(Integer.parseInt(record[7]));
                             oCrop c = new oCrop(context);
                             l.crop = c.getCropFromId(Integer.parseInt(record[8]));
-                            oTreatment t = new oTreatment(context);
-                            l.treatment = t.getTreatmentFromId(Integer.parseInt(record[9]));
+                            oTreatmentIngredient t = new oTreatmentIngredient(context);
+                            l.treatmentIngredient = t.getTreatmentIngredientFromId(Integer.parseInt(record[10]));
                             l.picture = record[10];
                             l.sound = record[11];
                             l.sent = (record[12].equals("1"));
@@ -219,8 +213,8 @@ public class oLog {
                                 l.units = u.getUnitFromId(Integer.parseInt(record[8]));
                                 oCrop c = new oCrop(context);
                                 l.crop = c.getCropFromId(Integer.parseInt(record[9]));
-                                oTreatment t = new oTreatment(context);
-                                l.treatment = t.getTreatmentFromId(Integer.parseInt(record[10]));
+                                oTreatmentIngredient t = new oTreatmentIngredient(context);
+                                l.treatmentIngredient = t.getTreatmentIngredientFromId(Integer.parseInt(record[10]));
                                 l.cost = Float.parseFloat(record[11]);
                                 l.comments = record[12];
                                 l.sent = (record[15].equals("1"));
@@ -242,8 +236,8 @@ public class oLog {
                             l.units = u.getUnitFromId(Integer.parseInt(record[8]));
                             oCrop c = new oCrop(context);
                             l.crop = c.getCropFromId(Integer.parseInt(record[9]));
-                            oTreatment t = new oTreatment(context);
-                            l.treatment = t.getTreatmentFromId(Integer.parseInt(record[10]));
+                            oTreatmentIngredient t = new oTreatmentIngredient(context);
+                            l.treatmentIngredient = t.getTreatmentIngredientFromId(Integer.parseInt(record[10]));
                             l.cost = Float.parseFloat(record[11]);
                             l.comments = record[12];
                             l.picture = record[13];
@@ -292,8 +286,8 @@ public class oLog {
                                 l.units = u.getUnitFromId(Integer.parseInt(record[8]));
                                 oCrop c = new oCrop(context);
                                 l.crop = c.getCropFromId(Integer.parseInt(record[9]));
-                                oTreatment t = new oTreatment(context);
-                                l.treatment = t.getTreatmentFromId(Integer.parseInt(record[10]));
+                                oTreatmentIngredient t = new oTreatmentIngredient(context);
+                                l.treatmentIngredient = t.getTreatmentIngredientFromId(Integer.parseInt(record[10]));
                                 l.cost = Float.parseFloat(record[11]);
                                 l.comments = record[12];
                                 l.sent = (record[15].equals("1"));
@@ -315,8 +309,8 @@ public class oLog {
                             l.units = u.getUnitFromId(Integer.parseInt(record[8]));
                             oCrop c = new oCrop(context);
                             l.crop = c.getCropFromId(Integer.parseInt(record[9]));
-                            oTreatment t = new oTreatment(context);
-                            l.treatment = t.getTreatmentFromId(Integer.parseInt(record[10]));
+                            oTreatmentIngredient t = new oTreatmentIngredient(context);
+                            l.treatmentIngredient = t.getTreatmentIngredientFromId(Integer.parseInt(record[10]));
                             l.cost = Float.parseFloat(record[11]);
                             l.comments = record[12];
                             l.picture = record[13];
@@ -427,7 +421,7 @@ public class oLog {
         String cropMarker = c.getString(R.string.cropMarker);
         String treatmentMarker = c.getString(R.string.treatmentMarker);
         String ret = (crop!=null) ? (dataItem.name.indexOf(cropMarker)>0) ? dataItem.name.replace(cropMarker,"("+crop.name+")") : dataItem.name + " ("+crop.name+")" : dataItem.name;
-        ret = (treatment!=null) ? (ret.indexOf(treatmentMarker)>0) ? ret.replace(treatmentMarker,"("+treatment.name+")") : ret + " ("+treatment.name+")" : ret;
+        ret = (treatmentIngredient !=null) ? (ret.indexOf(treatmentMarker)>0) ? ret.replace(treatmentMarker,"("+ treatmentIngredient.name+")") : ret + " ("+ treatmentIngredient.name+")" : ret;
         return ret;
     }
 
@@ -437,7 +431,7 @@ public class oLog {
         int dataItemId = (dataItem==null) ? -1 : dataItem.id;
         int unitsId = (units==null) ? -1 : units.id;
         int cropId = (crop==null) ? -1 : crop.id;
-        int treatmentId = (treatment==null) ? -1 : treatment.id;
+        int treatmentId = (treatmentIngredient ==null) ? -1 : treatmentIngredient.id;
         String sendComments = comments.replaceAll(separator,"_");
         try{
             sendComments=URLEncoder.encode(sendComments,"UTF-8");

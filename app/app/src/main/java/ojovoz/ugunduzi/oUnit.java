@@ -67,18 +67,6 @@ public class oUnit {
         return ret;
     }
 
-    public ArrayList<String> getUnitNames(){
-        ArrayList<String> ret = new ArrayList<>();
-        ArrayList<oUnit> unitList = getUnits();
-
-        Iterator<oUnit> iterator = unitList.iterator();
-        while(iterator.hasNext()){
-            oUnit u = iterator.next();
-            ret.add(u.name);
-        }
-        return ret;
-    }
-
     public ArrayList<String> getUnitNames(int type){
         ArrayList<String> ret = new ArrayList<>();
         ArrayList<oUnit> unitList = getUnits();

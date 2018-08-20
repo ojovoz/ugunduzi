@@ -123,4 +123,6 @@
     <string name="financeActivity">Finance</string>
     <string name="chooseCropButtonLabel">CHOOSE A CROP</string>
     <string name="chooseTreatmentButtonLabel">CHOOSE A TREATMENT</string>
+    <string name="placeholderQuantity">Quantity</string>
+    <string name="placeholderComments">Comments</string>
 </resources>
