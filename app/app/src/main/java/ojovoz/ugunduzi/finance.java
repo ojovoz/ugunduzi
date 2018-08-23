@@ -18,6 +18,7 @@ import android.widget.ListAdapter;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -137,6 +138,9 @@ public class finance extends AppCompatActivity {
         bCrop = (Button) dialog.findViewById(R.id.cropButton);
         bTreatment = (Button) dialog.findViewById(R.id.treatmentButton);
         bUnits = (Button) dialog.findViewById(R.id.dataItemUnits);
+        etValue = (EditText) dialog.findViewById(R.id.dataItemValue);
+        etQuantity = (EditText) dialog.findViewById(R.id.dataItemQuantity);
+        etComments = (EditText) dialog.findViewById(R.id.dataItemComments);
 
         final TableLayout tlQuantityUnits = (TableLayout) dialog.findViewById(R.id.quantityUnitsTable);
 
@@ -161,7 +165,7 @@ public class finance extends AppCompatActivity {
                             newItem = new oLog();
                             newItem.date = dd;
 
-                            //TODO: reset fields
+                            resetFields();
 
                             newItem.dataItem=d;
                             bDataItem.setText(d.name);
@@ -226,7 +230,6 @@ public class finance extends AppCompatActivity {
                                 tlQuantityUnits.setVisibility(View.GONE);
                             }
 
-                            etValue = (EditText) dialog.findViewById(R.id.dataItemValue);
                             etValue.setVisibility(View.VISIBLE);
                             etValue.setHint(getDefaultCostUnits());
 
@@ -235,6 +238,14 @@ public class finance extends AppCompatActivity {
 
                             Button bSave = (Button) dialog.findViewById(R.id.saveButton);
                             bSave.setVisibility(View.VISIBLE);
+                            bSave.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if(!checkFields()){
+                                        dialog.dismiss();
+                                    }
+                                }
+                            });
 
                         }
                         dialogInterface.dismiss();
@@ -247,6 +258,20 @@ public class finance extends AppCompatActivity {
         });
 
         dialog.show();
+    }
+
+    public boolean checkFields(){
+        boolean ret=false;
+        //TODO: check fields. if correct, save. if not, toast
+        return ret;
+    }
+
+    public void resetFields(){
+        etValue.setText(R.string.emptyString);
+        etQuantity.setText(R.string.emptyString);
+        etComments.setText(R.string.emptyString);
+        bCrop.setText(R.string.chooseCropButtonLabel);
+        bTreatment.setText(R.string.chooseTreatmentButtonLabel);
     }
 
     public void displayDatePicker(View view){

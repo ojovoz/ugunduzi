@@ -86,6 +86,7 @@
                     android:singleLine="true"
                     android:layout_column="0"
                     android:hint="@string/placeholderQuantity"
+                    android:imeOptions="actionNext"
                     android:textColor="@color/colorBlack" />
 
                 <Button
@@ -118,6 +119,7 @@
             android:padding="@dimen/activity_view_padding"
             android:singleLine="true"
             android:textColor="@color/colorBlack"
+            android:imeOptions="actionNext"
             android:visibility="gone" />
 
         <EditText
@@ -131,6 +133,7 @@
             android:singleLine="true"
             android:hint="@string/placeholderComments"
             android:textColor="@color/colorBlack"
+            android:imeOptions="actionDone"
             android:visibility="gone" />
 
         <Button
