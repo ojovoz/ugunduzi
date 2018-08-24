@@ -39,7 +39,7 @@ public class oLog {
 
     public boolean sent;
 
-    private Context context;
+    public Context context;
 
     private dateHelper dH;
 
@@ -326,7 +326,7 @@ public class oLog {
     }
 
 
-    public void appendToLog(int farmId, int farmVersion, int userId, int plot, Date date, oDataItem dataItem, float value, float quantity, oUnit units, oCrop crop, oTreatment treatment, float cost, String comments, String picture, String sound){
+    public void appendToLog(int farmId, int farmVersion, int userId, int plot, Date date, oDataItem dataItem, float value, float quantity, oUnit units, oCrop crop, oTreatmentIngredient treatmentIngredient, float cost, String comments, String picture, String sound){
         dateHelper dH = new dateHelper();
 
         csvFileManager log = new csvFileManager("log");
@@ -337,7 +337,7 @@ public class oLog {
         dataItemId = (dataItem == null) ? "0" : Integer.toString(dataItem.id);
         unitsId = (units == null) ? "0" : Integer.toString(units.id);
         cropId = (crop == null) ? "0" : Integer.toString(crop.id);
-        treatmentId = (treatment == null) ? "0" : Integer.toString(treatment.id);
+        treatmentId = (treatmentIngredient == null) ? "0" : Integer.toString(treatmentIngredient.id);
         String[] newLine = {Integer.toString(farmId), Integer.toString(farmVersion), Integer.toString(userId), Integer.toString(plot), dH.dateToString(date), dataItemId, Float.toString(value), Float.toString(quantity), unitsId, cropId, treatmentId, Float.toString(cost), comments, picture, sound, "0"};
 
         log.append(context, newLine);

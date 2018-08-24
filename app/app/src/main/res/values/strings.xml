@@ -73,6 +73,7 @@
     <string name="enterCropLabel">Crop</string>
     <string name="enterTreatmentLabel">Treatment</string>
     <string name="valueEmptyMessage">Value cannot be empty</string>
+    <string name="quantityEmptyMessage">Quantity cannot be empty</string>
     <string name="valueNegativeMessage">Value cannot be negative</string>
     <string name="mustChooseCropMessage">You must choose a crop</string>
     <string name="mustChooseTreatmentMessage">You must choose a treatment</string>

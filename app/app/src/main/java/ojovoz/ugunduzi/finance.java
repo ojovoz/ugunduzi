@@ -1,12 +1,14 @@
 package ojovoz.ugunduzi;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -65,11 +67,15 @@ public class finance extends AppCompatActivity {
     public EditText etQuantity;
 
     public ArrayList<oUnit> unitsList;
+    public Context context;
+    public boolean bCancellingData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finance);
+
+        context = this;
 
         user = getIntent().getExtras().getString("user");
         userPass = getIntent().getExtras().getString("userPass");
@@ -126,12 +132,42 @@ public class finance extends AppCompatActivity {
 
         newItem.date = new Date();
 
+        bCancellingData=false;
+
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_add_edit_data_item);
         dialog.getWindow().setLayout(displayWidth-10, ViewGroup.LayoutParams.WRAP_CONTENT);
-        dialog.setCanceledOnTouchOutside(true);
+        dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(true);
+        dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
+                if(i == keyEvent.KEYCODE_BACK && newItem.dataItem!=null && !bCancellingData){
+                    bCancellingData=true;
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setMessage(R.string.dataNotSavedText)
+                            .setCancelable(false)
+                            .setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dlg, int id) {
+                                    dlg.dismiss();
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setNegativeButton(R.string.noButtonText, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dlg, int id) {
+                                    dlg.dismiss();
+                                    bCancellingData=false;
+                                }
+                            });
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
 
         final Button bDataItem = (Button) dialog.findViewById(R.id.dataItemButton);
         bDate = (Button) dialog.findViewById(R.id.dateButton);
@@ -261,8 +297,26 @@ public class finance extends AppCompatActivity {
     }
 
     public boolean checkFields(){
-        boolean ret=false;
-        //TODO: check fields. if correct, save. if not, toast
+        boolean ret=true;
+        if(newItem.dataItem.isCropSpecific && newItem.crop==null){
+            Toast.makeText(this, R.string.mustChooseCropMessage, Toast.LENGTH_SHORT).show();
+        } else if (newItem.dataItem.isTreatmentSpecific && newItem.treatmentIngredient==null){
+            Toast.makeText(this, R.string.mustChooseTreatmentMessage, Toast.LENGTH_SHORT).show();
+        } else if (newItem.dataItem.type!=0 && (etQuantity.getText().toString().isEmpty())){
+            Toast.makeText(this, R.string.quantityEmptyMessage, Toast.LENGTH_SHORT).show();
+            etQuantity.requestFocus();
+        } else if (etValue.getText().toString().isEmpty()){
+            Toast.makeText(this, R.string.valueEmptyMessage, Toast.LENGTH_SHORT).show();
+            etValue.requestFocus();
+        } else {
+            ret=false;
+            newItem.quantity= (newItem.dataItem.type!=0) ? Float.parseFloat(etQuantity.getText().toString()) : 0.0f;
+            newItem.value=Float.parseFloat(etValue.getText().toString());
+            newItem.comments=etComments.getText().toString().replaceAll(";","");
+            newItem.context=context;
+            newItem.appendToLog(farmId,farmVersion,userId,plot,newItem.date,newItem.dataItem,newItem.value,newItem.quantity,
+                    newItem.units,newItem.crop,newItem.treatmentIngredient,0.0f,newItem.comments,"","");
+        }
         return ret;
     }
 
