@@ -136,7 +136,7 @@ public class enterData extends AppCompatActivity {
         dataItemsList = d.getDataItems(bExcludeCropSpecific, bExcludeTreatmentSpecific);
         dataItemsNamesArray = d.getDataItemNames(bExcludeCropSpecific, bExcludeTreatmentSpecific).toArray(new CharSequence[dataItemsList.size()]);
 
-        plotLog = log.createLog(farmName, userId, plot, 0);
+        //plotLog = log.createLog(farmName, userId, plot, 0);
         if (plotLog.size() == 0) {
             TextView tv = (TextView) findViewById(R.id.previousDataItems);
             tv.setVisibility(View.GONE);
@@ -641,7 +641,7 @@ public class enterData extends AppCompatActivity {
 
     public void resetLogList(){
         oLog l = new oLog(this);
-        plotLog = l.createLog(farmName, userId, plot, 0);
+        //plotLog = l.createLog(farmName, userId, plot, 0);
         plotLog = l.sortLogByDate(plotLog,true,10);
     }
 

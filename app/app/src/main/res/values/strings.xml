@@ -102,8 +102,8 @@
     <string name="sendingRecordsMessage">Sending records</string>
     <string name="sendingMultimediaRecordsMessage">Sending new pictures and sounds</string>
     <string name="textNoTreatments">No treatments</string>
-    <string name="cropMarker">(crop)</string>
-    <string name="treatmentMarker">(treatment)</string>
+    <string name="cropMarker">(Mbegu)</string>
+    <string name="treatmentMarker">(Matibabu)</string>
     <string name="selectCropsLabel">CROPS</string>
     <string name="selectPestControlIngredients">PEST CONTROL</string>
     <string name="selectSoilManagementIngredients">SOIL MANAGEMENT</string>

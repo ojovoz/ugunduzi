@@ -170,6 +170,25 @@ public class oFarm {
         return ret;
     }
 
+    public oFarm getFarm(int userId, int farmId, int version, Context c){
+        oFarm ret = null;
+        ArrayList<oFarm> farms = getFarms(userId, farmId);
+
+        Iterator<oFarm> iterator = farms.iterator();
+        while(iterator.hasNext()){
+            oFarm f = iterator.next();
+            if(f.version==version && f.status!=1){
+                ret=f;
+                break;
+            }
+        }
+        if(ret!=null){
+            ret.context=c;
+        }
+
+        return ret;
+    }
+
     public oFarm getVersion(int userId, int id, int version, Context c){
         oFarm ret = null;
         ArrayList<oFarm> farms = getFarms(userId, id);

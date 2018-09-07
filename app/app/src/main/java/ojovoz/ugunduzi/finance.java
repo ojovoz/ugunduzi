@@ -8,17 +8,19 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by Eugenio on 20/08/2018.
@@ -53,7 +56,6 @@ public class finance extends AppCompatActivity {
 
     ArrayList<oDataItem> dataItemsList;
     public CharSequence dataItemsNamesArray[];
-    public oDataItem chosenDataItem;
 
     public Date dataItemDate;
 
@@ -69,6 +71,9 @@ public class finance extends AppCompatActivity {
     public ArrayList<oUnit> unitsList;
     public Context context;
     public boolean bCancellingData;
+
+    oRecyclerViewAdapter recyclerViewAdapter;
+    public ArrayList<oLog> logList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,6 +123,8 @@ public class finance extends AppCompatActivity {
         currentPlot = getCurrentPlot();
 
         getDataItemsList();
+
+        fillRecyclerView();
 
     }
 
@@ -279,6 +286,10 @@ public class finance extends AppCompatActivity {
                                 public void onClick(View view) {
                                     if(!checkFields()){
                                         dialog.dismiss();
+                                        createLogList();
+                                        recyclerViewAdapter.list = cardDataFromLog();
+                                        recyclerViewAdapter.setList(recyclerViewAdapter.list);
+                                        recyclerViewAdapter.notifyDataSetChanged();
                                     }
                                 }
                             });
@@ -294,6 +305,99 @@ public class finance extends AppCompatActivity {
         });
 
         dialog.show();
+    }
+
+    public void fillRecyclerView() {
+        createLogList();
+        List<oCardData> data = cardDataFromLog();
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerViewAdapter = new oRecyclerViewAdapter(data, getApplication());
+        recyclerView.setAdapter(recyclerViewAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+    public void createLogList(){
+        oLog log = new oLog(this);
+        logList = (plot>=0) ? log.sortLogByDate(log.createLog(farmId, farmVersion, plot, userId, 0), true, -1) :
+                log.sortLogByDate(log.createLog(farmId, farmVersion, userId, 0), true, -1);
+    }
+
+    public List<oCardData> cardDataFromLog() {
+        dateHelper dH = new dateHelper();
+        List<oCardData> ret = new ArrayList<>();
+        Iterator<oLog> logIterator = logList.iterator();
+        int n = 0;
+        while (logIterator.hasNext()) {
+            oLog l = logIterator.next();
+            if(l.dataItem != null) {
+                oCardData c = new oCardData();
+                c.id = n;
+                if (plot < 0) {
+                    getPlotInfo(c, l);
+                } else {
+                    if (n % 2 == 0) {
+                        c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillFaded);
+                    } else {
+                        c.plotInfoColor = ContextCompat.getColor(this, R.color.colorWhite);
+                    }
+                }
+                c.info = (c.info.isEmpty()) ? getDataItemText(l) : c.info + "\n\n" + getDataItemText(l);
+                c.isSelected = false;
+                ret.add(c);
+                n++;
+            }
+        }
+        return ret;
+    }
+
+    public void getPlotInfo(oCardData c, oLog l){
+        oFarm f = new oFarm(this);
+        f = f.getFarm(userId,farmId,farmVersion,this);
+        oPlotMatrix pm = new oPlotMatrix();
+        pm.fromString(this,f.plotMatrix,";");
+        oPlot p = pm.getPlotFromId(l.plotId);
+
+        String title= getString(R.string.cropsTitle) + ": " + p.getCropNames(this);
+        title+="\n";
+        title+=getString(R.string.pestControlTitle) + ": " + p.getPestControlNames(this);
+        title+="\n";
+        title+=getString(R.string.soilManagementTitle) + ": " + p.getSoilManagementNames(this);
+
+        if(p.pestControlIngredients.size()>0 && p.soilManagementIngredients.size()>0) {
+            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControl);
+        } else if(p.pestControlIngredients.size()>0 && p.soilManagementIngredients.size()==0) {
+            c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillPestControl);
+        } else if(p.pestControlIngredients.size()==0 && p.soilManagementIngredients.size()>0) {
+            c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillSoilManagement);
+        } else {
+            c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillDefault);
+        }
+
+        c.info=title;
+    }
+
+    public String getDataItemText(oLog l) {
+        dateHelper dH = new dateHelper();
+        String ret = "";
+        String dataItem = l.getDataItemName(this);
+        String date = dH.dateToString(l.date);
+        if (l.dataItem.type != 0) {
+            String quantityUnits = String.valueOf(l.quantity) + " " + l.units.name;
+            ret = date + "\n" + dataItem + ": " + quantityUnits + "\n";
+        } else {
+            ret = date + "\n" + dataItem + ": ";
+        }
+        ret += String.valueOf(l.value) + " " + getDefaultCostUnits();
+        if(!l.comments.isEmpty()){
+            ret += "\n\n" + l.comments;
+        }
+        return ret;
+    }
+
+    public void selectItem(View v) {
+        int n = (int) v.getTag();
+        CheckBox cb = (CheckBox) v;
+        recyclerViewAdapter.list.get(n).isSelected = cb.isChecked();
     }
 
     public boolean checkFields(){
