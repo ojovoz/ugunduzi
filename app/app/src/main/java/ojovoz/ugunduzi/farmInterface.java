@@ -271,18 +271,19 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         } else if(state==1){
             menu.add(0, 0, 0, R.string.opManageFarmRecords);
+            menu.add(1,1,1, R.string.opFarmBalance);
             if(farmVersion==maxVersion) {
-                menu.add(1, 1, 1, R.string.opEditFarm);
+                menu.add(2, 2, 2, R.string.opEditFarm);
             } else {
-                menu.add(1, 1, 1, R.string.opGoToCurrentState);
+                menu.add(2, 2, 2, R.string.opGoToCurrentState);
             }
             if(farmVersion==maxVersion){
-                menu.add(2, 2, 2, R.string.opDeleteFarm);
-                menu.add(3, 3, 3, R.string.opCreateNewFarm);
+                menu.add(3, 3, 3, R.string.opDeleteFarm);
+                menu.add(4, 4, 4, R.string.opCreateNewFarm);
                 if(currentFarm.getNumberOfFarms(userId)>1) {
-                    menu.add(4, 4, 4, R.string.opGoToOtherFarm);
+                    menu.add(5, 5, 5, R.string.opGoToOtherFarm);
                 }
-                menu.add(5, 5, 5, R.string.opSwitchUser);
+                menu.add(6, 6, 6, R.string.opSwitchUser);
             }
 
         }
@@ -321,22 +322,25 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     goToRecords(true);
                     break;
                 case 1:
+                    //farm balance
+                    break;
+                case 2:
                     if(farmVersion==maxVersion) {
                         startEditFarm();
                     } else {
                         goToLatestFarm();
                     }
                     break;
-                case 2:
+                case 3:
                     deleteFarm();
                     break;
-                case 3:
+                case 4:
                     createNewFarm();
                     break;
-                case 4:
+                case 5:
                     goToFarmChooser();
                     break;
-                case 5:
+                case 6:
                     confirmExit();
             }
         }

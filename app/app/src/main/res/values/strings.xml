@@ -127,4 +127,5 @@
     <string name="placeholderQuantity">Quantity</string>
     <string name="placeholderComments">Comments</string>
     <string name="opBalance">Balance</string>
+    <string name="opFarmBalance">Farm balance</string>
 </resources>
