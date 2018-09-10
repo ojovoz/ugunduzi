@@ -167,7 +167,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 farmName=currentFarm.name;
                 maxVersion=farmVersion=currentFarm.version;
             }
-            this.setTitle(farmName);
+            this.setTitle(farmName + " (" + user + ")");
         }
 
         LinearLayout root = (LinearLayout) findViewById(R.id.mainRoot);
@@ -455,7 +455,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 prefs.savePreferenceInt("farmId", farmId);
                 farmName = currentFarm.name;
                 maxVersion = farmVersion = currentFarm.version;
-                this.setTitle(farmName);
+                this.setTitle(farmName + " (" + user + ")");
                 state = 1;
                 firstFarm = false;
                 newFarm = false;
@@ -565,7 +565,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         createFarm();
         state=1;
         bFarmSaved=true;
-        this.setTitle(farmName);
+        this.setTitle(farmName + " (" + user + ")");
         canvasView.invalidate();
     }
 
@@ -578,7 +578,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 currentFarm = currentFarm.getLatestActiveVersion(userId,farmId,this);
                 plotMatrix.fromString(this,currentFarm.plotMatrix,";",iconMove.getWidth(), iconMove.getHeight(), iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight());
                 state=1;
-                this.setTitle(farmName);
+                this.setTitle(farmName + " (" + user + ")");
                 canvasView.invalidate();
             } else {
                 goToFarmChooser();
@@ -607,7 +607,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         plotMatrix = new oPlotMatrix();
         plotMatrix.createMatrix(displayWidth,displayHeight);
         createFarm();
-        this.setTitle(farmName);
+        this.setTitle(farmName + " (" + user + ")");
         canvasView.invalidate();
     }
 
@@ -1026,8 +1026,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             bChange=true;
         }
         if(bChange) {
-            String date = dH.dateToString(currentFarm.dateCreated);
             currentFarm = currentFarm.getVersion(userId, farmId, farmVersion, this);
+            String date = dH.dateToString(currentFarm.dateCreated);
             farmName = currentFarm.name;
             Toast.makeText(this, farmName + ": " + date, Toast.LENGTH_SHORT).show();
             farmSize = currentFarm.size;
@@ -1035,9 +1035,9 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             plotMatrix.createMatrix(displayWidth, displayHeight);
             createFarm();
             if (farmVersion < maxVersion) {
-                this.setTitle(farmName + ": " + date);
+                this.setTitle(farmName + ": " + date + " (" + user + ")");
             } else {
-                this.setTitle(farmName);
+                this.setTitle(farmName + " (" + user + ")");
             }
             invalidateOptionsMenu();
         }
@@ -1119,7 +1119,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     public void updateFarmData(String fName, float fSize){
         fName = fName.replaceAll("[^A-Za-z0-9 ]", "");
         fName = fName.trim();
-        this.setTitle(fName);
+        this.setTitle(fName + " (" + user + ")");
         farmName = fName;
         farmSize = fSize;
     }
@@ -1203,7 +1203,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     firstFarm = false;
                     newFarm = false;
                     bFarmSaved = true;
-                    this.setTitle(farmName);
+                    this.setTitle(farmName + " (" + user + ")");
                     currentFarm = currentFarm.getLatestActiveVersion(userId, farmId, this);
                 }
             } else {
@@ -1212,7 +1212,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 firstFarm = false;
                 newFarm = false;
                 bFarmSaved = true;
-                this.setTitle(farmName);
+                this.setTitle(farmName + " (" + user + ")");
                 currentFarm = currentFarm.getLatestActiveVersion(userId, farmId, this);
             }
         }
@@ -1260,7 +1260,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 newFarm=false;
                 bFarmSaved=true;
                 canvasView.invalidate();
-                this.setTitle(farmName);
+                this.setTitle(farmName + " (" + user + ")");
                 break;
 
             case 1:

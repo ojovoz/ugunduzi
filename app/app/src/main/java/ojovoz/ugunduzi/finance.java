@@ -10,7 +10,10 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -63,10 +66,13 @@ public class finance extends AppCompatActivity {
     public Button bCrop;
     public Button bTreatment;
     public Button bUnits;
+    public Button bSave;
 
     public EditText etValue;
     public EditText etComments;
     public EditText etQuantity;
+
+    public TableLayout tlQuantityUnits;
 
     public ArrayList<oUnit> unitsList;
     public Context context;
@@ -74,6 +80,9 @@ public class finance extends AppCompatActivity {
 
     oRecyclerViewAdapter recyclerViewAdapter;
     public ArrayList<oLog> logList;
+
+    public oLog editingItem;
+    public boolean itemChanges;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,20 +109,20 @@ public class finance extends AppCompatActivity {
         TextView tt = (TextView) findViewById(R.id.plotLabel);
         String title = "";
 
-        title= getString(R.string.cropsTitle) + ": " + cropNames;
-        title+="\n";
-        title+=getString(R.string.pestControlTitle) + ": " + pestControlNames;
-        title+="\n";
-        title+=getString(R.string.soilManagementTitle) + ": " + soilManagementNames;
+        title = getString(R.string.cropsTitle) + ": " + cropNames;
+        title += "\n";
+        title += getString(R.string.pestControlTitle) + ": " + pestControlNames;
+        title += "\n";
+        title += getString(R.string.soilManagementTitle) + ": " + soilManagementNames;
 
-        if(!pestControlNames.equals(getString(R.string.textNone)) && !soilManagementNames.equals(getString(R.string.textNone))) {
+        if (!pestControlNames.equals(getString(R.string.textNone)) && !soilManagementNames.equals(getString(R.string.textNone))) {
             tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControl));
-        } else if(!pestControlNames.equals(getString(R.string.textNone)) && soilManagementNames.equals(getString(R.string.textNone))) {
-            tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorFillPestControl));
-        } else if(pestControlNames.equals(getString(R.string.textNone)) && !soilManagementNames.equals(getString(R.string.textNone))) {
-            tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorFillSoilManagement));
+        } else if (!pestControlNames.equals(getString(R.string.textNone)) && soilManagementNames.equals(getString(R.string.textNone))) {
+            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillPestControl));
+        } else if (pestControlNames.equals(getString(R.string.textNone)) && !soilManagementNames.equals(getString(R.string.textNone))) {
+            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagement));
         } else {
-            tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorFillDefault));
+            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillDefault));
         }
 
         tt.setText(title);
@@ -133,25 +142,58 @@ public class finance extends AppCompatActivity {
         goBack();
     }
 
-    public void addItem(View v){
-        final dateHelper dH = new dateHelper();
-        newItem = new oLog();
+    @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        menu.add(0, 0, 0, R.string.opDeleteSelectedItems);
+        menu.add(1, 1, 1, R.string.opBalance);
+        menu.add(2, 2, 2, R.string.opGoBack);
+        return true;
+    }
 
-        newItem.date = new Date();
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case 0:
+                //delete selected items
+                break;
+            case 1:
+                //go to balance
+                break;
+            case 2:
+                goBack();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
-        bCancellingData=false;
+    public void addItem(View v) {
+
+        final View editingView = v;
+
+        itemChanges = true;
+
+        if (editingItem == null) {
+            newItem = new oLog();
+            newItem.date = new Date();
+        } else {
+            newItem = editingItem;
+            itemChanges = false;
+        }
+
+        bCancellingData = false;
 
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_add_edit_data_item);
-        dialog.getWindow().setLayout(displayWidth-10, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setLayout(displayWidth - 10, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(true);
         dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
             public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
-                if(i == keyEvent.KEYCODE_BACK && newItem.dataItem!=null && !bCancellingData){
-                    bCancellingData=true;
+                if (i == keyEvent.KEYCODE_BACK && newItem.dataItem != null && itemChanges && !bCancellingData)
+                {
+                    bCancellingData = true;
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setMessage(R.string.dataNotSavedText)
                             .setCancelable(false)
@@ -159,18 +201,36 @@ public class finance extends AppCompatActivity {
                                 public void onClick(DialogInterface dlg, int id) {
                                     dlg.dismiss();
                                     dialog.dismiss();
+                                    if (editingItem != null) {
+                                        TextView tv = (TextView) editingView;
+                                        if ((int) tv.getTag() % 2 == 0) {
+                                            tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillFaded));
+                                        } else {
+                                            tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorWhite));
+                                        }
+                                        editingItem = null;
+                                    }
                                 }
                             })
                             .setNegativeButton(R.string.noButtonText, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dlg, int id) {
                                     dlg.dismiss();
-                                    bCancellingData=false;
+                                    bCancellingData = false;
                                 }
                             });
                     AlertDialog alert = builder.create();
                     alert.show();
                     return true;
-                } else {
+                }else{
+                    if (i == keyEvent.KEYCODE_BACK && editingItem != null) {
+                        TextView tv = (TextView) editingView;
+                        if ((int) tv.getTag() % 2 == 0) {
+                            tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillFaded));
+                        } else {
+                            tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorWhite));
+                        }
+                        editingItem = null;
+                    }
                     return false;
                 }
             }
@@ -184,8 +244,50 @@ public class finance extends AppCompatActivity {
         etValue = (EditText) dialog.findViewById(R.id.dataItemValue);
         etQuantity = (EditText) dialog.findViewById(R.id.dataItemQuantity);
         etComments = (EditText) dialog.findViewById(R.id.dataItemComments);
+        bSave = (Button) dialog.findViewById(R.id.saveButton);
 
-        final TableLayout tlQuantityUnits = (TableLayout) dialog.findViewById(R.id.quantityUnitsTable);
+        tlQuantityUnits = (TableLayout) dialog.findViewById(R.id.quantityUnitsTable);
+
+        if (editingItem != null) {
+            bDataItem.setText(editingItem.dataItem.name);
+            displayFields(editingItem.dataItem);
+            if (currentPlot.crops.size() > 1 && editingItem.dataItem.isCropSpecific) {
+                bCrop.setText(editingItem.crop.name);
+            }
+            if ((currentPlot.pestControlIngredients.size() > 0 || currentPlot.soilManagementIngredients.size() > 0) && editingItem.dataItem.isTreatmentSpecific) {
+                bTreatment.setText(editingItem.treatmentIngredient.name);
+            }
+
+            if (editingItem.dataItem.type != 0) {
+                bUnits.setText(editingItem.units.name);
+                etQuantity.setText(Float.toString(editingItem.quantity));
+            }
+
+            etValue.setText(Float.toString(editingItem.value));
+            etComments.setText(editingItem.comments);
+
+            bSave.setVisibility(View.VISIBLE);
+            bSave.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (itemChanges && !checkFields()) {
+                        dialog.dismiss();
+
+                        TextView tv = (TextView) editingView;
+                        if ((int) tv.getTag() % 2 == 0) {
+                            tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillFaded));
+                        } else {
+                            tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorWhite));
+                        }
+
+                        createLogList();
+                        recyclerViewAdapter.list = cardDataFromLog();
+                        recyclerViewAdapter.setList(recyclerViewAdapter.list);
+                        recyclerViewAdapter.notifyDataSetChanged();
+                    }
+                }
+            });
+        }
 
         bDataItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -210,83 +312,28 @@ public class finance extends AppCompatActivity {
 
                             resetFields();
 
-                            newItem.dataItem=d;
+                            newItem.dataItem = d;
                             bDataItem.setText(d.name);
-                            if(currentPlot.crops.size()>1 && d.isCropSpecific){
-                                bCrop.setVisibility(View.VISIBLE);
-                                bCrop.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        displayCropPicker();
-                                    }
-                                });
-                            } else if(d.isCropSpecific){
-                                bCrop.setVisibility(View.VISIBLE);
-                                bCrop.setText(currentPlot.crops.get(0).name);
-                                newItem.crop=currentPlot.crops.get(0);
-                            } else {
-                                bCrop.setVisibility(View.GONE);
-                            }
-                            if((currentPlot.pestControlIngredients.size()>0 || currentPlot.soilManagementIngredients.size()>0) && d.isTreatmentSpecific){
-                                bTreatment.setVisibility(View.VISIBLE);
-                                if((currentPlot.pestControlIngredients.size() + currentPlot.soilManagementIngredients.size())>1){
-                                    bTreatment.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            displayTreatmentIngredientPicker();
-                                        }
-                                    });
-                                }
-                            } else if(d.isTreatmentSpecific) {
-                                bTreatment.setVisibility(View.VISIBLE);
-                                if(currentPlot.pestControlIngredients.size()==1){
-                                    bTreatment.setText(currentPlot.pestControlIngredients.get(0).name);
-                                    newItem.treatmentIngredient=currentPlot.pestControlIngredients.get(0);
-                                } else {
-                                    bTreatment.setText(currentPlot.soilManagementIngredients.get(0).name);
-                                    newItem.treatmentIngredient=currentPlot.soilManagementIngredients.get(0);
-                                }
-                            } else {
-                                bTreatment.setVisibility(View.GONE);
-                            }
-                            bDate.setVisibility(View.VISIBLE);
-                            bDate.setText(dH.dateToString(newItem.date));
 
-                            bDate.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    displayDatePicker(view);
-                                }
-                            });
+                            displayFields(d);
 
-                            if(d.type!=0) {
-                                tlQuantityUnits.setVisibility(View.VISIBLE);
-                                newItem.units = d.defaultUnits;
-                                bUnits.setText(newItem.units.name);
-                                bUnits.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        displayUnitsPicker();
-                                    }
-                                });
-                            } else {
-                                tlQuantityUnits.setVisibility(View.GONE);
-                            }
-
-                            etValue.setVisibility(View.VISIBLE);
-                            etValue.setHint(getDefaultCostUnits());
-
-                            etComments = (EditText) dialog.findViewById(R.id.dataItemComments);
-                            etComments.setVisibility(View.VISIBLE);
-
-                            Button bSave = (Button) dialog.findViewById(R.id.saveButton);
                             bSave.setVisibility(View.VISIBLE);
                             bSave.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    if(!checkFields()){
+                                    if (itemChanges && !checkFields()) {
                                         dialog.dismiss();
                                         createLogList();
+
+                                        if(editingItem!=null) {
+                                            TextView tv = (TextView) editingView;
+                                            if ((int) tv.getTag() % 2 == 0) {
+                                                tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillFaded));
+                                            } else {
+                                                tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorWhite));
+                                            }
+                                        }
+
                                         recyclerViewAdapter.list = cardDataFromLog();
                                         recyclerViewAdapter.setList(recyclerViewAdapter.list);
                                         recyclerViewAdapter.notifyDataSetChanged();
@@ -307,6 +354,129 @@ public class finance extends AppCompatActivity {
         dialog.show();
     }
 
+    public void displayFields(oDataItem d) {
+        dateHelper dH = new dateHelper();
+        if (currentPlot.crops.size() > 1 && d.isCropSpecific) {
+            bCrop.setVisibility(View.VISIBLE);
+            bCrop.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    displayCropPicker();
+                }
+            });
+        } else if (d.isCropSpecific) {
+            bCrop.setVisibility(View.VISIBLE);
+            bCrop.setText(currentPlot.crops.get(0).name);
+            newItem.crop = currentPlot.crops.get(0);
+        } else {
+            bCrop.setVisibility(View.GONE);
+        }
+        if ((currentPlot.pestControlIngredients.size() > 0 || currentPlot.soilManagementIngredients.size() > 0) && d.isTreatmentSpecific) {
+            bTreatment.setVisibility(View.VISIBLE);
+            if ((currentPlot.pestControlIngredients.size() + currentPlot.soilManagementIngredients.size()) > 1) {
+                bTreatment.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        displayTreatmentIngredientPicker();
+                    }
+                });
+            }
+        } else if (d.isTreatmentSpecific) {
+            bTreatment.setVisibility(View.VISIBLE);
+            if (currentPlot.pestControlIngredients.size() == 1) {
+                bTreatment.setText(currentPlot.pestControlIngredients.get(0).name);
+                newItem.treatmentIngredient = currentPlot.pestControlIngredients.get(0);
+            } else {
+                bTreatment.setText(currentPlot.soilManagementIngredients.get(0).name);
+                newItem.treatmentIngredient = currentPlot.soilManagementIngredients.get(0);
+            }
+        } else {
+            bTreatment.setVisibility(View.GONE);
+        }
+        bDate.setVisibility(View.VISIBLE);
+        bDate.setText(dH.dateToString(newItem.date));
+
+        bDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                displayDatePicker(view);
+            }
+        });
+
+        if (d.type != 0) {
+            tlQuantityUnits.setVisibility(View.VISIBLE);
+            newItem.units = d.defaultUnits;
+            bUnits.setText(newItem.units.name);
+            bUnits.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    displayUnitsPicker();
+                }
+            });
+            etQuantity.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    if(!charSequence.toString().equals(String.valueOf(newItem.quantity))) {
+                        itemChanges = true;
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+
+                }
+            });
+        } else {
+            tlQuantityUnits.setVisibility(View.GONE);
+        }
+
+        etValue.setVisibility(View.VISIBLE);
+        etValue.setHint(getDefaultCostUnits());
+        etValue.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(!charSequence.toString().equals(String.valueOf(newItem.value))) {
+                    itemChanges = true;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        etComments.setVisibility(View.VISIBLE);
+        etComments.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(!charSequence.toString().equals(newItem.comments)) {
+                    itemChanges = true;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+    }
+
     public void fillRecyclerView() {
         createLogList();
         List<oCardData> data = cardDataFromLog();
@@ -316,9 +486,9 @@ public class finance extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
-    public void createLogList(){
+    public void createLogList() {
         oLog log = new oLog(this);
-        logList = (plot>=0) ? log.sortLogByDate(log.createLog(farmId, farmVersion, plot, userId, 0), true, -1) :
+        logList = (plot >= 0) ? log.sortLogByDate(log.createLog(farmId, farmVersion, plot, userId, 0), true, -1) :
                 log.sortLogByDate(log.createLog(farmId, farmVersion, userId, 0), true, -1);
     }
 
@@ -329,7 +499,7 @@ public class finance extends AppCompatActivity {
         int n = 0;
         while (logIterator.hasNext()) {
             oLog l = logIterator.next();
-            if(l.dataItem != null) {
+            if (l.dataItem != null) {
                 oCardData c = new oCardData();
                 c.id = n;
                 if (plot < 0) {
@@ -350,30 +520,30 @@ public class finance extends AppCompatActivity {
         return ret;
     }
 
-    public void getPlotInfo(oCardData c, oLog l){
+    public void getPlotInfo(oCardData c, oLog l) {
         oFarm f = new oFarm(this);
-        f = f.getFarm(userId,farmId,farmVersion,this);
+        f = f.getFarm(userId, farmId, farmVersion, this);
         oPlotMatrix pm = new oPlotMatrix();
-        pm.fromString(this,f.plotMatrix,";");
+        pm.fromString(this, f.plotMatrix, ";");
         oPlot p = pm.getPlotFromId(l.plotId);
 
-        String title= getString(R.string.cropsTitle) + ": " + p.getCropNames(this);
-        title+="\n";
-        title+=getString(R.string.pestControlTitle) + ": " + p.getPestControlNames(this);
-        title+="\n";
-        title+=getString(R.string.soilManagementTitle) + ": " + p.getSoilManagementNames(this);
+        String title = getString(R.string.cropsTitle) + ": " + p.getCropNames(this);
+        title += "\n";
+        title += getString(R.string.pestControlTitle) + ": " + p.getPestControlNames(this);
+        title += "\n";
+        title += getString(R.string.soilManagementTitle) + ": " + p.getSoilManagementNames(this);
 
-        if(p.pestControlIngredients.size()>0 && p.soilManagementIngredients.size()>0) {
+        if (p.pestControlIngredients.size() > 0 && p.soilManagementIngredients.size() > 0) {
             c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControl);
-        } else if(p.pestControlIngredients.size()>0 && p.soilManagementIngredients.size()==0) {
-            c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillPestControl);
-        } else if(p.pestControlIngredients.size()==0 && p.soilManagementIngredients.size()>0) {
-            c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillSoilManagement);
+        } else if (p.pestControlIngredients.size() > 0 && p.soilManagementIngredients.size() == 0) {
+            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillPestControl);
+        } else if (p.pestControlIngredients.size() == 0 && p.soilManagementIngredients.size() > 0) {
+            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillSoilManagement);
         } else {
-            c.plotInfoColor = ContextCompat.getColor(this,R.color.colorFillDefault);
+            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillDefault);
         }
 
-        c.info=title;
+        c.info = title;
     }
 
     public String getDataItemText(oLog l) {
@@ -388,7 +558,7 @@ public class finance extends AppCompatActivity {
             ret = date + "\n" + dataItem + ": ";
         }
         ret += String.valueOf(l.value) + " " + getDefaultCostUnits();
-        if(!l.comments.isEmpty()){
+        if (!l.comments.isEmpty()) {
             ret += "\n\n" + l.comments;
         }
         return ret;
@@ -400,31 +570,47 @@ public class finance extends AppCompatActivity {
         recyclerViewAdapter.list.get(n).isSelected = cb.isChecked();
     }
 
-    public boolean checkFields(){
-        boolean ret=true;
-        if(newItem.dataItem.isCropSpecific && newItem.crop==null){
+    public void editItem(View v) {
+        final int n = (int) v.getTag();
+        if (n >= 0) {
+            TextView tv = (TextView) v;
+            tv.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight));
+            editingItem = logList.get(n);
+            addItem(v);
+        }
+    }
+
+    public boolean checkFields() {
+        boolean ret = true;
+        if (newItem.dataItem.isCropSpecific && newItem.crop == null) {
             Toast.makeText(this, R.string.mustChooseCropMessage, Toast.LENGTH_SHORT).show();
-        } else if (newItem.dataItem.isTreatmentSpecific && newItem.treatmentIngredient==null){
+        } else if (newItem.dataItem.isTreatmentSpecific && newItem.treatmentIngredient == null) {
             Toast.makeText(this, R.string.mustChooseTreatmentMessage, Toast.LENGTH_SHORT).show();
-        } else if (newItem.dataItem.type!=0 && (etQuantity.getText().toString().isEmpty())){
+        } else if (newItem.dataItem.type != 0 && (etQuantity.getText().toString().isEmpty())) {
             Toast.makeText(this, R.string.quantityEmptyMessage, Toast.LENGTH_SHORT).show();
             etQuantity.requestFocus();
-        } else if (etValue.getText().toString().isEmpty()){
+        } else if (etValue.getText().toString().isEmpty()) {
             Toast.makeText(this, R.string.valueEmptyMessage, Toast.LENGTH_SHORT).show();
             etValue.requestFocus();
         } else {
-            ret=false;
-            newItem.quantity= (newItem.dataItem.type!=0) ? Float.parseFloat(etQuantity.getText().toString()) : 0.0f;
-            newItem.value=Float.parseFloat(etValue.getText().toString());
-            newItem.comments=etComments.getText().toString().replaceAll(";","");
-            newItem.context=context;
-            newItem.appendToLog(farmId,farmVersion,userId,plot,newItem.date,newItem.dataItem,newItem.value,newItem.quantity,
-                    newItem.units,newItem.crop,newItem.treatmentIngredient,0.0f,newItem.comments,"","");
+            ret = false;
+            newItem.quantity = (newItem.dataItem.type != 0) ? Float.parseFloat(etQuantity.getText().toString()) : 0.0f;
+            newItem.value = Float.parseFloat(etValue.getText().toString());
+            newItem.comments = etComments.getText().toString().replaceAll(";", "");
+            newItem.context = context;
+            if (editingItem == null) {
+                newItem.appendToLog(farmId, farmVersion, userId, plot, newItem.date, newItem.dataItem, newItem.value, newItem.quantity,
+                        newItem.units, newItem.crop, newItem.treatmentIngredient, 0.0f, newItem.comments, "", "");
+            } else {
+                //update log
+            }
+            editingItem = null;
         }
+
         return ret;
     }
 
-    public void resetFields(){
+    public void resetFields() {
         etValue.setText(R.string.emptyString);
         etQuantity.setText(R.string.emptyString);
         etComments.setText(R.string.emptyString);
@@ -432,7 +618,7 @@ public class finance extends AppCompatActivity {
         bTreatment.setText(R.string.chooseTreatmentButtonLabel);
     }
 
-    public void displayDatePicker(View view){
+    public void displayDatePicker(View view) {
         final Dialog dialogDate = new Dialog(view.getContext());
         dialogDate.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialogDate.setContentView(R.layout.dialog_datepicker);
@@ -463,19 +649,21 @@ public class finance extends AppCompatActivity {
 
                 Date nd = calendar.getTime();
 
-                newItem.date=nd;
+                newItem.date = nd;
 
                 bDate.setText(dH.dateToString(nd));
                 dialogDate.dismiss();
+
+                itemChanges=true;
             }
         });
         dialogDate.show();
     }
 
-    public void displayCropPicker(){
+    public void displayCropPicker() {
         ArrayList<String> cropNames = new ArrayList<>();
-        Iterator<oCrop> iterator =  currentPlot.crops.iterator();
-        while(iterator.hasNext()){
+        Iterator<oCrop> iterator = currentPlot.crops.iterator();
+        while (iterator.hasNext()) {
             oCrop c = iterator.next();
             cropNames.add(c.name);
         }
@@ -491,9 +679,9 @@ public class finance extends AppCompatActivity {
         builder.setSingleChoiceItems(adapter, -1, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                newItem.crop=currentPlot.crops.get(i);
+                newItem.crop = currentPlot.crops.get(i);
                 bCrop.setText(newItem.crop.name);
-
+                itemChanges=true;
                 dialogInterface.dismiss();
             }
         });
@@ -501,12 +689,12 @@ public class finance extends AppCompatActivity {
         dialogCrops.show();
     }
 
-    public void displayUnitsPicker(){
+    public void displayUnitsPicker() {
         ArrayList<String> unitNames = new ArrayList<>();
         oUnit u = new oUnit(this);
         final ArrayList<oUnit> unitList = u.getUnits(0);
         Iterator<oUnit> iteratorUnits = unitList.iterator();
-        while(iteratorUnits.hasNext()){
+        while (iteratorUnits.hasNext()) {
             u = iteratorUnits.next();
             unitNames.add(u.name);
         }
@@ -524,8 +712,9 @@ public class finance extends AppCompatActivity {
         builder.setSingleChoiceItems(adapter, -1, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                newItem.units=unitList.get(i);
+                newItem.units = unitList.get(i);
                 bUnits.setText(newItem.units.name);
+                itemChanges=true;
                 dialogInterface.dismiss();
             }
         });
@@ -534,17 +723,17 @@ public class finance extends AppCompatActivity {
 
     }
 
-    public void displayTreatmentIngredientPicker(){
+    public void displayTreatmentIngredientPicker() {
         final ArrayList<oTreatmentIngredient> treatmentIngredients = new ArrayList<>();
         ArrayList<String> treatmentIngredientNames = new ArrayList<>();
-        Iterator<oTreatmentIngredient> iteratorPestControl =  currentPlot.pestControlIngredients.iterator();
-        while(iteratorPestControl.hasNext()){
+        Iterator<oTreatmentIngredient> iteratorPestControl = currentPlot.pestControlIngredients.iterator();
+        while (iteratorPestControl.hasNext()) {
             oTreatmentIngredient t = iteratorPestControl.next();
             treatmentIngredientNames.add(t.name);
             treatmentIngredients.add(t);
         }
-        Iterator<oTreatmentIngredient> iteratorSoilManagement =  currentPlot.soilManagementIngredients.iterator();
-        while(iteratorSoilManagement.hasNext()){
+        Iterator<oTreatmentIngredient> iteratorSoilManagement = currentPlot.soilManagementIngredients.iterator();
+        while (iteratorSoilManagement.hasNext()) {
             oTreatmentIngredient t = iteratorSoilManagement.next();
             treatmentIngredientNames.add(t.name);
             treatmentIngredients.add(t);
@@ -561,9 +750,9 @@ public class finance extends AppCompatActivity {
         builder.setSingleChoiceItems(adapter, -1, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                newItem.treatmentIngredient =treatmentIngredients.get(i);
+                newItem.treatmentIngredient = treatmentIngredients.get(i);
                 bTreatment.setText(newItem.treatmentIngredient.name);
-
+                itemChanges=true;
                 dialogInterface.dismiss();
             }
         });
@@ -571,39 +760,39 @@ public class finance extends AppCompatActivity {
         dialogCrops.show();
     }
 
-    public CharSequence getDefaultCostUnits(){
-        CharSequence ret="";
+    public CharSequence getDefaultCostUnits() {
+        CharSequence ret = "";
         oUnit u = new oUnit(this);
         ret = u.getUnitNames(2).get(0);
         return ret;
     }
 
-    public oPlot getCurrentPlot(){
+    public oPlot getCurrentPlot() {
         oPlot ret;
         oFarm f = new oFarm(this);
-        f = f.getVersion(userId,farmId,farmVersion,this);
+        f = f.getVersion(userId, farmId, farmVersion, this);
         oPlotMatrix p = new oPlotMatrix();
-        p.fromString(this,f.plotMatrix,";");
-        ret=p.plots.get(plot);
+        p.fromString(this, f.plotMatrix, ";");
+        ret = p.plots.get(plot);
         return ret;
     }
 
-    public void getDataItemsList(){
+    public void getDataItemsList() {
         oDataItem d = new oDataItem(this);
-        boolean bExcludeCropSpecific = (currentPlot.crops.size()==0) ? true : false;
-        boolean bExcludeTreatmentSpecific = (currentPlot.pestControlIngredients.size()==0 && currentPlot.soilManagementIngredients.size()==0) ? true : false;
+        boolean bExcludeCropSpecific = (currentPlot.crops.size() == 0) ? true : false;
+        boolean bExcludeTreatmentSpecific = (currentPlot.pestControlIngredients.size() == 0 && currentPlot.soilManagementIngredients.size() == 0) ? true : false;
         dataItemsList = d.getDataItems(bExcludeCropSpecific, bExcludeTreatmentSpecific);
         dataItemsNamesArray = d.getDataItemNames(bExcludeCropSpecific, bExcludeTreatmentSpecific).toArray(new CharSequence[dataItemsList.size()]);
     }
 
-    public void goBack(){
+    public void goBack() {
         Intent i = new Intent(this, farmInterface.class);
         i.putExtra("user", user);
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
         i.putExtra("farmName", farmName);
         i.putExtra("farmId", farmId);
-        i.putExtra("farmVersion",farmVersion);
+        i.putExtra("farmVersion", farmVersion);
         i.putExtra("newFarm", false);
         i.putExtra("firstFarm", false);
         startActivity(i);

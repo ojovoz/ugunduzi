@@ -126,4 +126,5 @@
     <string name="chooseTreatmentButtonLabel">CHOOSE A TREATMENT</string>
     <string name="placeholderQuantity">Quantity</string>
     <string name="placeholderComments">Comments</string>
+    <string name="opBalance">Balance</string>
 </resources>
