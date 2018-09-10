@@ -273,17 +273,20 @@ public class finance extends AppCompatActivity {
                     if (itemChanges && !checkFields()) {
                         dialog.dismiss();
 
-                        TextView tv = (TextView) editingView;
-                        if ((int) tv.getTag() % 2 == 0) {
-                            tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillFaded));
-                        } else {
-                            tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorWhite));
-                        }
-
                         createLogList();
                         recyclerViewAdapter.list = cardDataFromLog();
                         recyclerViewAdapter.setList(recyclerViewAdapter.list);
                         recyclerViewAdapter.notifyDataSetChanged();
+                    } else if(!itemChanges) {
+                        dialog.dismiss();
+                        if(editingItem!=null) {
+                            TextView tv = (TextView) editingView;
+                            if ((int) tv.getTag() % 2 == 0) {
+                                tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillFaded));
+                            } else {
+                                tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorWhite));
+                            }
+                        }
                     }
                 }
             });
@@ -325,6 +328,11 @@ public class finance extends AppCompatActivity {
                                         dialog.dismiss();
                                         createLogList();
 
+                                        recyclerViewAdapter.list = cardDataFromLog();
+                                        recyclerViewAdapter.setList(recyclerViewAdapter.list);
+                                        recyclerViewAdapter.notifyDataSetChanged();
+                                    } else if(!itemChanges) {
+                                        dialog.dismiss();
                                         if(editingItem!=null) {
                                             TextView tv = (TextView) editingView;
                                             if ((int) tv.getTag() % 2 == 0) {
@@ -333,10 +341,6 @@ public class finance extends AppCompatActivity {
                                                 tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorWhite));
                                             }
                                         }
-
-                                        recyclerViewAdapter.list = cardDataFromLog();
-                                        recyclerViewAdapter.setList(recyclerViewAdapter.list);
-                                        recyclerViewAdapter.notifyDataSetChanged();
                                     }
                                 }
                             });
@@ -602,7 +606,8 @@ public class finance extends AppCompatActivity {
                 newItem.appendToLog(farmId, farmVersion, userId, plot, newItem.date, newItem.dataItem, newItem.value, newItem.quantity,
                         newItem.units, newItem.crop, newItem.treatmentIngredient, 0.0f, newItem.comments, "", "");
             } else {
-                //update log
+                newItem.updateLogItem(newItem.line,farmId,farmVersion,userId,plot,newItem.date,newItem.dataItem,newItem.value,newItem.quantity,
+                        newItem.units,newItem.crop,newItem.treatmentIngredient, 0.0f, newItem.comments);
             }
             editingItem = null;
         }

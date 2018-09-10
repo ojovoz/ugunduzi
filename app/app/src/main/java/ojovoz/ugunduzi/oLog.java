@@ -275,7 +275,7 @@ public class oLog {
         log.append(context, newLine);
     }
 
-    public void updateLogItem(int line, String farmName, int userId, int plot, Date date, oDataItem dataItem, float value, float quantity, oUnit units, oCrop crop, oTreatment treatment, float cost, String comments){
+    public void updateLogItem(int line, int farmId, int farmVersion, int userId, int plot, Date date, oDataItem dataItem, float value, float quantity, oUnit units, oCrop crop, oTreatmentIngredient treatment, float cost, String comments){
         dateHelper dH = new dateHelper();
 
         csvFileManager log = new csvFileManager("log");
@@ -288,7 +288,7 @@ public class oLog {
         cropId = (crop == null) ? "0" : Integer.toString(crop.id);
         treatmentId = (treatment == null) ? "0" : Integer.toString(treatment.id);
 
-        String[] newLine = {farmName, Integer.toString(userId), Integer.toString(plot), dH.dateToString(date), dataItemId, Float.toString(value), Float.toString(quantity), unitsId, cropId, treatmentId, Float.toString(cost), comments, "", "", "0"};
+        String[] newLine = {Integer.toString(farmId), Integer.toString(farmVersion), Integer.toString(userId), Integer.toString(plot), dH.dateToString(date), dataItemId, Float.toString(value), Float.toString(quantity), unitsId, cropId, treatmentId, Float.toString(cost), comments, "", "", "0"};
         log.update(context, newLine, line);
     }
 
