@@ -84,12 +84,15 @@ public class finance extends AppCompatActivity {
     public oLog editingItem;
     public boolean itemChanges;
 
+    public int nSelected;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finance);
 
         context = this;
+        nSelected=0;
 
         user = getIntent().getExtras().getString("user");
         userPass = getIntent().getExtras().getString("userPass");
@@ -143,19 +146,21 @@ public class finance extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(android.view.Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        menu.add(0, 0, 0, R.string.opDeleteSelectedItems);
+    public boolean onPrepareOptionsMenu(android.view.Menu menu) {
+        menu.clear();
+        if(nSelected>0) {
+            menu.add(0, 0, 0, R.string.opDeleteSelectedItems);
+        }
         menu.add(1, 1, 1, R.string.opBalance);
         menu.add(2, 2, 2, R.string.opGoBack);
-        return true;
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case 0:
-                //delete selected items
+                tryDeleteSelectedItems();
                 break;
             case 1:
                 //go to balance
@@ -164,6 +169,49 @@ public class finance extends AppCompatActivity {
                 goBack();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void tryDeleteSelectedItems() {
+        if (nSelected > 0) {
+            AlertDialog.Builder confirmDialog = new AlertDialog.Builder(this);
+            confirmDialog.setMessage(R.string.deleteItemsConfirmMessage);
+            confirmDialog.setNegativeButton(R.string.noButtonText, null);
+            confirmDialog.setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    deleteSelectedItems();
+
+                }
+            });
+            confirmDialog.create();
+            confirmDialog.show();
+        } else {
+            Toast.makeText(this, R.string.noItemsSelectedMessage, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void deleteSelectedItems() {
+        int[] delete = new int[recyclerViewAdapter.list.size()];
+        List<oCardData> list = recyclerViewAdapter.list;
+        Iterator<oCardData> iterator = list.iterator();
+        int n = 0;
+        while (iterator.hasNext()) {
+            oCardData cd = iterator.next();
+            if (cd.isSelected) {
+                delete[n] = logList.get(cd.id).line;
+            } else {
+                delete[n] = -1;
+            }
+            n++;
+        }
+        oLog l = new oLog(this);
+        l.deleteLogItems(delete);
+        createLogList();
+        recyclerViewAdapter.list = cardDataFromLog();
+        recyclerViewAdapter.setList(recyclerViewAdapter.list);
+        recyclerViewAdapter.notifyDataSetChanged();
+        nSelected = 0;
+        setTitle(getString(R.string.financeActivity));
     }
 
     public void addItem(View v) {
@@ -572,6 +620,15 @@ public class finance extends AppCompatActivity {
         int n = (int) v.getTag();
         CheckBox cb = (CheckBox) v;
         recyclerViewAdapter.list.get(n).isSelected = cb.isChecked();
+
+        nSelected = (cb.isChecked()) ? nSelected + 1 : nSelected - 1;
+        if (nSelected > 0) {
+            setTitle(getString(R.string.financeActivity) + ": " + String.valueOf(nSelected) + " " + getString(R.string.selected));
+        } else {
+            setTitle(getString(R.string.financeActivity));
+        }
+
+        invalidateOptionsMenu();
     }
 
     public void editItem(View v) {
