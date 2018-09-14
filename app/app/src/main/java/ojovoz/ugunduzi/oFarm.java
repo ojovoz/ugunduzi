@@ -125,9 +125,18 @@ public class oFarm {
         return ret;
     }
 
-    public boolean farmNameExists(int userId, String farmName){
-        ArrayList<String> fNames = getActiveFarmNames(userId);
-        return fNames.contains(farmName);
+    public boolean farmNameExists(int userId, int farmId, String farmName){
+        boolean ret=false;
+        ArrayList<oFarm> fList = getActiveFarms(userId);
+        Iterator<oFarm> iterator = fList.iterator();
+        while(iterator.hasNext()){
+            oFarm f = iterator.next();
+            if(f.name.equals(farmName) && f.id!=farmId){
+                ret=true;
+                break;
+            }
+        }
+        return ret;
     }
 
     public int getFarmIdFromNameUser(int userId, String farmName){

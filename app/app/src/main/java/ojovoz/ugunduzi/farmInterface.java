@@ -504,7 +504,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             int n = 1;
             ret = getString(R.string.defaultFarmNamePrefix) + " " + Integer.toString(n);
             do {
-                if (!currentFarm.farmNameExists(userId, ret)) {
+                if (!currentFarm.farmNameExists(userId, farmId, ret)) {
                     break;
                 } else {
                     ret = getString(R.string.defaultFarmNamePrefix) + " " + Integer.toString(n);
@@ -934,7 +934,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 if (fName.isEmpty()) {
                     Toast.makeText(view.getContext(), R.string.farmNameCannotBeEmptyMessage, Toast.LENGTH_SHORT).show();
                 } else {
-                    if (currentFarm.farmNameExists(userId, fName)) {
+                    if (currentFarm.farmNameExists(userId, farmId, fName)) {
                         Toast.makeText(view.getContext(), R.string.farmNameRepeated, Toast.LENGTH_SHORT).show();
                     } else {
                         EditText fSize = (EditText) dialog.findViewById(R.id.acres);
