@@ -127,15 +127,13 @@ public class pictureSound extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        tryExit(2);
+        tryExit(0);
     }
 
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
         super.onCreateOptionsMenu(menu);
-        menu.add(0, 0, 0, R.string.opEnterData);
-        menu.add(1, 1, 1, R.string.opManagePlotRecords);
-        menu.add(2, 2, 2, R.string.opGoBack);
+        menu.add(0, 0, 0, R.string.opGoBack);
         return true;
     }
 
@@ -151,13 +149,13 @@ public class pictureSound extends AppCompatActivity {
         } else {
             switch (exitAction) {
                 case 0:
-                    goToEnterData();
+                    goBack();
                     break;
                 case 1:
-                    goToManageRecords();
+                    //
                     break;
                 case 2:
-                    goBack();
+                    //
             }
         }
     }
