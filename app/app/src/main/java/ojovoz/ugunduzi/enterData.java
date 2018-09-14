@@ -158,7 +158,7 @@ public class enterData extends AppCompatActivity {
         super.onCreateOptionsMenu(menu);
         menu.add(0, 0, 0, R.string.opPictureSound);
         menu.add(1, 1, 1, R.string.opManagePlotRecords);
-        menu.add(2, 2, 2, R.string.opGoBack);
+        menu.add(2, 2, 2, R.string.opGoBackToFarm);
         return true;
     }
 

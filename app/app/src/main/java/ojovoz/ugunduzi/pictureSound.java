@@ -4,16 +4,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -133,7 +130,7 @@ public class pictureSound extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
         super.onCreateOptionsMenu(menu);
-        menu.add(0, 0, 0, R.string.opGoBack);
+        menu.add(0, 0, 0, R.string.opGoBackToFarm);
         return true;
     }
 
@@ -179,10 +176,10 @@ public class pictureSound extends AppCompatActivity {
                 }
                 switch (exitAction) {
                     case 0:
-                        goToEnterData();
+                        //
                         break;
                     case 1:
-                        goToManageRecords();
+                        //
                         break;
                     case 2:
                         goBack();
@@ -204,38 +201,6 @@ public class pictureSound extends AppCompatActivity {
         i.putExtra("farmVersion",farmVersion);
         i.putExtra("newFarm", false);
         i.putExtra("firstFarm", false);
-        startActivity(i);
-        finish();
-    }
-
-    public void goToEnterData(){
-        Intent i = new Intent(this, enterData.class);
-        i.putExtra("user", user);
-        i.putExtra("userId", userId);
-        i.putExtra("userPass", userPass);
-        i.putExtra("farmName", farmName);
-        i.putExtra("farmId", farmId);
-        i.putExtra("farmVersion", farmVersion);
-        i.putExtra("plot", plot);
-        i.putExtra("cropNames",cropNames);
-        i.putExtra("pestControlNames",pestControlNames);
-        i.putExtra("soilManagementNames",soilManagementNames);
-        startActivity(i);
-        finish();
-    }
-
-    void goToManageRecords(){
-        Intent i = new Intent(this, dataManager.class);
-        i.putExtra("user", user);
-        i.putExtra("userId", userId);
-        i.putExtra("userPass", userPass);
-        i.putExtra("farmName", farmName);
-        i.putExtra("farmId", farmId);
-        i.putExtra("farmVersion", farmVersion);
-        i.putExtra("plot", plot);
-        i.putExtra("cropNames",cropNames);
-        i.putExtra("pestControlNames",pestControlNames);
-        i.putExtra("soilManagementNames",soilManagementNames);
         startActivity(i);
         finish();
     }

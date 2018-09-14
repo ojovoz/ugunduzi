@@ -40,8 +40,12 @@ public class oRecyclerViewAdapter extends RecyclerView.Adapter<oCardViewHolder> 
     @Override
     public void onBindViewHolder(oCardViewHolder holder, int position) {
 
-        holder.cb.setChecked(list.get(position).isSelected);
-        holder.cb.setTag(position);
+        if(list.get(position).id>=0) {
+            holder.cb.setChecked(list.get(position).isSelected);
+            holder.cb.setTag(position);
+        } else {
+            holder.cb.setVisibility(View.GONE);
+        }
         holder.info.setText(list.get(position).info);
 
         holder.cv.setBackgroundColor(list.get(position).plotInfoColor);

@@ -1,9 +1,13 @@
 package ojovoz.ugunduzi;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -14,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by Eugenio on 14/09/2018.
@@ -36,6 +41,7 @@ public class balance extends AppCompatActivity {
     public int displayHeight;
 
     public ArrayList<oLog> logList;
+    oRecyclerViewAdapter recyclerViewAdapter;
 
     public Date date1;
     public Date date2;
@@ -125,6 +131,33 @@ public class balance extends AppCompatActivity {
             }
         });
 
+        fillRecyclerView();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        goBack();
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(android.view.Menu menu) {
+        menu.clear();
+        if(plot==-1){
+            menu.add(0, 0, 0, R.string.opGoBackToFarm);
+        } else {
+            menu.add(0, 0, 0, R.string.opGoBack);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case 0:
+                goBack();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void findMaxMinDates() {
@@ -202,10 +235,59 @@ public class balance extends AppCompatActivity {
                     bDate2.setText(dH.dateToString(nd));
                 }
 
-
                 dialogDate.dismiss();
+                recyclerViewAdapter.list = cardDataFromLog();
+                recyclerViewAdapter.setList(recyclerViewAdapter.list);
+                recyclerViewAdapter.notifyDataSetChanged();
             }
         });
         dialogDate.show();
+    }
+
+    public void fillRecyclerView() {
+        List<oCardData> data = cardDataFromLog();
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerViewAdapter = new oRecyclerViewAdapter(data, getApplication());
+        recyclerView.setAdapter(recyclerViewAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+    public List<oCardData> cardDataFromLog(){
+        List<oCardData> ret = new ArrayList<>();
+        //get aggregate financial data for each crop, treatment ingredient and other activities between date1 and date2
+        //id's have to be -1
+        return ret;
+    }
+
+    public void goBack(){
+        if(plot==-1){
+            Intent i = new Intent(this, farmInterface.class);
+            i.putExtra("user", user);
+            i.putExtra("userId", userId);
+            i.putExtra("userPass", userPass);
+            i.putExtra("farmName", farmName);
+            i.putExtra("farmId", farmId);
+            i.putExtra("farmVersion", farmVersion);
+            i.putExtra("newFarm", false);
+            i.putExtra("firstFarm", false);
+            startActivity(i);
+            finish();
+        } else {
+            Intent i = new Intent(this, finance.class);
+            i.putExtra("user", user);
+            i.putExtra("userId", userId);
+            i.putExtra("userPass", userPass);
+            i.putExtra("farmName", farmName);
+            i.putExtra("farmId", farmId);
+            i.putExtra("farmVersion", farmVersion);
+            i.putExtra("plot", plot);
+            i.putExtra("cropNames", cropNames);
+            i.putExtra("pestControlNames", pestControlNames);
+            i.putExtra("soilManagementNames", soilManagementNames);
+            i.putExtra("displayWidth", displayWidth);
+            i.putExtra("displayHeight", displayHeight);
+            startActivity(i);
+            finish();
+        }
     }
 }

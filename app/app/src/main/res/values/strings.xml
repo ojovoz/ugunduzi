@@ -69,7 +69,8 @@
     <string name="saveButtonText">SAVE</string>
     <string name="enterDataActivityTitle">Enter data</string>
     <string name="dataNotSavedText">Data has not been saved. Do you really want to exit?</string>
-    <string name="opGoBack">Go to farm</string>
+    <string name="opGoBackToFarm">Go to farm</string>
+    <string name="opGoBack">Go back</string>
     <string name="enterCropLabel">Crop</string>
     <string name="enterTreatmentLabel">Treatment</string>
     <string name="valueEmptyMessage">Value cannot be empty</string>

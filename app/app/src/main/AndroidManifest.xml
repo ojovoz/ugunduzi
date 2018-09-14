@@ -39,12 +39,6 @@
             android:launchMode="singleTop">
         </activity>
         <activity
-            android:name=".enterData"
-            android:screenOrientation="portrait"
-            android:label="@string/enterDataActivityTitle"
-            android:launchMode="singleTop">
-        </activity>
-        <activity
             android:name=".pictureSound"
             android:screenOrientation="portrait"
             android:label="@string/pictureSoundActivityTitle"

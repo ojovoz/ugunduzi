@@ -207,7 +207,7 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
             menu.add(2, 2, 2, R.string.opPictureSound);
             menu.add(3, 3, 3, R.string.opEnterData);
         }
-        menu.add(4, 4, 4, R.string.opGoBack);
+        menu.add(4, 4, 4, R.string.opGoBackToFarm);
         return true;
     }
 
@@ -333,6 +333,7 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
     }
 
     public void goToEnterData() {
+        /*
         stopSoundPlayer();
         Intent i = new Intent(this, enterData.class);
         i.putExtra("user", user);
@@ -362,6 +363,7 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
         }
         startActivity(i);
         finish();
+        */
     }
 
     public void goBack() {

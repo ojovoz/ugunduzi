@@ -152,7 +152,7 @@ public class finance extends AppCompatActivity {
             menu.add(0, 0, 0, R.string.opDeleteSelectedItems);
         }
         menu.add(1, 1, 1, R.string.opBalance);
-        menu.add(2, 2, 2, R.string.opGoBack);
+        menu.add(2, 2, 2, R.string.opGoBackToFarm);
         return super.onPrepareOptionsMenu(menu);
     }
 
