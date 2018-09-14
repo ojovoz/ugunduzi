@@ -72,8 +72,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     boolean bSaveEditedFarmAsNew;
 
-    int farmId=-1;
-    String farmName="";
+    int farmId = -1;
+    String farmName = "";
     float farmSize;
     String farmDateString;
 
@@ -99,7 +99,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     preferenceManager prefs;
 
-    boolean bConnecting=false;
+    boolean bConnecting = false;
     int connectionTask; //0=create new farm, 1=delete farm
     String server;
     ProgressDialog createFarmDialog;
@@ -110,13 +110,13 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_farm_interface);
 
-        final Context ctxt=this;
+        final Context ctxt = this;
 
-        currentFarm=new oFarm(this);
+        currentFarm = new oFarm(this);
 
-        user=getIntent().getExtras().getString("user");
-        userPass=getIntent().getExtras().getString("userPass");
-        userId=getIntent().getExtras().getInt("userId");
+        user = getIntent().getExtras().getString("user");
+        userPass = getIntent().getExtras().getString("userPass");
+        userId = getIntent().getExtras().getInt("userId");
         newFarm = getIntent().getExtras().getBoolean("newFarm");
         firstFarm = getIntent().getExtras().getBoolean("firstFarm");
 
@@ -134,38 +134,38 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         soilManagementList = start.getTreatmentIngredients(1);
         soilManagementNamesArray = start.getTreatmentIngredientNames(soilManagementList).toArray(new CharSequence[soilManagementList.size()]);
 
-        iconMove=BitmapFactory.decodeResource(this.getResources(),R.drawable.move);
-        iconResize=BitmapFactory.decodeResource(this.getResources(),R.drawable.resize);
-        iconContents=BitmapFactory.decodeResource(this.getResources(),R.drawable.contents);
-        iconActions=BitmapFactory.decodeResource(this.getResources(),R.drawable.actions);
-        iconMoveFaded=BitmapFactory.decodeResource(this.getResources(),R.drawable.move_faded);
-        iconResizeFaded=BitmapFactory.decodeResource(this.getResources(),R.drawable.resize_faded);
-        iconContentsFaded=BitmapFactory.decodeResource(this.getResources(),R.drawable.contents_faded);
-        iconActionsFaded=BitmapFactory.decodeResource(this.getResources(),R.drawable.actions_faded);
-        iconMoveActive=BitmapFactory.decodeResource(this.getResources(),R.drawable.move_active);
-        iconResizeActive=BitmapFactory.decodeResource(this.getResources(),R.drawable.resize_active);
-        iconContentsActive=BitmapFactory.decodeResource(this.getResources(),R.drawable.contents_active);
-        iconActionsActive=BitmapFactory.decodeResource(this.getResources(),R.drawable.actions_active);
+        iconMove = BitmapFactory.decodeResource(this.getResources(), R.drawable.move);
+        iconResize = BitmapFactory.decodeResource(this.getResources(), R.drawable.resize);
+        iconContents = BitmapFactory.decodeResource(this.getResources(), R.drawable.contents);
+        iconActions = BitmapFactory.decodeResource(this.getResources(), R.drawable.actions);
+        iconMoveFaded = BitmapFactory.decodeResource(this.getResources(), R.drawable.move_faded);
+        iconResizeFaded = BitmapFactory.decodeResource(this.getResources(), R.drawable.resize_faded);
+        iconContentsFaded = BitmapFactory.decodeResource(this.getResources(), R.drawable.contents_faded);
+        iconActionsFaded = BitmapFactory.decodeResource(this.getResources(), R.drawable.actions_faded);
+        iconMoveActive = BitmapFactory.decodeResource(this.getResources(), R.drawable.move_active);
+        iconResizeActive = BitmapFactory.decodeResource(this.getResources(), R.drawable.resize_active);
+        iconContentsActive = BitmapFactory.decodeResource(this.getResources(), R.drawable.contents_active);
+        iconActionsActive = BitmapFactory.decodeResource(this.getResources(), R.drawable.actions_active);
 
         plotMatrix = new oPlotMatrix();
 
-        if(newFarm){
-            state=0;
-            farmId=-1;
-            bFarmSaved=false;
+        if (newFarm) {
+            state = 0;
+            farmId = -1;
+            bFarmSaved = false;
             this.setTitle(R.string.drawNewFarmTitle);
             farmName = getDefaultFarmName();
         } else {
-            state=1;
-            farmId=getIntent().getExtras().getInt("farmId");
-            if(farmId==-1){
+            state = 1;
+            farmId = getIntent().getExtras().getInt("farmId");
+            if (farmId == -1) {
                 prefs.deletePreference("farmId");
                 prefs.deletePreference("user");
                 goToLogin();
             } else {
-                currentFarm=currentFarm.getLatestActiveVersion(userId,farmId,this);
-                farmName=currentFarm.name;
-                maxVersion=farmVersion=currentFarm.version;
+                currentFarm = currentFarm.getLatestActiveVersion(userId, farmId, this);
+                farmName = currentFarm.name;
+                maxVersion = farmVersion = currentFarm.version;
             }
             this.setTitle(farmName + " (" + user + ")");
         }
@@ -181,10 +181,10 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 DisplayMetrics metrics = new DisplayMetrics();
                 getWindowManager().getDefaultDisplay().getMetrics(metrics);
                 displayWidth = metrics.widthPixels;
-                displayHeight = (int)(metrics.heightPixels-(contentViewTop*metrics.density));
+                displayHeight = (int) (metrics.heightPixels - (contentViewTop * metrics.density));
 
-                relativeLayout = (RelativeLayout)findViewById(R.id.drawingCanvas);
-                canvasView = new SketchSheetView(farmInterface.this,displayWidth,displayHeight);
+                relativeLayout = (RelativeLayout) findViewById(R.id.drawingCanvas);
+                canvasView = new SketchSheetView(farmInterface.this, displayWidth, displayHeight);
                 paint = new Paint();
                 relativeLayout.addView(canvasView, new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
                 paint.setDither(true);
@@ -200,9 +200,9 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 textPaint.setColor(ContextCompat.getColor(ctxt, R.color.colorBlack));
                 textPaint.setTypeface(Typeface.create("Arial", Typeface.NORMAL));
 
-                plotMatrix.createMatrix(displayWidth,displayHeight);
-                if(newFarm){
-                    defineFarmNameAcres(true,false);
+                plotMatrix.createMatrix(displayWidth, displayHeight);
+                if (newFarm) {
+                    defineFarmNameAcres(true, false);
                 }
                 createFarm();
 
@@ -210,31 +210,31 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         });
     }
 
-    public void createFarm(){
-        int mw=iconMove.getWidth();
-        int mh=iconMove.getHeight();
-        int rw=iconResize.getWidth();
-        int rh=iconResize.getHeight();
-        int cw=iconContents.getWidth();
-        int ch=iconContents.getHeight();
-        int aw=iconActions.getWidth();
-        int ah=iconActions.getHeight();
+    public void createFarm() {
+        int mw = iconMove.getWidth();
+        int mh = iconMove.getHeight();
+        int rw = iconResize.getWidth();
+        int rh = iconResize.getHeight();
+        int cw = iconContents.getWidth();
+        int ch = iconContents.getHeight();
+        int aw = iconActions.getWidth();
+        int ah = iconActions.getHeight();
 
-        if(newFarm){
+        if (newFarm) {
             plotMatrix.addPlot(mw, mh, rw, rh, cw, ch, aw, ah);
-        } else if(state==1 || state==2){
-            plotMatrix.fromString(this,currentFarm.plotMatrix,";",mw,mh,rw,rh,cw,ch,aw,ah);
+        } else if (state == 1 || state == 2) {
+            plotMatrix.fromString(this, currentFarm.plotMatrix, ";", mw, mh, rw, rh, cw, ch, aw, ah);
         }
     }
 
     @Override
-    public void onBackPressed () {
-        boolean bProceed=true;
-        if(!bFarmSaved && (state==0||state==2)) {
-            if(state==2){
-                bProceed=farmHasBeenEdited();
+    public void onBackPressed() {
+        boolean bProceed = true;
+        if (!bFarmSaved && (state == 0 || state == 2)) {
+            if (state == 2) {
+                bProceed = farmHasBeenEdited();
             }
-            if(bProceed) {
+            if (bProceed) {
                 AlertDialog.Builder logoutDialog = new AlertDialog.Builder(this);
                 logoutDialog.setMessage(R.string.farmHasNotBeenSavedMessage);
                 logoutDialog.setNegativeButton(R.string.noButtonText, null);
@@ -259,28 +259,28 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
         menu.clear();
 
-        if(state==0||state==2) {
+        if (state == 0 || state == 2) {
             menu.add(0, 0, 0, R.string.opAddPlot);
             menu.add(1, 1, 1, R.string.opDeletePlot);
             menu.add(2, 2, 2, R.string.opEditFarmNameSize);
             menu.add(3, 3, 3, R.string.opSaveFarm);
-            if(!firstFarm && state==0) {
+            if (!firstFarm && state == 0) {
                 menu.add(4, 4, 4, R.string.opCancelNewFarm);
-            } else if(state==2){
+            } else if (state == 2) {
                 menu.add(4, 4, 4, R.string.opCancelEditing);
             }
-        } else if(state==1){
+        } else if (state == 1) {
             menu.add(0, 0, 0, R.string.opManageFarmRecords);
-            menu.add(1,1,1, R.string.opFarmBalance);
-            if(farmVersion==maxVersion) {
+            menu.add(1, 1, 1, R.string.opFarmBalance);
+            if (farmVersion == maxVersion) {
                 menu.add(2, 2, 2, R.string.opEditFarm);
             } else {
                 menu.add(2, 2, 2, R.string.opGoToCurrentState);
             }
-            if(farmVersion==maxVersion){
+            if (farmVersion == maxVersion) {
                 menu.add(3, 3, 3, R.string.opDeleteFarm);
                 menu.add(4, 4, 4, R.string.opCreateNewFarm);
-                if(currentFarm.getNumberOfFarms(userId)>1) {
+                if (currentFarm.getNumberOfFarms(userId) > 1) {
                     menu.add(5, 5, 5, R.string.opGoToOtherFarm);
                 }
                 menu.add(6, 6, 6, R.string.opSwitchUser);
@@ -293,7 +293,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(state==0 || state==2) {
+        if (state == 0 || state == 2) {
             switch (item.getItemId()) {
                 case 0:
                     addPlot();
@@ -304,28 +304,28 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     canvasView.invalidate();
                     break;
                 case 2:
-                    defineFarmNameAcres(true,false);
+                    defineFarmNameAcres(true, false);
                     break;
                 case 3:
                     saveFarm();
                     break;
                 case 4:
-                    if(state==0) {
+                    if (state == 0) {
                         cancelNewFarm();
                     } else {
                         cancelEditedFarm();
                     }
             }
-        } else if (state==1){
-            switch(item.getItemId()){
+        } else if (state == 1) {
+            switch (item.getItemId()) {
                 case 0:
                     goToRecords(true);
                     break;
                 case 1:
-                    //farm balance
+                    goToBalance();
                     break;
                 case 2:
-                    if(farmVersion==maxVersion) {
+                    if (farmVersion == maxVersion) {
                         startEditFarm();
                     } else {
                         goToLatestFarm();
@@ -347,11 +347,11 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         return super.onOptionsItemSelected(item);
     }
 
-    public void confirmExit(){
+    public void confirmExit() {
         AlertDialog.Builder logoutDialog = new AlertDialog.Builder(this);
 
         logoutDialog.setMessage(getString(R.string.logoutConfirmMessage));
-        logoutDialog.setNegativeButton(R.string.noButtonText,null);
+        logoutDialog.setNegativeButton(R.string.noButtonText, null);
         logoutDialog.setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -362,11 +362,11 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         logoutDialog.show();
     }
 
-    public void deleteFarm(){
+    public void deleteFarm() {
         AlertDialog.Builder deleteFarmDialog = new AlertDialog.Builder(this);
 
         deleteFarmDialog.setMessage(getString(R.string.deleteThisFarmConfirmMessage));
-        deleteFarmDialog.setNegativeButton(R.string.noButtonText,null);
+        deleteFarmDialog.setNegativeButton(R.string.noButtonText, null);
         deleteFarmDialog.setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -377,12 +377,12 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         deleteFarmDialog.show();
     }
 
-    public void doDeleteFarm(){
+    public void doDeleteFarm() {
 
         httpConnection http = new httpConnection(this, this);
         if (http.isOnline()) {
-            bConnecting=true;
-            connectionTask=1;
+            bConnecting = true;
+            connectionTask = 1;
             CharSequence dialogTitle = getString(R.string.deletingFarmLabel);
 
             deleteFarmDialog = new ProgressDialog(this);
@@ -405,20 +405,20 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         }
     }
 
-    public void markDeletedFarm(){
+    public void markDeletedFarm() {
         oFarm f = new oFarm(this);
-        int[] idsToDelete = f.getFarmLineList(userId,farmId);
-        f.updateFarmstatus(idsToDelete,1);
+        int[] idsToDelete = f.getFarmLineList(userId, farmId);
+        f.updateFarmstatus(idsToDelete, 1);
         deleteFarmLogs(idsToDelete);
     }
 
-    public void deleteFarmLogs(int[] ids){
+    public void deleteFarmLogs(int[] ids) {
         oLog l = new oLog(this);
         ArrayList<String> deleteFiles = l.deleteFarmItems(ids);
         deleteImgSndFiles(deleteFiles);
     }
 
-    public void deleteImgSndFiles(ArrayList<String> deleteFiles){
+    public void deleteImgSndFiles(ArrayList<String> deleteFiles) {
         Iterator<String> iterator = deleteFiles.iterator();
         while (iterator.hasNext()) {
             String f = iterator.next();
@@ -439,17 +439,17 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         }
     }
 
-    public void executeDeleteFarm(){
+    public void executeDeleteFarm() {
         oFarm f = new oFarm(this);
-        int[] idsToDelete = f.getFarmLineList(userId,farmId);
+        int[] idsToDelete = f.getFarmLineList(userId, farmId);
         f.doDeleteFarm(idsToDelete);
         deleteFarmLogs(idsToDelete);
     }
 
-    public void afterFarmDeletion(){
+    public void afterFarmDeletion() {
         oFarm f = new oFarm(this);
         ArrayList<oFarm> userFarms = f.getActiveFarms(userId);
-        if(userFarms.size()>0) {
+        if (userFarms.size() > 0) {
             if (userFarms.size() > 1) {
                 goToFarmChooser();
             } else {
@@ -471,13 +471,13 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         } else {
             prefs.deletePreference("farmId");
-            firstFarm=true;
+            firstFarm = true;
             createNewFarm();
         }
     }
 
-    public void goToLogin(){
-        prefs.savePreference("user","");
+    public void goToLogin() {
+        prefs.savePreference("user", "");
         prefs.deletePreference("farmId");
         final Context context = this;
         Intent i = new Intent(context, login.class);
@@ -485,7 +485,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         finish();
     }
 
-    public void goToFarmChooser(){
+    public void goToFarmChooser() {
         final Context context = this;
         Intent i = new Intent(context, farmChooser.class);
         i.putExtra("user", user);
@@ -495,43 +495,43 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         finish();
     }
 
-    public String getDefaultFarmName(){
+    public String getDefaultFarmName() {
         String ret = "";
 
-        if(firstFarm){
-            ret = getString(R.string.defaultFarmNamePrefix)+" 1";
+        if (firstFarm) {
+            ret = getString(R.string.defaultFarmNamePrefix) + " 1";
         } else {
-            int n=1;
-            ret = getString(R.string.defaultFarmNamePrefix)+" "+Integer.toString(n);
-            do{
-                if(!currentFarm.farmNameExists(userId,ret)){
+            int n = 1;
+            ret = getString(R.string.defaultFarmNamePrefix) + " " + Integer.toString(n);
+            do {
+                if (!currentFarm.farmNameExists(userId, ret)) {
                     break;
-                } else{
-                    ret=getString(R.string.defaultFarmNamePrefix)+" "+Integer.toString(n);
+                } else {
+                    ret = getString(R.string.defaultFarmNamePrefix) + " " + Integer.toString(n);
                     n++;
                 }
-            } while(true);
+            } while (true);
         }
         return ret;
     }
 
-    public void createNewFarm(){
-        plotMatrix=new oPlotMatrix();
-        plotMatrix.createMatrix(displayWidth,displayHeight);
+    public void createNewFarm() {
+        plotMatrix = new oPlotMatrix();
+        plotMatrix.createMatrix(displayWidth, displayHeight);
         plotMatrix.addPlot(iconMove.getWidth(), iconMove.getHeight(), iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight());
-        state=0;
-        bFarmSaved=false;
+        state = 0;
+        bFarmSaved = false;
         canvasView.invalidate();
-        newFarm=true;
-        farmId=-1;
+        newFarm = true;
+        farmId = -1;
         farmName = getDefaultFarmName();
-        defineFarmNameAcres(true,false);
+        defineFarmNameAcres(true, false);
     }
 
-    public void cancelNewFarm(){
+    public void cancelNewFarm() {
         AlertDialog.Builder logoutDialog = new AlertDialog.Builder(this);
         logoutDialog.setMessage(R.string.cancelNewFarmMessage);
-        logoutDialog.setNegativeButton(R.string.noButtonText,null);
+        logoutDialog.setNegativeButton(R.string.noButtonText, null);
         logoutDialog.setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -542,8 +542,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         logoutDialog.show();
     }
 
-    public void cancelEditedFarm(){
-        if(farmHasBeenEdited()) {
+    public void cancelEditedFarm() {
+        if (farmHasBeenEdited()) {
             AlertDialog.Builder logoutDialog = new AlertDialog.Builder(this);
             logoutDialog.setMessage(R.string.cancelEditedFarmMessage);
             logoutDialog.setNegativeButton(R.string.noButtonText, null);
@@ -560,28 +560,28 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         }
     }
 
-    public void doCancelEditedFarm(){
-        currentFarm=currentFarm.getLatestActiveVersion(userId,farmId,this);
-        farmName=currentFarm.name;
-        farmSize=currentFarm.size;
+    public void doCancelEditedFarm() {
+        currentFarm = currentFarm.getLatestActiveVersion(userId, farmId, this);
+        farmName = currentFarm.name;
+        farmSize = currentFarm.size;
         plotMatrix = new oPlotMatrix();
-        plotMatrix.createMatrix(displayWidth,displayHeight);
+        plotMatrix.createMatrix(displayWidth, displayHeight);
         createFarm();
-        state=1;
-        bFarmSaved=true;
+        state = 1;
+        bFarmSaved = true;
         this.setTitle(farmName + " (" + user + ")");
         canvasView.invalidate();
     }
 
-    public void doCancelNewFarm(){
-        if(prefs.preferenceExists("farmId")){
-            farmId=prefs.getPreferenceInt("farmId");
-            if(farmId>=0){
+    public void doCancelNewFarm() {
+        if (prefs.preferenceExists("farmId")) {
+            farmId = prefs.getPreferenceInt("farmId");
+            if (farmId >= 0) {
                 plotMatrix = new oPlotMatrix();
-                plotMatrix.createMatrix(displayWidth,displayHeight);
-                currentFarm = currentFarm.getLatestActiveVersion(userId,farmId,this);
-                plotMatrix.fromString(this,currentFarm.plotMatrix,";",iconMove.getWidth(), iconMove.getHeight(), iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight());
-                state=1;
+                plotMatrix.createMatrix(displayWidth, displayHeight);
+                currentFarm = currentFarm.getLatestActiveVersion(userId, farmId, this);
+                plotMatrix.fromString(this, currentFarm.plotMatrix, ";", iconMove.getWidth(), iconMove.getHeight(), iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight());
+                state = 1;
                 this.setTitle(farmName + " (" + user + ")");
                 canvasView.invalidate();
             } else {
@@ -592,44 +592,44 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         }
     }
 
-    public void startEditFarm(){
-        state=2;
-        newFarm=false;
+    public void startEditFarm() {
+        state = 2;
+        newFarm = false;
         bSaveEditedFarmAsNew = currentFarm.hasRecords();
         plotMatrix = new oPlotMatrix();
-        plotMatrix.createMatrix(displayWidth,displayHeight);
+        plotMatrix.createMatrix(displayWidth, displayHeight);
         createFarm();
-        bFarmSaved=false;
+        bFarmSaved = false;
         canvasView.invalidate();
     }
 
-    public void goToLatestFarm(){
-        currentFarm=currentFarm.getLatestActiveVersion(userId,farmId,this);
-        farmName=currentFarm.name;
-        farmSize=currentFarm.size;
-        farmVersion=currentFarm.version;
+    public void goToLatestFarm() {
+        currentFarm = currentFarm.getLatestActiveVersion(userId, farmId, this);
+        farmName = currentFarm.name;
+        farmSize = currentFarm.size;
+        farmVersion = currentFarm.version;
         plotMatrix = new oPlotMatrix();
-        plotMatrix.createMatrix(displayWidth,displayHeight);
+        plotMatrix.createMatrix(displayWidth, displayHeight);
         createFarm();
         this.setTitle(farmName + " (" + user + ")");
         canvasView.invalidate();
     }
 
-    public void addPlot(){
-        if(!plotMatrix.addPlot(iconMove.getWidth(), iconMove.getHeight(), iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight())){
+    public void addPlot() {
+        if (!plotMatrix.addPlot(iconMove.getWidth(), iconMove.getHeight(), iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight())) {
             Toast.makeText(this, R.string.noSpaceForNewPlotMessage, Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void deleteSelectedPlot(){
-        if(plotMatrix.currentPlot!=null){
+    public void deleteSelectedPlot() {
+        if (plotMatrix.currentPlot != null) {
             AlertDialog.Builder logoutDialog = new AlertDialog.Builder(this);
             logoutDialog.setMessage(R.string.deletePlotConfirmMessage);
-            logoutDialog.setNegativeButton(R.string.noButtonText,null);
+            logoutDialog.setNegativeButton(R.string.noButtonText, null);
             logoutDialog.setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    if(!plotMatrix.deletePlot()){
+                    if (!plotMatrix.deletePlot()) {
                         Toast.makeText(farmInterface.this, R.string.farmMustHavePlotMessage, Toast.LENGTH_SHORT).show();
                     } else {
                         canvasView.invalidate();
@@ -643,7 +643,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         }
     }
 
-    public void definePlotContents(){
+    public void definePlotContents() {
 
         tempPlot = new oPlot();
         copyContentsToTempPlot();
@@ -657,19 +657,19 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
-                plotMatrix.currentPlot.state=1;
+                plotMatrix.currentPlot.state = 1;
                 dialog.dismiss();
                 canvasView.invalidate();
             }
         });
 
-        Button okButton = (Button)dialog.findViewById(R.id.okButton);
-        okButton.setOnClickListener(new View.OnClickListener(){
+        Button okButton = (Button) dialog.findViewById(R.id.okButton);
+        okButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.okButton:
-                        plotMatrix.currentPlot.state=1;
+                        plotMatrix.currentPlot.state = 1;
                         copyContentsFromTempPlot();
                         dialog.dismiss();
                         canvasView.invalidate();
@@ -680,8 +680,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         });
 
-        Button crops = (Button)dialog.findViewById(R.id.cropButton);
-        crops.setOnClickListener(new View.OnClickListener(){
+        Button crops = (Button) dialog.findViewById(R.id.cropButton);
+        crops.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switch (v.getId()) {
@@ -694,8 +694,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         });
 
-        Button pestControl = (Button)dialog.findViewById(R.id.pestControlButton);
-        pestControl.setOnClickListener(new View.OnClickListener(){
+        Button pestControl = (Button) dialog.findViewById(R.id.pestControlButton);
+        pestControl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switch (v.getId()) {
@@ -708,8 +708,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         });
 
-        Button soilManagement = (Button)dialog.findViewById(R.id.soilManagementButton);
-        soilManagement.setOnClickListener(new View.OnClickListener(){
+        Button soilManagement = (Button) dialog.findViewById(R.id.soilManagementButton);
+        soilManagement.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switch (v.getId()) {
@@ -725,53 +725,53 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         dialog.show();
     }
 
-    void copyContentsToTempPlot(){
+    void copyContentsToTempPlot() {
         Iterator<oCrop> iteratorCrops = plotMatrix.currentPlot.crops.iterator();
-        while(iteratorCrops.hasNext()){
+        while (iteratorCrops.hasNext()) {
             oCrop c = iteratorCrops.next();
             tempPlot.crops.add(c);
         }
         Iterator<oTreatmentIngredient> iteratorPC = plotMatrix.currentPlot.pestControlIngredients.iterator();
-        while(iteratorPC.hasNext()){
+        while (iteratorPC.hasNext()) {
             oTreatmentIngredient pc = iteratorPC.next();
             tempPlot.pestControlIngredients.add(pc);
         }
         Iterator<oTreatmentIngredient> iteratorSM = plotMatrix.currentPlot.soilManagementIngredients.iterator();
-        while(iteratorSM.hasNext()){
+        while (iteratorSM.hasNext()) {
             oTreatmentIngredient sm = iteratorSM.next();
             tempPlot.soilManagementIngredients.add(sm);
         }
     }
 
-    void copyContentsFromTempPlot(){
+    void copyContentsFromTempPlot() {
         plotMatrix.currentPlot.crops.clear();
         Iterator<oCrop> iteratorCrops = tempPlot.crops.iterator();
-        while(iteratorCrops.hasNext()){
+        while (iteratorCrops.hasNext()) {
             oCrop c = iteratorCrops.next();
             plotMatrix.currentPlot.crops.add(c);
         }
         plotMatrix.currentPlot.pestControlIngredients.clear();
         Iterator<oTreatmentIngredient> iteratorPC = tempPlot.pestControlIngredients.iterator();
-        while(iteratorPC.hasNext()){
+        while (iteratorPC.hasNext()) {
             oTreatmentIngredient pc = iteratorPC.next();
             plotMatrix.currentPlot.pestControlIngredients.add(pc);
         }
         plotMatrix.currentPlot.soilManagementIngredients.clear();
         Iterator<oTreatmentIngredient> iteratorSM = tempPlot.soilManagementIngredients.iterator();
-        while(iteratorSM.hasNext()){
+        while (iteratorSM.hasNext()) {
             oTreatmentIngredient sm = iteratorSM.next();
             plotMatrix.currentPlot.soilManagementIngredients.add(sm);
         }
     }
 
-    public void showCropSelector(){
+    public void showCropSelector() {
         boolean[] checkedCrops = new boolean[cropNamesArray.length];
-        for(int i=0;i<cropNamesArray.length;i++){
+        for (int i = 0; i < cropNamesArray.length; i++) {
             Iterator<oCrop> iterator = tempPlot.crops.iterator();
-            while(iterator.hasNext()){
+            while (iterator.hasNext()) {
                 oCrop pc = iterator.next();
-                if(pc.name.equals(cropNamesArray[i])){
-                    checkedCrops[i]=true;
+                if (pc.name.equals(cropNamesArray[i])) {
+                    checkedCrops[i] = true;
                     break;
                 }
             }
@@ -785,10 +785,10 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 } else {
                     oCrop removeCrop = cropList.get(which);
                     Iterator<oCrop> iterator = tempPlot.crops.iterator();
-                    int index=0;
-                    while(iterator.hasNext()){
+                    int index = 0;
+                    while (iterator.hasNext()) {
                         oCrop c = iterator.next();
-                        if(c.id==removeCrop.id){
+                        if (c.id == removeCrop.id) {
                             break;
                         }
                         index++;
@@ -802,7 +802,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         builder.setMultiChoiceItems(cropNamesArray, checkedCrops, cropsDialogListener);
         builder.setPositiveButton(R.string.okButtonText, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                plotMatrix.currentPlot.state=1;
+                plotMatrix.currentPlot.state = 1;
                 canvasView.invalidate();
             }
         });
@@ -811,14 +811,14 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     }
 
-    public void showPestControlIngredientSelector(){
+    public void showPestControlIngredientSelector() {
         boolean[] checkedIngredients = new boolean[pestControlNamesArray.length];
-        for(int i=0;i<pestControlNamesArray.length;i++){
+        for (int i = 0; i < pestControlNamesArray.length; i++) {
             Iterator<oTreatmentIngredient> iterator = tempPlot.pestControlIngredients.iterator();
-            while(iterator.hasNext()){
+            while (iterator.hasNext()) {
                 oTreatmentIngredient pt = iterator.next();
-                if(pt.name.equals(pestControlNamesArray[i])){
-                    checkedIngredients[i]=true;
+                if (pt.name.equals(pestControlNamesArray[i])) {
+                    checkedIngredients[i] = true;
                     break;
                 }
             }
@@ -832,10 +832,10 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 } else {
                     oTreatmentIngredient removeIngredient = pestControlList.get(which);
                     Iterator<oTreatmentIngredient> iterator = tempPlot.pestControlIngredients.iterator();
-                    int index=0;
-                    while(iterator.hasNext()){
+                    int index = 0;
+                    while (iterator.hasNext()) {
                         oTreatmentIngredient tp = iterator.next();
-                        if(tp.id==removeIngredient.id){
+                        if (tp.id == removeIngredient.id) {
                             break;
                         }
                         index++;
@@ -849,7 +849,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         builder.setMultiChoiceItems(pestControlNamesArray, checkedIngredients, ingredientsDialogListener);
         builder.setPositiveButton(R.string.okButtonText, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                plotMatrix.currentPlot.state=1;
+                plotMatrix.currentPlot.state = 1;
                 canvasView.invalidate();
             }
         });
@@ -858,14 +858,14 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     }
 
-    public void showSoilManagementIngredientSelector(){
+    public void showSoilManagementIngredientSelector() {
         boolean[] checkedIngredients = new boolean[soilManagementNamesArray.length];
-        for(int i=0;i<soilManagementNamesArray.length;i++){
+        for (int i = 0; i < soilManagementNamesArray.length; i++) {
             Iterator<oTreatmentIngredient> iterator = tempPlot.soilManagementIngredients.iterator();
-            while(iterator.hasNext()){
+            while (iterator.hasNext()) {
                 oTreatmentIngredient pt = iterator.next();
-                if(pt.name.equals(soilManagementNamesArray[i])){
-                    checkedIngredients[i]=true;
+                if (pt.name.equals(soilManagementNamesArray[i])) {
+                    checkedIngredients[i] = true;
                     break;
                 }
             }
@@ -879,10 +879,10 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 } else {
                     oTreatmentIngredient removeIngredient = soilManagementList.get(which);
                     Iterator<oTreatmentIngredient> iterator = tempPlot.soilManagementIngredients.iterator();
-                    int index=0;
-                    while(iterator.hasNext()){
+                    int index = 0;
+                    while (iterator.hasNext()) {
                         oTreatmentIngredient tp = iterator.next();
-                        if(tp.id==removeIngredient.id){
+                        if (tp.id == removeIngredient.id) {
                             break;
                         }
                         index++;
@@ -896,7 +896,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         builder.setMultiChoiceItems(soilManagementNamesArray, checkedIngredients, ingredientsDialogListener);
         builder.setPositiveButton(R.string.okButtonText, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                plotMatrix.currentPlot.state=1;
+                plotMatrix.currentPlot.state = 1;
                 canvasView.invalidate();
             }
         });
@@ -905,7 +905,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     }
 
-    public void defineFarmNameAcres(boolean cancellable, final boolean isSaving){
+    public void defineFarmNameAcres(boolean cancellable, final boolean isSaving) {
 
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -913,28 +913,28 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         dialog.setCanceledOnTouchOutside(cancellable);
         dialog.setCancelable(cancellable);
 
-        EditText et = (EditText)dialog.findViewById(R.id.newFarm);
+        EditText et = (EditText) dialog.findViewById(R.id.newFarm);
         String defaultFarmName = farmName;
 
         et.setText(defaultFarmName);
 
-        EditText fSize = (EditText)dialog.findViewById(R.id.acres);
-        if(farmSize>0){
+        EditText fSize = (EditText) dialog.findViewById(R.id.acres);
+        if (farmSize > 0) {
             fSize.setText(Float.toString(farmSize));
         } else {
             fSize.setText(Float.toString(1f));
         }
 
-        Button button = (Button)dialog.findViewById(R.id.okButton);
+        Button button = (Button) dialog.findViewById(R.id.okButton);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EditText et = (EditText)dialog.findViewById(R.id.newFarm);
+                EditText et = (EditText) dialog.findViewById(R.id.newFarm);
                 String fName = et.getText().toString();
-                if(fName.isEmpty()){
+                if (fName.isEmpty()) {
                     Toast.makeText(view.getContext(), R.string.farmNameCannotBeEmptyMessage, Toast.LENGTH_SHORT).show();
                 } else {
-                    if(currentFarm.farmNameExists(userId,fName)){
+                    if (currentFarm.farmNameExists(userId, fName)) {
                         Toast.makeText(view.getContext(), R.string.farmNameRepeated, Toast.LENGTH_SHORT).show();
                     } else {
                         EditText fSize = (EditText) dialog.findViewById(R.id.acres);
@@ -944,7 +944,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                         } else {
                             updateFarmData(fName, farmSize);
                             dialog.dismiss();
-                            if(isSaving){
+                            if (isSaving) {
                                 saveFarm();
                             }
                         }
@@ -956,34 +956,34 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         dialog.show();
     }
 
-    public void showActionChooser(){
+    public void showActionChooser() {
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_action_chooser);
         dialog.setCanceledOnTouchOutside(true);
         dialog.setCancelable(true);
 
-        TextView tt = (TextView)dialog.findViewById(R.id.plotLabel);
+        TextView tt = (TextView) dialog.findViewById(R.id.plotLabel);
 
-        String title= getString(R.string.cropsTitle) + ": " + plotMatrix.currentPlot.getCropNames(this);
-        title+="\n";
-        title+=getString(R.string.pestControlTitle) + ": " + plotMatrix.currentPlot.getPestControlNames(this);
-        title+="\n";
-        title+=getString(R.string.soilManagementTitle) + ": " + plotMatrix.currentPlot.getSoilManagementNames(this);
+        String title = getString(R.string.cropsTitle) + ": " + plotMatrix.currentPlot.getCropNames(this);
+        title += "\n";
+        title += getString(R.string.pestControlTitle) + ": " + plotMatrix.currentPlot.getPestControlNames(this);
+        title += "\n";
+        title += getString(R.string.soilManagementTitle) + ": " + plotMatrix.currentPlot.getSoilManagementNames(this);
 
-        if(plotMatrix.currentPlot.pestControlIngredients.size()>0 && plotMatrix.currentPlot.soilManagementIngredients.size()>0) {
+        if (plotMatrix.currentPlot.pestControlIngredients.size() > 0 && plotMatrix.currentPlot.soilManagementIngredients.size() > 0) {
             tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControl));
-        } else if(plotMatrix.currentPlot.pestControlIngredients.size()>0 && plotMatrix.currentPlot.soilManagementIngredients.size()==0) {
-            tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorFillPestControl));
-        } else if(plotMatrix.currentPlot.pestControlIngredients.size()==0 && plotMatrix.currentPlot.soilManagementIngredients.size()>0) {
-            tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorFillSoilManagement));
+        } else if (plotMatrix.currentPlot.pestControlIngredients.size() > 0 && plotMatrix.currentPlot.soilManagementIngredients.size() == 0) {
+            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillPestControl));
+        } else if (plotMatrix.currentPlot.pestControlIngredients.size() == 0 && plotMatrix.currentPlot.soilManagementIngredients.size() > 0) {
+            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagement));
         } else {
-            tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorFillDefault));
+            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillDefault));
         }
 
         tt.setText(title);
 
-        Button dataButton = (Button)dialog.findViewById(R.id.dataButton);
+        Button dataButton = (Button) dialog.findViewById(R.id.dataButton);
         dataButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -991,7 +991,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         });
 
-        Button psButton = (Button)dialog.findViewById(R.id.pictureSoundButton);
+        Button psButton = (Button) dialog.findViewById(R.id.pictureSoundButton);
         psButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -999,7 +999,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         });
 
-        Button recordsButton = (Button)dialog.findViewById(R.id.manageRecordsButton);
+        Button recordsButton = (Button) dialog.findViewById(R.id.manageRecordsButton);
         recordsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -1010,7 +1010,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                plotMatrix.currentPlot.state=1;
+                plotMatrix.currentPlot.state = 1;
                 canvasView.invalidate();
             }
         });
@@ -1018,18 +1018,18 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         dialog.show();
     }
 
-    public void farmHistory(boolean bNext,boolean bPrev){
+    public void farmHistory(boolean bNext, boolean bPrev) {
         dateHelper dH = new dateHelper();
-        boolean bChange=false;
+        boolean bChange = false;
         plotMatrix.bGoPrev = plotMatrix.bGoNext = false;
-        if(bNext && farmVersion<maxVersion){
+        if (bNext && farmVersion < maxVersion) {
             farmVersion++;
-            bChange=true;
-        } else if(bPrev && farmVersion>0){
+            bChange = true;
+        } else if (bPrev && farmVersion > 0) {
             farmVersion--;
-            bChange=true;
+            bChange = true;
         }
-        if(bChange) {
+        if (bChange) {
             currentFarm = currentFarm.getVersion(userId, farmId, farmVersion, this);
             String date = dH.dateToString(currentFarm.dateCreated);
             farmName = currentFarm.name;
@@ -1047,71 +1047,71 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         }
     }
 
-    public void goToDataEntry(){
+    public void goToDataEntry() {
         final Context context = this;
         Intent i = new Intent(context, finance.class);
         i.putExtra("user", user);
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
-        i.putExtra("farmName",farmName);
+        i.putExtra("farmName", farmName);
         i.putExtra("farmId", farmId);
         i.putExtra("farmVersion", currentFarm.version);
-        i.putExtra("plot",plotMatrix.currentPlot.id);
-        i.putExtra("cropNames",plotMatrix.currentPlot.getCropNames(this));
-        i.putExtra("pestControlNames",plotMatrix.currentPlot.getPestControlNames(this));
-        i.putExtra("soilManagementNames",plotMatrix.currentPlot.getSoilManagementNames(this));
-        i.putExtra("displayWidth",displayWidth);
-        i.putExtra("displayHeight",displayHeight);
+        i.putExtra("plot", plotMatrix.currentPlot.id);
+        i.putExtra("cropNames", plotMatrix.currentPlot.getCropNames(this));
+        i.putExtra("pestControlNames", plotMatrix.currentPlot.getPestControlNames(this));
+        i.putExtra("soilManagementNames", plotMatrix.currentPlot.getSoilManagementNames(this));
+        i.putExtra("displayWidth", displayWidth);
+        i.putExtra("displayHeight", displayHeight);
         startActivity(i);
         finish();
     }
 
-    public void goToPictureSound(){
+    public void goToPictureSound() {
         final Context context = this;
         Intent i = new Intent(context, pictureSound.class);
         i.putExtra("user", user);
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
-        i.putExtra("farmName",farmName);
+        i.putExtra("farmName", farmName);
         i.putExtra("farmId", farmId);
         i.putExtra("farmVersion", currentFarm.version);
-        i.putExtra("plot",plotMatrix.currentPlot.id);
-        i.putExtra("cropNames",plotMatrix.currentPlot.getCropNames(this));
-        i.putExtra("pestControlNames",plotMatrix.currentPlot.getPestControlNames(this));
-        i.putExtra("soilManagementNames",plotMatrix.currentPlot.getSoilManagementNames(this));
-        i.putExtra("displayWidth",displayWidth);
+        i.putExtra("plot", plotMatrix.currentPlot.id);
+        i.putExtra("cropNames", plotMatrix.currentPlot.getCropNames(this));
+        i.putExtra("pestControlNames", plotMatrix.currentPlot.getPestControlNames(this));
+        i.putExtra("soilManagementNames", plotMatrix.currentPlot.getSoilManagementNames(this));
+        i.putExtra("displayWidth", displayWidth);
         startActivity(i);
         finish();
     }
 
-    public void goToRecords(boolean bFarm){
+    public void goToRecords(boolean bFarm) {
         final Context context = this;
         Intent i = new Intent(context, dataManager.class);
         i.putExtra("user", user);
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
-        i.putExtra("farmName",farmName);
-        if(bFarm){
+        i.putExtra("farmName", farmName);
+        if (bFarm) {
             i.putExtra("plot", -1);
         } else {
             i.putExtra("plot", plotMatrix.currentPlot.id);
         }
-        if(plotMatrix.currentPlot.crop1!=null) {
+        if (plotMatrix.currentPlot.crop1 != null) {
             i.putExtra("crop1", plotMatrix.currentPlot.crop1.id);
         } else {
             i.putExtra("crop1", -1);
         }
-        if(plotMatrix.currentPlot.crop2!=null) {
+        if (plotMatrix.currentPlot.crop2 != null) {
             i.putExtra("crop2", plotMatrix.currentPlot.crop2.id);
         } else {
             i.putExtra("crop2", -1);
         }
-        if(plotMatrix.currentPlot.treatment1!=null) {
+        if (plotMatrix.currentPlot.treatment1 != null) {
             i.putExtra("treatment1", plotMatrix.currentPlot.treatment1.id);
         } else {
             i.putExtra("treatment1", -1);
         }
-        if(plotMatrix.currentPlot.treatment2!=null) {
+        if (plotMatrix.currentPlot.treatment2 != null) {
             i.putExtra("treatment2", plotMatrix.currentPlot.treatment2.id);
         } else {
             i.putExtra("treatment2", -1);
@@ -1120,7 +1120,26 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         finish();
     }
 
-    public void updateFarmData(String fName, float fSize){
+    public void goToBalance() {
+        final Context context = this;
+        Intent i = new Intent(context, balance.class);
+        i.putExtra("user", user);
+        i.putExtra("userId", userId);
+        i.putExtra("userPass", userPass);
+        i.putExtra("farmName", farmName);
+        i.putExtra("farmId", farmId);
+        i.putExtra("farmVersion", farmVersion);
+        i.putExtra("plot", -1);
+        i.putExtra("cropNames", "");
+        i.putExtra("pestControlNames", "");
+        i.putExtra("soilManagementNames", "");
+        i.putExtra("displayWidth", displayWidth);
+        i.putExtra("displayHeight", displayHeight);
+        startActivity(i);
+        finish();
+    }
+
+    public void updateFarmData(String fName, float fSize) {
         fName = fName.replaceAll("[^A-Za-z0-9 ]", "");
         fName = fName.trim();
         this.setTitle(fName + " (" + user + ")");
@@ -1128,38 +1147,38 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         farmSize = fSize;
     }
 
-    public boolean farmHasBeenEdited(){
-        boolean ret=true;
+    public boolean farmHasBeenEdited() {
+        boolean ret = true;
         oFarm pastFarm = new oFarm(this);
-        pastFarm = pastFarm.getLatestActiveVersion(userId,farmId,this);
-        String newMatrix=plotMatrix.toString();
-        if(pastFarm.name.equals(farmName) && pastFarm.size==farmSize && pastFarm.plotMatrix.equals(newMatrix)){
-            ret=false;
+        pastFarm = pastFarm.getLatestActiveVersion(userId, farmId, this);
+        String newMatrix = plotMatrix.toString();
+        if (pastFarm.name.equals(farmName) && pastFarm.size == farmSize && pastFarm.plotMatrix.equals(newMatrix)) {
+            ret = false;
         }
         return ret;
     }
 
-    public void saveFarm(){
+    public void saveFarm() {
 
         boolean bChangesMade;
         dateHelper dH = new dateHelper();
         sMatrix = plotMatrix.toString();
 
-        if(farmName.isEmpty()){
-            farmName=getDefaultFarmName();
-            defineFarmNameAcres(false,true);
+        if (farmName.isEmpty()) {
+            farmName = getDefaultFarmName();
+            defineFarmNameAcres(false, true);
         } else {
 
             Date farmDate = new Date();
             farmDateString = dH.dateToString(farmDate);
 
-            if(farmId==-1){
-                farmId=currentFarm.getFarmIdFromNameUser(userId, farmName);
+            if (farmId == -1) {
+                farmId = currentFarm.getFarmIdFromNameUser(userId, farmName);
             }
 
-            bChangesMade = (state==2) ? farmHasBeenEdited() : true;
+            bChangesMade = (state == 2) ? farmHasBeenEdited() : true;
 
-            if(bChangesMade) {
+            if (bChangesMade) {
 
                 maxVersion = farmVersion = (state == 0) ? 0 : (bSaveEditedFarmAsNew) ? currentFarm.version + 1 : currentFarm.version;
 
@@ -1169,7 +1188,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
                     CharSequence dialogTitle;
 
-                    if(state==0) {
+                    if (state == 0) {
                         dialogTitle = getString(R.string.createNewFarmLabel);
                     } else {
                         dialogTitle = getString(R.string.updatingFarmLabel);
@@ -1222,13 +1241,13 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         }
     }
 
-    public void doCreateUpdateFarm(String s){
+    public void doCreateUpdateFarm(String s) {
         httpConnection http = new httpConnection(this, this);
         if (http.isOnline()) {
             if (!bConnecting) {
                 bConnecting = true;
-                connectionTask=0;
-                if (bSaveEditedFarmAsNew || state==0) {
+                connectionTask = 0;
+                if (bSaveEditedFarmAsNew || state == 0) {
                     http.execute(server + "/mobile/create_new_farm.php?farm=" + s.replaceAll(" ", "_"), "");
                 } else {
                     http.execute(server + "/mobile/update_farm.php?farm=" + s.replaceAll(" ", "_"), "");
@@ -1239,17 +1258,17 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     @Override
     public void processFinish(String output) {
-        switch(connectionTask){
+        switch (connectionTask) {
             case 0:
-                bConnecting=false;
+                bConnecting = false;
                 createFarmDialog.dismiss();
                 Date farmDate = new Date();
                 int status = (!output.equals("ko") && !output.isEmpty()) ? 2 : 0;
-                if(state==0) {
+                if (state == 0) {
                     currentFarm.addNewFarm(farmId, userId, farmName, farmSize, farmDate, sMatrix, farmVersion, status);
                     Toast.makeText(this, R.string.farmSavedMessage, Toast.LENGTH_SHORT).show();
                 } else {
-                    if(bSaveEditedFarmAsNew){
+                    if (bSaveEditedFarmAsNew) {
                         currentFarm.addNewFarm(farmId, userId, farmName, farmSize, farmDate, sMatrix, farmVersion, status);
                     } else {
                         currentFarm.updateFarm(farmId, userId, farmName, farmSize, farmDate, sMatrix, farmVersion, status);
@@ -1257,21 +1276,21 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     Toast.makeText(this, R.string.farmEditedMessage, Toast.LENGTH_SHORT).show();
                 }
                 prefs.savePreferenceInt("farmId", farmId);
-                currentFarm = currentFarm.getLatestActiveVersion(userId,farmId,this);
+                currentFarm = currentFarm.getLatestActiveVersion(userId, farmId, this);
 
-                state=1;
-                firstFarm=false;
-                newFarm=false;
-                bFarmSaved=true;
+                state = 1;
+                firstFarm = false;
+                newFarm = false;
+                bFarmSaved = true;
                 canvasView.invalidate();
                 this.setTitle(farmName + " (" + user + ")");
                 break;
 
             case 1:
-                bConnecting=false;
+                bConnecting = false;
                 deleteFarmDialog.dismiss();
 
-                if(output.equals("ok")){
+                if (output.equals("ok")) {
                     executeDeleteFarm();
                 } else {
                     markDeletedFarm();
@@ -1288,7 +1307,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         public SketchSheetView(Context c, int w, int h) {
 
             super(c);
-            context=c;
+            context = c;
             bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_4444);
             canvas = new Canvas(bitmap);
             this.setBackgroundColor(ContextCompat.getColor(context, R.color.colorWhite));
@@ -1299,15 +1318,15 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
             if (event.getActionMasked() == MotionEvent.ACTION_DOWN || event.getActionMasked() == MotionEvent.ACTION_MOVE || event.getActionMasked() == MotionEvent.ACTION_UP) {
                 invalidate();
-                boolean b = plotMatrix.passEvent(event,state);
-                if(plotMatrix.currentPlot!=null) {
-                    if (plotMatrix.currentPlot.state == 4 && (state==0 || state==2)) {
+                boolean b = plotMatrix.passEvent(event, state);
+                if (plotMatrix.currentPlot != null) {
+                    if (plotMatrix.currentPlot.state == 4 && (state == 0 || state == 2)) {
                         definePlotContents();
-                    } else if (plotMatrix.currentPlot.state == 5 && state==1){
+                    } else if (plotMatrix.currentPlot.state == 5 && state == 1) {
                         showActionChooser();
                     }
                 }
-                if(state==1 && (plotMatrix.bGoNext || plotMatrix.bGoPrev)) {
+                if (state == 1 && (plotMatrix.bGoNext || plotMatrix.bGoPrev)) {
                     farmHistory(plotMatrix.bGoNext, plotMatrix.bGoPrev);
                 }
                 return b;
@@ -1332,70 +1351,70 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             Iterator<oPlot> iterator = plotMatrix.getPlots().iterator();
             while (iterator.hasNext()) {
                 oPlot plot = iterator.next();
-                fillColor=getFillColor(plot,plot==plotMatrix.currentPlot);
-                borderColor= (plot==plotMatrix.currentPlot) ? ContextCompat.getColor(context, R.color.colorDraw) : ContextCompat.getColor(context, R.color.colorDrawFaded);
-                if(state==0 || state==2) {
+                fillColor = getFillColor(plot, plot == plotMatrix.currentPlot);
+                borderColor = (plot == plotMatrix.currentPlot) ? ContextCompat.getColor(context, R.color.colorDraw) : ContextCompat.getColor(context, R.color.colorDrawFaded);
+                if (state == 0 || state == 2) {
                     iMove = (plot == plotMatrix.currentPlot) ? (plotMatrix.currentPlot.state == 2) ? iconMoveActive : iconMove : iconMoveFaded;
                     iResize = (plot == plotMatrix.currentPlot) ? (plotMatrix.currentPlot.state == 3) ? iconResizeActive : iconResize : iconResizeFaded;
                     iContents = (plot == plotMatrix.currentPlot) ? (plotMatrix.currentPlot.state == 4) ? iconContentsActive : iconContents : iconContentsFaded;
                     drawPlot(canvas, plot, borderColor, fillColor, iMove, iResize, iContents);
-                } else if(state==1){
+                } else if (state == 1) {
                     iActions = (plot == plotMatrix.currentPlot) ? (plotMatrix.currentPlot.state == 5) ? iconActionsActive : iconActions : iconActionsFaded;
                     drawPlot(canvas, plot, borderColor, fillColor, iActions);
                 }
             }
 
-            if(plotMatrix.ghostPlot !=null && (state==0 || state==2)){
+            if (plotMatrix.ghostPlot != null && (state == 0 || state == 2)) {
                 drawGhostRectangle(canvas, plotMatrix.ghostPlot, ContextCompat.getColor(context, R.color.colorDrawGhostRectangle));
             }
         }
 
-        public int getFillColor(oPlot p, boolean strong){
+        public int getFillColor(oPlot p, boolean strong) {
             int ret;
-            if(p.pestControlIngredients.size()>0 && p.soilManagementIngredients.size()>0) {
+            if (p.pestControlIngredients.size() > 0 && p.soilManagementIngredients.size() > 0) {
                 ret = (strong) ? ContextCompat.getColor(context, R.color.colorFillSoilManagementAndPestControl) : ContextCompat.getColor(context, R.color.colorFillSoilManagementAndPestControlFaded);
-            } else if(p.pestControlIngredients.size()>0 && p.soilManagementIngredients.size()==0) {
-                ret = (strong) ? ContextCompat.getColor(context,R.color.colorFillPestControl) : ContextCompat.getColor(context,R.color.colorFillPestControlFaded);
-            } else if(p.pestControlIngredients.size()==0 && p.soilManagementIngredients.size()>0) {
-                ret = (strong) ? ContextCompat.getColor(context,R.color.colorFillSoilManagement) : ContextCompat.getColor(context,R.color.colorFillSoilManagementFaded);
+            } else if (p.pestControlIngredients.size() > 0 && p.soilManagementIngredients.size() == 0) {
+                ret = (strong) ? ContextCompat.getColor(context, R.color.colorFillPestControl) : ContextCompat.getColor(context, R.color.colorFillPestControlFaded);
+            } else if (p.pestControlIngredients.size() == 0 && p.soilManagementIngredients.size() > 0) {
+                ret = (strong) ? ContextCompat.getColor(context, R.color.colorFillSoilManagement) : ContextCompat.getColor(context, R.color.colorFillSoilManagementFaded);
             } else {
-                ret = (strong) ? ContextCompat.getColor(context,R.color.colorFillDefault) : ContextCompat.getColor(context,R.color.colorFillFaded);
+                ret = (strong) ? ContextCompat.getColor(context, R.color.colorFillDefault) : ContextCompat.getColor(context, R.color.colorFillFaded);
             }
             return ret;
         }
 
-        private void drawPlot(Canvas canvas, oPlot p, int border, int fill, Bitmap iMove, Bitmap iResize, Bitmap iContents){
+        private void drawPlot(Canvas canvas, oPlot p, int border, int fill, Bitmap iMove, Bitmap iResize, Bitmap iContents) {
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(fill);
-            canvas.drawRect(p.x,p.y,p.x+p.w,p.y+p.h,paint);
+            canvas.drawRect(p.x, p.y, p.x + p.w, p.y + p.h, paint);
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(border);
-            canvas.drawRect(p.x,p.y,p.x+p.w,p.y+p.h,paint);
-            canvas.drawBitmap(iResize,p.iResizeX,p.iResizeY,paint);
-            canvas.drawBitmap(iContents,p.iContentsX,p.iContentsY,paint);
-            int added = (state==1) ? 15 : 0;
-            float yOffset = (((p.h/(displayHeight/4))-1)*30)+(20-p.crops.size())+added;
-            drawPlotCropLabels(canvas, p, p.iContentsY+p.iContentsH+yOffset);
+            canvas.drawRect(p.x, p.y, p.x + p.w, p.y + p.h, paint);
+            canvas.drawBitmap(iResize, p.iResizeX, p.iResizeY, paint);
+            canvas.drawBitmap(iContents, p.iContentsX, p.iContentsY, paint);
+            int added = (state == 1) ? 15 : 0;
+            float yOffset = (((p.h / (displayHeight / 4)) - 1) * 30) + (20 - p.crops.size()) + added;
+            drawPlotCropLabels(canvas, p, p.iContentsY + p.iContentsH + yOffset);
         }
 
-        private void drawPlot(Canvas canvas, oPlot p, int border, int fill, Bitmap iActions){
+        private void drawPlot(Canvas canvas, oPlot p, int border, int fill, Bitmap iActions) {
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(fill);
-            canvas.drawRect(p.x,p.y,p.x+p.w,p.y+p.h,paint);
+            canvas.drawRect(p.x, p.y, p.x + p.w, p.y + p.h, paint);
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(border);
-            canvas.drawRect(p.x,p.y,p.x+p.w,p.y+p.h,paint);
-            canvas.drawBitmap(iActions,p.iActionsX,p.iActionsY,paint);
-            int added = (state==1) ? 15 : 0;
-            float yOffset = (((p.h/(displayHeight/4))-1)*30)+(20-p.crops.size())+added;
-            drawPlotCropLabels(canvas, p, p.iActionsY+p.iActionsH+yOffset);
+            canvas.drawRect(p.x, p.y, p.x + p.w, p.y + p.h, paint);
+            canvas.drawBitmap(iActions, p.iActionsX, p.iActionsY, paint);
+            int added = (state == 1) ? 15 : 0;
+            float yOffset = (((p.h / (displayHeight / 4)) - 1) * 30) + (20 - p.crops.size()) + added;
+            drawPlotCropLabels(canvas, p, p.iActionsY + p.iActionsH + yOffset);
         }
 
-        private void drawPlotCropLabels(Canvas canvas, oPlot p, float txtY){
+        private void drawPlotCropLabels(Canvas canvas, oPlot p, float txtY) {
             Rect txtBounds = new Rect();
             float txtX;
 
-            float fontSize = ((((p.w/(displayWidth/4)+(p.h/(displayHeight/4)))-2)*10)/14)+21;
+            float fontSize = ((((p.w / (displayWidth / 4) + (p.h / (displayHeight / 4))) - 2) * 10) / 14) + 21;
 
             textPaint.setTextSize(fontSize);
 
@@ -1404,24 +1423,24 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 oCrop c = iterator.next();
                 textPaint.getTextBounds(c.name, 0, c.name.length(), txtBounds);
 
-                int n=c.name.length();
-                while(txtBounds.width()>(p.w)){
+                int n = c.name.length();
+                while (txtBounds.width() > (p.w)) {
                     n--;
                     textPaint.getTextBounds(c.name, 0, n, txtBounds);
                 }
 
                 txtX = ((p.w - txtBounds.width()) / 2) + p.x;
-                canvas.drawText(c.name.substring(0,n), (int) txtX, (int) txtY, textPaint);
+                canvas.drawText(c.name.substring(0, n), (int) txtX, (int) txtY, textPaint);
 
-                txtY+=(((p.h/(displayHeight/4))-1)*3)+24;
+                txtY += (((p.h / (displayHeight / 4)) - 1) * 3) + 24;
 
             }
         }
 
-        private void drawGhostRectangle(Canvas canvas, oPlot gR, int border){
+        private void drawGhostRectangle(Canvas canvas, oPlot gR, int border) {
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(border);
-            canvas.drawRect(gR.x,gR.y,gR.x+gR.w+1,gR.y+gR.h+1,paint);
+            canvas.drawRect(gR.x, gR.y, gR.x + gR.w + 1, gR.y + gR.h + 1, paint);
         }
     }
 }

@@ -163,7 +163,7 @@ public class finance extends AppCompatActivity {
                 tryDeleteSelectedItems();
                 break;
             case 1:
-                //go to balance
+                goToBalance();
                 break;
             case 2:
                 goBack();
@@ -857,6 +857,25 @@ public class finance extends AppCompatActivity {
         i.putExtra("farmVersion", farmVersion);
         i.putExtra("newFarm", false);
         i.putExtra("firstFarm", false);
+        startActivity(i);
+        finish();
+    }
+
+    public void goToBalance(){
+        final Context context = this;
+        Intent i = new Intent(context, balance.class);
+        i.putExtra("user", user);
+        i.putExtra("userId", userId);
+        i.putExtra("userPass", userPass);
+        i.putExtra("farmName",farmName);
+        i.putExtra("farmId", farmId);
+        i.putExtra("farmVersion", farmVersion);
+        i.putExtra("plot",plot);
+        i.putExtra("cropNames",cropNames);
+        i.putExtra("pestControlNames",pestControlNames);
+        i.putExtra("soilManagementNames",soilManagementNames);
+        i.putExtra("displayWidth",displayWidth);
+        i.putExtra("displayHeight",displayHeight);
         startActivity(i);
         finish();
     }
