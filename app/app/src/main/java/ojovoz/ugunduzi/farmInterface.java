@@ -13,6 +13,8 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +36,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Timer;
 
 /**
  * Created by Eugenio on 13/03/2018.
@@ -61,6 +64,10 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     Bitmap iconActions;
     Bitmap iconActionsFaded;
     Bitmap iconActionsActive;
+
+    Bitmap historyLeft;
+    Bitmap historyRight;
+    int arrowShowing; // -1 = none, 0 = left, 1 = right
 
     String user;
     String userPass;
@@ -104,6 +111,14 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     ProgressDialog createFarmDialog;
     ProgressDialog deleteFarmDialog;
 
+    private Handler historyHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            arrowShowing=-1;
+            canvasView.invalidate();
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -145,6 +160,10 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         iconResizeActive = BitmapFactory.decodeResource(this.getResources(), R.drawable.resize_active);
         iconContentsActive = BitmapFactory.decodeResource(this.getResources(), R.drawable.contents_active);
         iconActionsActive = BitmapFactory.decodeResource(this.getResources(), R.drawable.actions_active);
+
+        historyLeft = BitmapFactory.decodeResource(this.getResources(), R.drawable.history_left);
+        historyRight = BitmapFactory.decodeResource(this.getResources(), R.drawable.history_right);
+        arrowShowing = -1;
 
         plotMatrix = new oPlotMatrix();
 
@@ -208,6 +227,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         });
     }
+
+
 
     public void createFarm() {
         int mw = iconMove.getWidth();
@@ -958,15 +979,17 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         if (bNext && farmVersion < maxVersion) {
             farmVersion++;
             bChange = true;
+            arrowShowing = 1;
         } else if (bPrev && farmVersion > 0) {
             farmVersion--;
             bChange = true;
+            arrowShowing = 0;
         }
         if (bChange) {
+            historyHandler.sendEmptyMessageDelayed(-1,800);
             currentFarm = currentFarm.getVersion(userId, farmId, farmVersion, this);
             String date = dH.dateToString(currentFarm.dateCreated);
             farmName = currentFarm.name;
-            Toast.makeText(this, farmName + ": " + date, Toast.LENGTH_SHORT).show();
             farmSize = currentFarm.size;
             plotMatrix = new oPlotMatrix();
             plotMatrix.createMatrix(displayWidth, displayHeight);
@@ -1249,6 +1272,12 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
             if (plotMatrix.ghostPlot != null && (state == 0 || state == 2)) {
                 drawGhostRectangle(canvas, plotMatrix.ghostPlot, ContextCompat.getColor(context, R.color.colorDrawGhostRectangle));
+            }
+
+            if(arrowShowing==0){
+                canvas.drawBitmap(historyLeft,(displayWidth/4)-(historyLeft.getWidth()/2),(displayHeight/2)-(historyLeft.getHeight()/2), paint);
+            } else if (arrowShowing==1){
+                canvas.drawBitmap(historyRight,((displayWidth/4)*3)-(historyRight.getWidth()/2),(displayHeight/2)-(historyRight.getHeight()/2), paint);
             }
         }
 
