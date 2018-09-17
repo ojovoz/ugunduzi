@@ -273,7 +273,7 @@ public class balance extends AppCompatActivity {
             startActivity(i);
             finish();
         } else {
-            Intent i = new Intent(this, finance.class);
+            Intent i = new Intent(this, records.class);
             i.putExtra("user", user);
             i.putExtra("userId", userId);
             i.putExtra("userPass", userPass);

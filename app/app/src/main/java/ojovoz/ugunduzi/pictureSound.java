@@ -1,5 +1,6 @@
 package ojovoz.ugunduzi;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -64,6 +65,7 @@ public class pictureSound extends AppCompatActivity {
     boolean bChanges=false;
 
     int displayWidth;
+    int displayHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +87,7 @@ public class pictureSound extends AppCompatActivity {
         soilManagementNames = getIntent().getExtras().getString("soilManagementNames");
 
         displayWidth = getIntent().getExtras().getInt("displayWidth");
+        displayHeight = getIntent().getExtras().getInt("displayHeight");
 
         TextView tt = (TextView) findViewById(R.id.plotLabel);
         String title = "";
@@ -124,13 +127,14 @@ public class pictureSound extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        tryExit(0);
+        tryExit(1);
     }
 
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
         super.onCreateOptionsMenu(menu);
         menu.add(0, 0, 0, R.string.opGoBackToFarm);
+        menu.add(1, 1, 1, R.string.opGoBack);
         return true;
     }
 
@@ -146,13 +150,11 @@ public class pictureSound extends AppCompatActivity {
         } else {
             switch (exitAction) {
                 case 0:
-                    goBack();
+                    goBackToFarm();
                     break;
                 case 1:
-                    //
+                    goBack();
                     break;
-                case 2:
-                    //
             }
         }
     }
@@ -182,7 +184,7 @@ public class pictureSound extends AppCompatActivity {
                         //
                         break;
                     case 2:
-                        goBack();
+                        goBackToFarm();
                 }
 
             }
@@ -191,7 +193,7 @@ public class pictureSound extends AppCompatActivity {
         exitDialog.show();
     }
 
-    public void goBack(){
+    public void goBackToFarm(){
         Intent i = new Intent(this, farmInterface.class);
         i.putExtra("user", user);
         i.putExtra("userId", userId);
@@ -201,6 +203,25 @@ public class pictureSound extends AppCompatActivity {
         i.putExtra("farmVersion",farmVersion);
         i.putExtra("newFarm", false);
         i.putExtra("firstFarm", false);
+        startActivity(i);
+        finish();
+    }
+
+    public void goBack(){
+        final Context context = this;
+        Intent i = new Intent(context, records.class);
+        i.putExtra("user", user);
+        i.putExtra("userId", userId);
+        i.putExtra("userPass", userPass);
+        i.putExtra("farmName",farmName);
+        i.putExtra("farmId", farmId);
+        i.putExtra("farmVersion", farmVersion);
+        i.putExtra("plot",plot);
+        i.putExtra("cropNames",cropNames);
+        i.putExtra("pestControlNames",pestControlNames);
+        i.putExtra("soilManagementNames",soilManagementNames);
+        i.putExtra("displayWidth",displayWidth);
+        i.putExtra("displayHeight",displayHeight);
         startActivity(i);
         finish();
     }

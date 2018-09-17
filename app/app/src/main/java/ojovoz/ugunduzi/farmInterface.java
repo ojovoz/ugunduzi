@@ -28,7 +28,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -271,19 +270,18 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         } else if (state == 1) {
             menu.add(0, 0, 0, R.string.opManageFarmRecords);
-            menu.add(1, 1, 1, R.string.opFarmBalance);
             if (farmVersion == maxVersion) {
-                menu.add(2, 2, 2, R.string.opEditFarm);
+                menu.add(1, 1, 1, R.string.opEditFarm);
             } else {
-                menu.add(2, 2, 2, R.string.opGoToCurrentState);
+                menu.add(1, 1, 1, R.string.opGoToCurrentState);
             }
             if (farmVersion == maxVersion) {
-                menu.add(3, 3, 3, R.string.opDeleteFarm);
-                menu.add(4, 4, 4, R.string.opCreateNewFarm);
+                menu.add(2, 2, 2, R.string.opDeleteFarm);
+                menu.add(3, 3, 3, R.string.opCreateNewFarm);
                 if (currentFarm.getNumberOfFarms(userId) > 1) {
-                    menu.add(5, 5, 5, R.string.opGoToOtherFarm);
+                    menu.add(4, 4, 4, R.string.opGoToOtherFarm);
                 }
-                menu.add(6, 6, 6, R.string.opSwitchUser);
+                menu.add(5, 5, 5, R.string.opSwitchUser);
             }
 
         }
@@ -319,28 +317,25 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         } else if (state == 1) {
             switch (item.getItemId()) {
                 case 0:
-                    goToRecords(true);
+                    goToFarmRecords();
                     break;
                 case 1:
-                    goToBalance();
-                    break;
-                case 2:
                     if (farmVersion == maxVersion) {
                         startEditFarm();
                     } else {
                         goToLatestFarm();
                     }
                     break;
-                case 3:
+                case 2:
                     deleteFarm();
                     break;
-                case 4:
+                case 3:
                     createNewFarm();
                     break;
-                case 5:
+                case 4:
                     goToFarmChooser();
                     break;
-                case 6:
+                case 5:
                     confirmExit();
             }
         }
@@ -956,68 +951,6 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         dialog.show();
     }
 
-    public void showActionChooser() {
-        final Dialog dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_action_chooser);
-        dialog.setCanceledOnTouchOutside(true);
-        dialog.setCancelable(true);
-
-        TextView tt = (TextView) dialog.findViewById(R.id.plotLabel);
-
-        String title = getString(R.string.cropsTitle) + ": " + plotMatrix.currentPlot.getCropNames(this);
-        title += "\n";
-        title += getString(R.string.pestControlTitle) + ": " + plotMatrix.currentPlot.getPestControlNames(this);
-        title += "\n";
-        title += getString(R.string.soilManagementTitle) + ": " + plotMatrix.currentPlot.getSoilManagementNames(this);
-
-        if (plotMatrix.currentPlot.pestControlIngredients.size() > 0 && plotMatrix.currentPlot.soilManagementIngredients.size() > 0) {
-            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControl));
-        } else if (plotMatrix.currentPlot.pestControlIngredients.size() > 0 && plotMatrix.currentPlot.soilManagementIngredients.size() == 0) {
-            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillPestControl));
-        } else if (plotMatrix.currentPlot.pestControlIngredients.size() == 0 && plotMatrix.currentPlot.soilManagementIngredients.size() > 0) {
-            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagement));
-        } else {
-            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillDefault));
-        }
-
-        tt.setText(title);
-
-        Button dataButton = (Button) dialog.findViewById(R.id.dataButton);
-        dataButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goToDataEntry();
-            }
-        });
-
-        Button psButton = (Button) dialog.findViewById(R.id.pictureSoundButton);
-        psButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goToPictureSound();
-            }
-        });
-
-        Button recordsButton = (Button) dialog.findViewById(R.id.manageRecordsButton);
-        recordsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goToRecords(false);
-            }
-        });
-
-        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialogInterface) {
-                plotMatrix.currentPlot.state = 1;
-                canvasView.invalidate();
-            }
-        });
-
-        dialog.show();
-    }
-
     public void farmHistory(boolean bNext, boolean bPrev) {
         dateHelper dH = new dateHelper();
         boolean bChange = false;
@@ -1047,9 +980,9 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         }
     }
 
-    public void goToDataEntry() {
+    public void goToPlotRecords(){
         final Context context = this;
-        Intent i = new Intent(context, finance.class);
+        Intent i = new Intent(context, records.class);
         i.putExtra("user", user);
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
@@ -1066,58 +999,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         finish();
     }
 
-    public void goToPictureSound() {
-        final Context context = this;
-        Intent i = new Intent(context, pictureSound.class);
-        i.putExtra("user", user);
-        i.putExtra("userId", userId);
-        i.putExtra("userPass", userPass);
-        i.putExtra("farmName", farmName);
-        i.putExtra("farmId", farmId);
-        i.putExtra("farmVersion", currentFarm.version);
-        i.putExtra("plot", plotMatrix.currentPlot.id);
-        i.putExtra("cropNames", plotMatrix.currentPlot.getCropNames(this));
-        i.putExtra("pestControlNames", plotMatrix.currentPlot.getPestControlNames(this));
-        i.putExtra("soilManagementNames", plotMatrix.currentPlot.getSoilManagementNames(this));
-        i.putExtra("displayWidth", displayWidth);
-        startActivity(i);
-        finish();
-    }
+    public void goToFarmRecords() {
 
-    public void goToRecords(boolean bFarm) {
-        final Context context = this;
-        Intent i = new Intent(context, dataManager.class);
-        i.putExtra("user", user);
-        i.putExtra("userId", userId);
-        i.putExtra("userPass", userPass);
-        i.putExtra("farmName", farmName);
-        if (bFarm) {
-            i.putExtra("plot", -1);
-        } else {
-            i.putExtra("plot", plotMatrix.currentPlot.id);
-        }
-        if (plotMatrix.currentPlot.crop1 != null) {
-            i.putExtra("crop1", plotMatrix.currentPlot.crop1.id);
-        } else {
-            i.putExtra("crop1", -1);
-        }
-        if (plotMatrix.currentPlot.crop2 != null) {
-            i.putExtra("crop2", plotMatrix.currentPlot.crop2.id);
-        } else {
-            i.putExtra("crop2", -1);
-        }
-        if (plotMatrix.currentPlot.treatment1 != null) {
-            i.putExtra("treatment1", plotMatrix.currentPlot.treatment1.id);
-        } else {
-            i.putExtra("treatment1", -1);
-        }
-        if (plotMatrix.currentPlot.treatment2 != null) {
-            i.putExtra("treatment2", plotMatrix.currentPlot.treatment2.id);
-        } else {
-            i.putExtra("treatment2", -1);
-        }
-        startActivity(i);
-        finish();
     }
 
     public void goToBalance() {
@@ -1323,7 +1206,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     if (plotMatrix.currentPlot.state == 4 && (state == 0 || state == 2)) {
                         definePlotContents();
                     } else if (plotMatrix.currentPlot.state == 5 && state == 1) {
-                        showActionChooser();
+                        goToPlotRecords();
                     }
                 }
                 if (state == 1 && (plotMatrix.bGoNext || plotMatrix.bGoPrev)) {

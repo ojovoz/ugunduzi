@@ -62,7 +62,7 @@
     <string name="previousDataItemsLabel">Previous data</string>
     <string name="dataItemLabel">Item</string>
     <string name="dateLabel">Date</string>
-    <string name="enterNewDataItemButtonLabel">Enter new item</string>
+    <string name="enterNewDataItemButtonLabel">ENTER DATA</string>
     <string name="chooseDataItemButtonLabel">CHOOSE ITEM</string>
     <string name="valueLabel">Value</string>
     <string name="unitsLabel">Units</string>

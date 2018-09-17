@@ -51,7 +51,7 @@
             android:launchMode="singleTop">
         </activity>
         <activity
-            android:name=".finance"
+            android:name=".records"
             android:screenOrientation="portrait"
             android:label="@string/financeActivity"
             android:launchMode="singleTop">
