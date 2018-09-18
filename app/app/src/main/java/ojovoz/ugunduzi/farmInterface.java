@@ -36,7 +36,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Timer;
 
 /**
  * Created by Eugenio on 13/03/2018.
@@ -133,6 +132,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         userId = getIntent().getExtras().getInt("userId");
         newFarm = getIntent().getExtras().getBoolean("newFarm");
         firstFarm = getIntent().getExtras().getBoolean("firstFarm");
+        int initialVersion = getIntent().getExtras().getInt("farmVersion");
 
         prefs = new preferenceManager(this);
         server = prefs.getPreference("server");
@@ -181,11 +181,20 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 prefs.deletePreference("user");
                 goToLogin();
             } else {
-                currentFarm = currentFarm.getLatestActiveVersion(userId, farmId, this);
+                if(initialVersion==-1) {
+                    currentFarm = currentFarm.getLatestActiveVersion(userId, farmId, this);
+                    maxVersion = farmVersion = currentFarm.version;
+                    this.setTitle(currentFarm.name + " (" + user + ")");
+                } else {
+                    currentFarm = currentFarm.getVersion(userId, farmId, initialVersion, this);
+                    farmVersion = initialVersion;
+                    maxVersion = currentFarm.getMaxVersionNumber(userId, farmId, this);
+                    dateHelper dH = new dateHelper();
+                    this.setTitle(currentFarm.name + ": " + dH.dateToString(currentFarm.dateCreated) + " (" + user + ")");
+                }
                 farmName = currentFarm.name;
-                maxVersion = farmVersion = currentFarm.version;
+
             }
-            this.setTitle(farmName + " (" + user + ")");
         }
 
         LinearLayout root = (LinearLayout) findViewById(R.id.mainRoot);
@@ -1012,6 +1021,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         i.putExtra("farmName", farmName);
         i.putExtra("farmId", farmId);
         i.putExtra("farmVersion", currentFarm.version);
+        i.putExtra("maxVersion", maxVersion);
         i.putExtra("plot", plotMatrix.currentPlot.id);
         i.putExtra("cropNames", plotMatrix.currentPlot.getCropNames(this));
         i.putExtra("pestControlNames", plotMatrix.currentPlot.getPestControlNames(this));
@@ -1024,25 +1034,6 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     public void goToFarmRecords() {
 
-    }
-
-    public void goToBalance() {
-        final Context context = this;
-        Intent i = new Intent(context, balance.class);
-        i.putExtra("user", user);
-        i.putExtra("userId", userId);
-        i.putExtra("userPass", userPass);
-        i.putExtra("farmName", farmName);
-        i.putExtra("farmId", farmId);
-        i.putExtra("farmVersion", farmVersion);
-        i.putExtra("plot", -1);
-        i.putExtra("cropNames", "");
-        i.putExtra("pestControlNames", "");
-        i.putExtra("soilManagementNames", "");
-        i.putExtra("displayWidth", displayWidth);
-        i.putExtra("displayHeight", displayHeight);
-        startActivity(i);
-        finish();
     }
 
     public void updateFarmData(String fName, float fSize) {

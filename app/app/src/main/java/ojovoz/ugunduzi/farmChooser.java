@@ -323,6 +323,7 @@ public class farmChooser extends AppCompatActivity implements httpConnection.Asy
         i.putExtra("newFarm", newFarm);
         i.putExtra("firstFarm",false);
         i.putExtra("farmId", farmId);
+        i.putExtra("farmVersion", -1);
         startActivity(i);
         finish();
     }

@@ -179,6 +179,11 @@ public class oFarm {
         return ret;
     }
 
+    public int getMaxVersionNumber(int userId, int id, Context c){
+        oFarm f = getLatestActiveVersion(userId, id, c);
+        return f.version;
+    }
+
     public oFarm getFarm(int userId, int farmId, int version, Context c){
         oFarm ret = null;
         ArrayList<oFarm> farms = getFarms(userId, farmId);

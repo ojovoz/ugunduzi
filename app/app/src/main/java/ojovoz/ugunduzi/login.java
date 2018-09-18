@@ -350,6 +350,7 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                 i.putExtra("newFarm", false);
                 i.putExtra("firstFarm", false);
                 i.putExtra("farmId", farmId);
+                i.putExtra("farmVersion", -1);
                 startActivity(i);
                 finish();
                 bProceed=false;
@@ -378,6 +379,7 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                     i.putExtra("newFarm", false);
                     i.putExtra("firstFarm", false);
                     i.putExtra("farmId", farmId);
+                    i.putExtra("farmVersion", -1);
                     startActivity(i);
                     finish();
                 }
@@ -388,6 +390,7 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                 i.putExtra("userPass", userPass);
                 i.putExtra("newFarm", true);
                 i.putExtra("firstFarm", true);
+                i.putExtra("farmVersion", -1);
                 startActivity(i);
                 finish();
             }

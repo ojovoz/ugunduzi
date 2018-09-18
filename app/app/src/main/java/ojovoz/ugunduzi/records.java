@@ -55,6 +55,7 @@ public class records extends AppCompatActivity {
     public String farmName;
     public int farmId;
     public int farmVersion;
+    public int maxVersion;
     public int plot;
 
     public String cropNames;
@@ -104,7 +105,7 @@ public class records extends AppCompatActivity {
         setContentView(R.layout.activity_records);
 
         context = this;
-        nSelected=0;
+        nSelected = 0;
 
         user = getIntent().getExtras().getString("user");
         userPass = getIntent().getExtras().getString("userPass");
@@ -112,6 +113,7 @@ public class records extends AppCompatActivity {
         farmName = getIntent().getExtras().getString("farmName");
         farmId = getIntent().getExtras().getInt("farmId");
         farmVersion = getIntent().getExtras().getInt("farmVersion");
+        maxVersion = getIntent().getExtras().getInt("maxVersion");
         plot = getIntent().getExtras().getInt("plot");
 
         cropNames = getIntent().getExtras().getString("cropNames");
@@ -150,6 +152,11 @@ public class records extends AppCompatActivity {
 
         fillRecyclerView();
 
+        if (farmVersion < maxVersion) {
+            TableLayout tl = (TableLayout) findViewById(R.id.actionsTable);
+            tl.setVisibility(View.GONE);
+        }
+
     }
 
     @Override
@@ -160,11 +167,12 @@ public class records extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(android.view.Menu menu) {
         menu.clear();
-        if(nSelected>0) {
+        if (nSelected > 0) {
             menu.add(0, 0, 0, R.string.opDeleteSelectedItems);
         }
         menu.add(1, 1, 1, R.string.opBalance);
-        menu.add(2, 2, 2, R.string.opGoBackToFarm);
+        menu.add(2, 2, 2, R.string.opUploadRecords);
+        menu.add(3, 3, 3, R.string.opGoBackToFarm);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -178,6 +186,9 @@ public class records extends AppCompatActivity {
                 goToBalance();
                 break;
             case 2:
+                //uploadRecords
+                break;
+            case 3:
                 goBack();
         }
         return super.onOptionsItemSelected(item);
@@ -256,22 +267,23 @@ public class records extends AppCompatActivity {
         }
     }
 
-    public void goToPictureSound(View v){
+    public void goToPictureSound(View v) {
         stopSoundPlayer();
         final Context context = this;
         Intent i = new Intent(context, pictureSound.class);
         i.putExtra("user", user);
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
-        i.putExtra("farmName",farmName);
+        i.putExtra("farmName", farmName);
         i.putExtra("farmId", farmId);
         i.putExtra("farmVersion", farmVersion);
-        i.putExtra("plot",plot);
-        i.putExtra("cropNames",cropNames);
-        i.putExtra("pestControlNames",pestControlNames);
-        i.putExtra("soilManagementNames",soilManagementNames);
-        i.putExtra("displayWidth",displayWidth);
-        i.putExtra("displayHeight",displayHeight);
+        i.putExtra("maxVersion", maxVersion);
+        i.putExtra("plot", plot);
+        i.putExtra("cropNames", cropNames);
+        i.putExtra("pestControlNames", pestControlNames);
+        i.putExtra("soilManagementNames", soilManagementNames);
+        i.putExtra("displayWidth", displayWidth);
+        i.putExtra("displayHeight", displayHeight);
         startActivity(i);
         finish();
     }
@@ -301,8 +313,7 @@ public class records extends AppCompatActivity {
         dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
             public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
-                if (i == keyEvent.KEYCODE_BACK && newItem.dataItem != null && itemChanges && !bCancellingData)
-                {
+                if (i == keyEvent.KEYCODE_BACK && newItem.dataItem != null && itemChanges && !bCancellingData) {
                     bCancellingData = true;
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setMessage(R.string.dataNotSavedText)
@@ -331,7 +342,7 @@ public class records extends AppCompatActivity {
                     AlertDialog alert = builder.create();
                     alert.show();
                     return true;
-                }else{
+                } else {
                     if (i == keyEvent.KEYCODE_BACK && editingItem != null) {
                         TextView tv = (TextView) editingView;
                         if ((int) tv.getTag() % 2 == 0) {
@@ -387,9 +398,9 @@ public class records extends AppCompatActivity {
                         recyclerViewAdapter.list = cardDataFromLog();
                         recyclerViewAdapter.setList(recyclerViewAdapter.list);
                         recyclerViewAdapter.notifyDataSetChanged();
-                    } else if(!itemChanges) {
+                    } else if (!itemChanges) {
                         dialog.dismiss();
-                        if(editingItem!=null) {
+                        if (editingItem != null) {
                             TextView tv = (TextView) editingView;
                             if ((int) tv.getTag() % 2 == 0) {
                                 tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillFaded));
@@ -441,9 +452,9 @@ public class records extends AppCompatActivity {
                                         recyclerViewAdapter.list = cardDataFromLog();
                                         recyclerViewAdapter.setList(recyclerViewAdapter.list);
                                         recyclerViewAdapter.notifyDataSetChanged();
-                                    } else if(!itemChanges) {
+                                    } else if (!itemChanges) {
                                         dialog.dismiss();
-                                        if(editingItem!=null) {
+                                        if (editingItem != null) {
                                             TextView tv = (TextView) editingView;
                                             if ((int) tv.getTag() % 2 == 0) {
                                                 tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillFaded));
@@ -535,7 +546,7 @@ public class records extends AppCompatActivity {
 
                 @Override
                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                    if(!charSequence.toString().equals(String.valueOf(newItem.quantity))) {
+                    if (!charSequence.toString().equals(String.valueOf(newItem.quantity))) {
                         itemChanges = true;
                     }
                 }
@@ -559,7 +570,7 @@ public class records extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(!charSequence.toString().equals(String.valueOf(newItem.value))) {
+                if (!charSequence.toString().equals(String.valueOf(newItem.value))) {
                     itemChanges = true;
                 }
             }
@@ -579,7 +590,7 @@ public class records extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(!charSequence.toString().equals(newItem.comments)) {
+                if (!charSequence.toString().equals(newItem.comments)) {
                     itemChanges = true;
                 }
             }
@@ -826,12 +837,14 @@ public class records extends AppCompatActivity {
     }
 
     public void editItem(View v) {
-        final int n = (int) v.getTag();
-        if (n >= 0) {
-            TextView tv = (TextView) v;
-            tv.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight));
-            editingItem = logList.get(n);
-            addItem(v);
+        if (farmVersion == maxVersion) {
+            final int n = (int) v.getTag();
+            if (n >= 0) {
+                TextView tv = (TextView) v;
+                tv.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight));
+                editingItem = logList.get(n);
+                addItem(v);
+            }
         }
     }
 
@@ -857,8 +870,8 @@ public class records extends AppCompatActivity {
                 newItem.appendToLog(farmId, farmVersion, userId, plot, newItem.date, newItem.dataItem, newItem.value, newItem.quantity,
                         newItem.units, newItem.crop, newItem.treatmentIngredient, 0.0f, newItem.comments, "", "");
             } else {
-                newItem.updateLogItem(newItem.line,farmId,farmVersion,userId,plot,newItem.date,newItem.dataItem,newItem.value,newItem.quantity,
-                        newItem.units,newItem.crop,newItem.treatmentIngredient, 0.0f, newItem.comments);
+                newItem.updateLogItem(editingItem.line, farmId, farmVersion, userId, plot, newItem.date, newItem.dataItem, newItem.value, newItem.quantity,
+                        newItem.units, newItem.crop, newItem.treatmentIngredient, 0.0f, newItem.comments);
             }
             editingItem = null;
         }
@@ -910,7 +923,7 @@ public class records extends AppCompatActivity {
                 bDate.setText(dH.dateToString(nd));
                 dialogDate.dismiss();
 
-                itemChanges=true;
+                itemChanges = true;
             }
         });
         dialogDate.show();
@@ -937,7 +950,7 @@ public class records extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 newItem.crop = currentPlot.crops.get(i);
                 bCrop.setText(newItem.crop.name);
-                itemChanges=true;
+                itemChanges = true;
                 dialogInterface.dismiss();
             }
         });
@@ -970,7 +983,7 @@ public class records extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 newItem.units = unitList.get(i);
                 bUnits.setText(newItem.units.name);
-                itemChanges=true;
+                itemChanges = true;
                 dialogInterface.dismiss();
             }
         });
@@ -1008,7 +1021,7 @@ public class records extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 newItem.treatmentIngredient = treatmentIngredients.get(i);
                 bTreatment.setText(newItem.treatmentIngredient.name);
-                itemChanges=true;
+                itemChanges = true;
                 dialogInterface.dismiss();
             }
         });
@@ -1056,22 +1069,23 @@ public class records extends AppCompatActivity {
         finish();
     }
 
-    public void goToBalance(){
+    public void goToBalance() {
         stopSoundPlayer();
         final Context context = this;
         Intent i = new Intent(context, balance.class);
         i.putExtra("user", user);
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
-        i.putExtra("farmName",farmName);
+        i.putExtra("farmName", farmName);
         i.putExtra("farmId", farmId);
         i.putExtra("farmVersion", farmVersion);
-        i.putExtra("plot",plot);
-        i.putExtra("cropNames",cropNames);
-        i.putExtra("pestControlNames",pestControlNames);
-        i.putExtra("soilManagementNames",soilManagementNames);
-        i.putExtra("displayWidth",displayWidth);
-        i.putExtra("displayHeight",displayHeight);
+        i.putExtra("maxVersion", maxVersion);
+        i.putExtra("plot", plot);
+        i.putExtra("cropNames", cropNames);
+        i.putExtra("pestControlNames", pestControlNames);
+        i.putExtra("soilManagementNames", soilManagementNames);
+        i.putExtra("displayWidth", displayWidth);
+        i.putExtra("displayHeight", displayHeight);
         startActivity(i);
         finish();
     }
