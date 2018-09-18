@@ -841,7 +841,7 @@ public class records extends AppCompatActivity {
     }
 
     public void editItem(View v) {
-        if (farmVersion == maxVersion || plot==-1) {
+        if (farmVersion == maxVersion || plot>=0) {
             final int n = (int) v.getTag();
             if (n >= 0) {
                 TextView tv = (TextView) v;
