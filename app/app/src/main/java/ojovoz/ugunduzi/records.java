@@ -126,20 +126,24 @@ public class records extends AppCompatActivity {
         TextView tt = (TextView) findViewById(R.id.plotLabel);
         String title = "";
 
-        title = getString(R.string.cropsTitle) + ": " + cropNames;
-        title += "\n";
-        title += getString(R.string.pestControlTitle) + ": " + pestControlNames;
-        title += "\n";
-        title += getString(R.string.soilManagementTitle) + ": " + soilManagementNames;
+        if(plot>=0) {
+            title = getString(R.string.cropsTitle) + ": " + cropNames;
+            title += "\n";
+            title += getString(R.string.pestControlTitle) + ": " + pestControlNames;
+            title += "\n";
+            title += getString(R.string.soilManagementTitle) + ": " + soilManagementNames;
 
-        if (!pestControlNames.equals(getString(R.string.textNone)) && !soilManagementNames.equals(getString(R.string.textNone))) {
-            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControl));
-        } else if (!pestControlNames.equals(getString(R.string.textNone)) && soilManagementNames.equals(getString(R.string.textNone))) {
-            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillPestControl));
-        } else if (pestControlNames.equals(getString(R.string.textNone)) && !soilManagementNames.equals(getString(R.string.textNone))) {
-            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagement));
+            if (!pestControlNames.equals(getString(R.string.textNone)) && !soilManagementNames.equals(getString(R.string.textNone))) {
+                tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControl));
+            } else if (!pestControlNames.equals(getString(R.string.textNone)) && soilManagementNames.equals(getString(R.string.textNone))) {
+                tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillPestControl));
+            } else if (pestControlNames.equals(getString(R.string.textNone)) && !soilManagementNames.equals(getString(R.string.textNone))) {
+                tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagement));
+            } else {
+                tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillDefault));
+            }
         } else {
-            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillDefault));
+            //TODO: farm title
         }
 
         tt.setText(title);
@@ -152,7 +156,7 @@ public class records extends AppCompatActivity {
 
         fillRecyclerView();
 
-        if (farmVersion < maxVersion) {
+        if (farmVersion < maxVersion || plot==-1) {
             TableLayout tl = (TableLayout) findViewById(R.id.actionsTable);
             tl.setVisibility(View.GONE);
         }
@@ -837,7 +841,7 @@ public class records extends AppCompatActivity {
     }
 
     public void editItem(View v) {
-        if (farmVersion == maxVersion) {
+        if (farmVersion == maxVersion || plot==-1) {
             final int n = (int) v.getTag();
             if (n >= 0) {
                 TextView tv = (TextView) v;
