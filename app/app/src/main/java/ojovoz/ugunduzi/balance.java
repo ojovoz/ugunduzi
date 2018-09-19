@@ -33,6 +33,7 @@ public class balance extends AppCompatActivity {
     public int farmVersion;
     public int maxVersion;
     public int plot;
+    public String farmDate;
 
     public String cropNames;
     public String pestControlNames;
@@ -68,6 +69,7 @@ public class balance extends AppCompatActivity {
         farmVersion = getIntent().getExtras().getInt("farmVersion");
         maxVersion = getIntent().getExtras().getInt("maxVersion");
         plot = getIntent().getExtras().getInt("plot");
+        farmDate = getIntent().getExtras().getString("farmDate");
 
         cropNames = getIntent().getExtras().getString("cropNames");
         pestControlNames = getIntent().getExtras().getString("pestControlNames");
@@ -283,6 +285,7 @@ public class balance extends AppCompatActivity {
             i.putExtra("farmId", farmId);
             i.putExtra("farmVersion", farmVersion);
             i.putExtra("maxVersion", maxVersion);
+            i.putExtra("farmDate", farmDate);
             i.putExtra("plot", plot);
             i.putExtra("cropNames", cropNames);
             i.putExtra("pestControlNames", pestControlNames);

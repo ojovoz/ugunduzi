@@ -58,6 +58,7 @@ public class pictureSound extends AppCompatActivity {
     public int farmVersion;
     public int maxVersion;
     public int plot;
+    public String farmDate;
 
     String cropNames;
     String pestControlNames;
@@ -83,6 +84,7 @@ public class pictureSound extends AppCompatActivity {
         farmVersion = getIntent().getExtras().getInt("farmVersion");
         maxVersion = getIntent().getExtras().getInt("maxVersion");
         plot = getIntent().getExtras().getInt("plot");
+        farmDate = getIntent().getExtras().getString("farmDate");
 
         cropNames = getIntent().getExtras().getString("cropNames");
         pestControlNames = getIntent().getExtras().getString("pestControlNames");
@@ -220,6 +222,7 @@ public class pictureSound extends AppCompatActivity {
         i.putExtra("farmVersion", farmVersion);
         i.putExtra("maxVersion", maxVersion);
         i.putExtra("plot",plot);
+        i.putExtra("farmDate", farmDate);
         i.putExtra("cropNames",cropNames);
         i.putExtra("pestControlNames",pestControlNames);
         i.putExtra("soilManagementNames",soilManagementNames);

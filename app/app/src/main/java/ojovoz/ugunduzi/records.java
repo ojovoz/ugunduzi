@@ -57,6 +57,7 @@ public class records extends AppCompatActivity {
     public int farmVersion;
     public int maxVersion;
     public int plot;
+    public String farmDate;
 
     public String cropNames;
     public String pestControlNames;
@@ -115,6 +116,7 @@ public class records extends AppCompatActivity {
         farmVersion = getIntent().getExtras().getInt("farmVersion");
         maxVersion = getIntent().getExtras().getInt("maxVersion");
         plot = getIntent().getExtras().getInt("plot");
+        farmDate = getIntent().getExtras().getString("farmDate");
 
         cropNames = getIntent().getExtras().getString("cropNames");
         pestControlNames = getIntent().getExtras().getString("pestControlNames");
@@ -143,16 +145,22 @@ public class records extends AppCompatActivity {
                 tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillDefault));
             }
         } else {
-            //TODO: farm title
+            title = farmName;
+            if(farmVersion<maxVersion){
+                title += ": " + farmDate;
+            }
+            tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorPrimary));
+            tt.setTextColor(ContextCompat.getColor(this,R.color.colorWhite));
         }
 
         tt.setText(title);
 
         dataItemDate = new Date();
         unitsList = new ArrayList<>();
-        currentPlot = getCurrentPlot();
-
-        getDataItemsList();
+        if(plot>=0) {
+            currentPlot = getCurrentPlot();
+            getDataItemsList();
+        }
 
         fillRecyclerView();
 
@@ -283,6 +291,7 @@ public class records extends AppCompatActivity {
         i.putExtra("farmVersion", farmVersion);
         i.putExtra("maxVersion", maxVersion);
         i.putExtra("plot", plot);
+        i.putExtra("farmDate", farmDate);
         i.putExtra("cropNames", cropNames);
         i.putExtra("pestControlNames", pestControlNames);
         i.putExtra("soilManagementNames", soilManagementNames);
@@ -789,22 +798,22 @@ public class records extends AppCompatActivity {
         oPlot p = pm.getPlotFromId(l.plotId);
 
         String title = getString(R.string.cropsTitle) + ": " + p.getCropNames(this);
-        title += "\n";
-        title += getString(R.string.pestControlTitle) + ": " + p.getPestControlNames(this);
-        title += "\n";
-        title += getString(R.string.soilManagementTitle) + ": " + p.getSoilManagementNames(this);
+        String treatments = "";
 
         if (p.pestControlIngredients.size() > 0 && p.soilManagementIngredients.size() > 0) {
-            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControl);
+            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControlFaded);
+            treatments = "\n" + getString(R.string.soilManagementTitle) + ", " + getString(R.string.pestControlTitle);
         } else if (p.pestControlIngredients.size() > 0 && p.soilManagementIngredients.size() == 0) {
-            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillPestControl);
+            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillPestControlFaded);
+            treatments = "\n" + getString(R.string.pestControlTitle);
         } else if (p.pestControlIngredients.size() == 0 && p.soilManagementIngredients.size() > 0) {
-            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillSoilManagement);
+            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillSoilManagementFaded);
+            treatments = "\n" + getString(R.string.soilManagementTitle);
         } else {
-            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillDefault);
+            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillFaded);
         }
 
-        c.info = title;
+        c.info = title + treatments;
     }
 
     public String getDataItemText(oLog l) {
@@ -841,7 +850,7 @@ public class records extends AppCompatActivity {
     }
 
     public void editItem(View v) {
-        if (farmVersion == maxVersion || plot>=0) {
+        if (farmVersion == maxVersion && plot>=0) {
             final int n = (int) v.getTag();
             if (n >= 0) {
                 TextView tv = (TextView) v;
@@ -1085,6 +1094,7 @@ public class records extends AppCompatActivity {
         i.putExtra("farmVersion", farmVersion);
         i.putExtra("maxVersion", maxVersion);
         i.putExtra("plot", plot);
+        i.putExtra("farmDate", farmDate);
         i.putExtra("cropNames", cropNames);
         i.putExtra("pestControlNames", pestControlNames);
         i.putExtra("soilManagementNames", soilManagementNames);

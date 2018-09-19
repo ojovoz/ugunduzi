@@ -1013,6 +1013,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     }
 
     public void goToPlotRecords(){
+        dateHelper dH = new dateHelper();
         final Context context = this;
         Intent i = new Intent(context, records.class);
         i.putExtra("user", user);
@@ -1023,6 +1024,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         i.putExtra("farmVersion", currentFarm.version);
         i.putExtra("maxVersion", maxVersion);
         i.putExtra("plot", plotMatrix.currentPlot.id);
+        i.putExtra("farmDate", dH.dateToString(currentFarm.dateCreated));
         i.putExtra("cropNames", plotMatrix.currentPlot.getCropNames(this));
         i.putExtra("pestControlNames", plotMatrix.currentPlot.getPestControlNames(this));
         i.putExtra("soilManagementNames", plotMatrix.currentPlot.getSoilManagementNames(this));
@@ -1033,7 +1035,25 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     }
 
     public void goToFarmRecords() {
-
+        dateHelper dH = new dateHelper();
+        final Context context = this;
+        Intent i = new Intent(context, records.class);
+        i.putExtra("user", user);
+        i.putExtra("userId", userId);
+        i.putExtra("userPass", userPass);
+        i.putExtra("farmName", farmName);
+        i.putExtra("farmId", farmId);
+        i.putExtra("farmVersion", currentFarm.version);
+        i.putExtra("maxVersion", maxVersion);
+        i.putExtra("plot", -1);
+        i.putExtra("farmDate", dH.dateToString(currentFarm.dateCreated));
+        i.putExtra("cropNames", plotMatrix.currentPlot.getCropNames(this));
+        i.putExtra("pestControlNames", plotMatrix.currentPlot.getPestControlNames(this));
+        i.putExtra("soilManagementNames", plotMatrix.currentPlot.getSoilManagementNames(this));
+        i.putExtra("displayWidth", displayWidth);
+        i.putExtra("displayHeight", displayHeight);
+        startActivity(i);
+        finish();
     }
 
     public void updateFarmData(String fName, float fSize) {
