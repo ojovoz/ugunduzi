@@ -1,6 +1,7 @@
 package ojovoz.ugunduzi;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -340,7 +341,46 @@ public class balance extends AppCompatActivity {
             }
         }
 
-        //same for treatment ingredients and other costs
+        if(treatmentBalanceItems.size() > 0){
+            oCardData cTreatments = new oCardData();
+            cTreatments.id = -1;
+            cTreatments.plotInfoColor = ContextCompat.getColor(this, R.color.colorPrimaryLight);
+            cTreatments.info = getString(R.string.treatmentIngredientsPhrase);
+            ret.add(cTreatments);
+
+            Iterator<oBalance> treatmentBalanceIterator = treatmentBalanceItems.iterator();
+            while (treatmentBalanceIterator.hasNext()) {
+                oBalance b = treatmentBalanceIterator.next();
+                oCardData c = new oCardData();
+                c.id = -1;
+                c.info = b.treatmentIngredient.name + "\n" + getString(R.string.balanceWord) + ": " + b.cost + " " + getDefaultCostUnits();
+                c.plotInfoColor = (b.treatmentIngredient.getTreatmentIngredientCategory(b.treatmentIngredient.id,this) == 0) ?
+                        ContextCompat.getColor(this,R.color.colorFillPestControlFaded) :
+                        (b.treatmentIngredient.getTreatmentIngredientCategory(b.treatmentIngredient.id,this) == 1) ?
+                        ContextCompat.getColor(this,R.color.colorFillSoilManagementFaded) : ContextCompat.getColor(this,R.color.colorWhite);
+                ret.add(c);
+                n++;
+            }
+        }
+
+        if(otherBalanceItems.size() > 0){
+            oCardData cOther = new oCardData();
+            cOther.id = -1;
+            cOther.plotInfoColor = ContextCompat.getColor(this, R.color.colorPrimaryLight);
+            cOther.info = getString(R.string.otherWord);
+            ret.add(cOther);
+
+            Iterator<oBalance> otherBalanceIterator = otherBalanceItems.iterator();
+            while (otherBalanceIterator.hasNext()) {
+                oBalance b = otherBalanceIterator.next();
+                oCardData c = new oCardData();
+                c.id = -1;
+                c.info = b.treatmentIngredient.name + "\n" + getString(R.string.balanceWord) + ": " + b.cost + " " + getDefaultCostUnits();
+                c.plotInfoColor = (n%2==0) ? ContextCompat.getColor(this,R.color.colorFillFaded) : ContextCompat.getColor(this,R.color.colorWhite);
+                ret.add(c);
+                n++;
+            }
+        }
 
         return ret;
     }

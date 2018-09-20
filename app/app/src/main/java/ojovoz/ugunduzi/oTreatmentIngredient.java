@@ -50,6 +50,26 @@ public class oTreatmentIngredient {
         return ret;
     }
 
+    public int getTreatmentIngredientCategory(int id, Context c){
+        int ret=-1;
+        csvFileManager treatmentIngredientList;
+
+        treatmentIngredientList = new csvFileManager("treatment_ingredients");
+        List<String[]> treatmentIngredientsCSV = treatmentIngredientList.read(context);
+        if(treatmentIngredientsCSV!=null) {
+            Iterator<String[]> iterator = treatmentIngredientsCSV.iterator();
+            while (iterator.hasNext()) {
+                String[] record = iterator.next();
+                if(Integer.parseInt(record[0])==id){
+                    oTreatment t = new oTreatment(c);
+                    ret = t.getTreatmentCategoryFromId(Integer.parseInt(record[1]));
+                    break;
+                }
+            }
+        }
+        return ret;
+    }
+
     public ArrayList<String> getTreatmentIngredientNames(ArrayList<oTreatmentIngredient> list){
         ArrayList<String> ret = new ArrayList<>();
 

@@ -134,4 +134,6 @@
     <string name="sizeUnits">acres</string>
     <string name="recordsActivity">Records</string>
     <string name="totalWord">Total</string>
+    <string name="treatmentIngredientsPhrase">Treatment ingredients</string>
+    <string name="otherWord">Other</string>
 </resources>
