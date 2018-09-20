@@ -53,13 +53,13 @@
         <activity
             android:name=".records"
             android:screenOrientation="portrait"
-            android:label="@string/financeActivity"
+            android:label="@string/recordsActivity"
             android:launchMode="singleTop">
         </activity>
         <activity
             android:name=".balance"
             android:screenOrientation="portrait"
-            android:label="@string/balanceActivity"
+            android:label="@string/balanceWord"
             android:launchMode="singleTop">
         </activity>
     </application>

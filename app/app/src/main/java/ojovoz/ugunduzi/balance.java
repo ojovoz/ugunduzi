@@ -16,6 +16,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -115,8 +117,8 @@ public class balance extends AppCompatActivity {
         date1 = minDate;
         date2 = maxDate;
 
-        bDate1 = (Button)findViewById(R.id.date1Button);
-        bDate2 = (Button)findViewById(R.id.date2Button);
+        bDate1 = (Button) findViewById(R.id.date1Button);
+        bDate2 = (Button) findViewById(R.id.date2Button);
 
         bDate1.setText(dH.dateToString(date1));
         bDate2.setText(dH.dateToString(date2));
@@ -124,14 +126,14 @@ public class balance extends AppCompatActivity {
         bDate1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                displayDatePicker(1,view);
+                displayDatePicker(1, view);
             }
         });
 
         bDate2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                displayDatePicker(2,view);
+                displayDatePicker(2, view);
             }
         });
 
@@ -147,11 +149,7 @@ public class balance extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(android.view.Menu menu) {
         menu.clear();
-        if(plot==-1){
-            menu.add(0, 0, 0, R.string.opGoBackToFarm);
-        } else {
-            menu.add(0, 0, 0, R.string.opGoBack);
-        }
+        menu.add(0, 0, 0, R.string.opGoBack);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -188,7 +186,7 @@ public class balance extends AppCompatActivity {
         }
     }
 
-    public void displayDatePicker(int n, View view){
+    public void displayDatePicker(int n, View view) {
         Calendar calMax;
         Calendar calMin;
 
@@ -200,7 +198,7 @@ public class balance extends AppCompatActivity {
 
         DatePicker dp = (DatePicker) dialogDate.findViewById(R.id.datePicker);
         Calendar calActivity = Calendar.getInstance();
-        if(which==1) {
+        if (which == 1) {
             calActivity.setTime(date1);
             calMax = Calendar.getInstance();
             calMax.setTime(date2);
@@ -231,11 +229,11 @@ public class balance extends AppCompatActivity {
 
                 Date nd = calendar.getTime();
 
-                if(which==1){
-                    date1=nd;
+                if (which == 1) {
+                    date1 = nd;
                     bDate1.setText(dH.dateToString(nd));
                 } else {
-                    date2=nd;
+                    date2 = nd;
                     bDate2.setText(dH.dateToString(nd));
                 }
 
@@ -256,44 +254,160 @@ public class balance extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
-    public List<oCardData> cardDataFromLog(){
+    public List<oCardData> cardDataFromLog() {
         List<oCardData> ret = new ArrayList<>();
-        //get aggregate financial data for each crop, treatment ingredient and other activities between date1 and date2
-        //id's have to be -1
+        ArrayList<oBalance> balanceItems = new ArrayList<>();
+        float total = 0.0f;
+        Iterator<oLog> logIterator = logList.iterator();
+        while (logIterator.hasNext()) {
+            oBalance b;
+            oLog l = logIterator.next();
+            if ((l.date == date1 || l.date.after(date1)) && (l.date == date2 || l.date.before(date2))) {
+                b = findBalanceItem(balanceItems, l.crop, l.treatmentIngredient, l.dataItem);
+                if (b == null) {
+                    b = new oBalance();
+                    b.crop = l.crop;
+                    b.treatmentIngredient = l.treatmentIngredient;
+                    b.dataItem = l.dataItem;
+                }
+                b.cost = (l.dataItem.type == 3) ? b.cost + l.value : b.cost - l.value;
+                balanceItems.add(b);
+            }
+        }
+
+        ArrayList<oBalance> cropBalanceItems = new ArrayList<>();
+        ArrayList<oBalance> treatmentBalanceItems = new ArrayList<>();
+        ArrayList<oBalance> otherBalanceItems = new ArrayList<>();
+
+        Iterator<oBalance> balanceIterator = balanceItems.iterator();
+        while (balanceIterator.hasNext()) {
+            oBalance b = balanceIterator.next();
+            if (b.crop != null) {
+                cropBalanceItems.add(b);
+            } else if (b.treatmentIngredient != null) {
+                treatmentBalanceItems.add(b);
+            } else {
+                otherBalanceItems.add(b);
+            }
+            total += b.cost;
+        }
+
+        Collections.sort(cropBalanceItems, new Comparator<oBalance>() {
+            @Override
+            public int compare(oBalance b1, oBalance b2) {
+                return b1.crop.name.compareTo(b2.crop.name);
+            }
+        });
+
+        Collections.sort(treatmentBalanceItems, new Comparator<oBalance>() {
+            @Override
+            public int compare(oBalance b1, oBalance b2) {
+                return b1.treatmentIngredient.name.compareTo(b2.treatmentIngredient.name);
+            }
+        });
+
+        Collections.sort(otherBalanceItems, new Comparator<oBalance>() {
+            @Override
+            public int compare(oBalance b1, oBalance b2) {
+                return b1.dataItem.name.compareTo(b2.dataItem.name);
+            }
+        });
+
+        oCardData cTotal = new oCardData();
+        cTotal.id = -1;
+        cTotal.plotInfoColor = ContextCompat.getColor(this, R.color.colorAccent);
+        cTotal.info = getString(R.string.totalWord) + ": " + String.valueOf(total);
+        ret.add(cTotal);
+
+        int n=0;
+
+        if (cropBalanceItems.size() > 0) {
+            oCardData cCrops = new oCardData();
+            cCrops.id = -1;
+            cCrops.plotInfoColor = ContextCompat.getColor(this, R.color.colorPrimaryLight);
+            cCrops.info = getString(R.string.cropsTitle);
+            ret.add(cCrops);
+
+            Iterator<oBalance> cropBalanceIterator = cropBalanceItems.iterator();
+            while (cropBalanceIterator.hasNext()) {
+                oBalance b = cropBalanceIterator.next();
+                oCardData c = new oCardData();
+                c.id = -1;
+                c.info = b.crop.name + "\n" + getString(R.string.balanceWord) + ": " + b.cost + " " + getDefaultCostUnits();
+                c.plotInfoColor = (n%2==0) ? ContextCompat.getColor(this,R.color.colorFillFaded) : ContextCompat.getColor(this,R.color.colorWhite);
+                ret.add(c);
+                n++;
+            }
+        }
+
+        //same for treatment ingredients and other costs
+
         return ret;
     }
 
-    public void goBack(){
-        if(plot==-1){
-            Intent i = new Intent(this, farmInterface.class);
-            i.putExtra("user", user);
-            i.putExtra("userId", userId);
-            i.putExtra("userPass", userPass);
-            i.putExtra("farmName", farmName);
-            i.putExtra("farmId", farmId);
-            i.putExtra("farmVersion", farmVersion);
-            i.putExtra("newFarm", false);
-            i.putExtra("firstFarm", false);
-            startActivity(i);
-            finish();
-        } else {
-            Intent i = new Intent(this, records.class);
-            i.putExtra("user", user);
-            i.putExtra("userId", userId);
-            i.putExtra("userPass", userPass);
-            i.putExtra("farmName", farmName);
-            i.putExtra("farmId", farmId);
-            i.putExtra("farmVersion", farmVersion);
-            i.putExtra("maxVersion", maxVersion);
-            i.putExtra("farmDate", farmDate);
-            i.putExtra("plot", plot);
-            i.putExtra("cropNames", cropNames);
-            i.putExtra("pestControlNames", pestControlNames);
-            i.putExtra("soilManagementNames", soilManagementNames);
-            i.putExtra("displayWidth", displayWidth);
-            i.putExtra("displayHeight", displayHeight);
-            startActivity(i);
-            finish();
+    public oBalance findBalanceItem(ArrayList<oBalance> balanceItems, oCrop c, oTreatmentIngredient t, oDataItem d) {
+        oBalance ret = null;
+        Iterator<oBalance> iterator = balanceItems.iterator();
+        while (iterator.hasNext()) {
+            oBalance b = iterator.next();
+            if (c != null) {
+                if (b.crop.id == c.id) {
+                    ret = b;
+                    break;
+                }
+            } else if (t != null) {
+                if (b.treatmentIngredient.id == t.id) {
+                    ret = b;
+                    break;
+                }
+            } else if (d != null) {
+                if (b.dataItem.id == d.id) {
+                    ret = b;
+                    break;
+                }
+            }
+        }
+        return ret;
+    }
+
+    public void goBack() {
+        Intent i = new Intent(this, records.class);
+        i.putExtra("user", user);
+        i.putExtra("userId", userId);
+        i.putExtra("userPass", userPass);
+        i.putExtra("farmName", farmName);
+        i.putExtra("farmId", farmId);
+        i.putExtra("farmVersion", farmVersion);
+        i.putExtra("maxVersion", maxVersion);
+        i.putExtra("farmDate", farmDate);
+        i.putExtra("plot", plot);
+        i.putExtra("cropNames", cropNames);
+        i.putExtra("pestControlNames", pestControlNames);
+        i.putExtra("soilManagementNames", soilManagementNames);
+        i.putExtra("displayWidth", displayWidth);
+        i.putExtra("displayHeight", displayHeight);
+        startActivity(i);
+        finish();
+    }
+
+    public CharSequence getDefaultCostUnits() {
+        CharSequence ret = "";
+        oUnit u = new oUnit(this);
+        ret = u.getUnitNames(2).get(0);
+        return ret;
+    }
+
+    private class oBalance {
+        public oCrop crop;
+        public oTreatmentIngredient treatmentIngredient;
+        public oDataItem dataItem;
+        public float cost;
+
+        oBalance() {
+            crop = null;
+            treatmentIngredient = null;
+            dataItem = null;
+            cost = 0.0f;
         }
     }
 }

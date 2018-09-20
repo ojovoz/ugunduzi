@@ -123,7 +123,7 @@
     <string name="opDeleteFarm">Delete farm</string>
     <string name="deleteThisFarmConfirmMessage">Do you really want to delete this farm?</string>
     <string name="financeActivity">Finance</string>
-    <string name="balanceActivity">Balance</string>
+    <string name="balanceWord">Balance</string>
     <string name="chooseCropButtonLabel">CHOOSE A CROP</string>
     <string name="chooseTreatmentButtonLabel">CHOOSE A TREATMENT</string>
     <string name="placeholderQuantity">Quantity</string>
@@ -132,4 +132,6 @@
     <string name="opFarmBalance">Farm balance</string>
     <string name="opUploadRecords">Upload records</string>
     <string name="sizeUnits">acres</string>
+    <string name="recordsActivity">Records</string>
+    <string name="totalWord">Total</string>
 </resources>

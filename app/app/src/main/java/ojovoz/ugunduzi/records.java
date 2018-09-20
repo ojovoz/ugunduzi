@@ -125,6 +125,8 @@ public class records extends AppCompatActivity {
         displayWidth = getIntent().getExtras().getInt("displayWidth");
         displayHeight = getIntent().getExtras().getInt("displayHeight");
 
+        setTitle(getTitle()+ ": " + farmName);
+
         TextView tt = (TextView) findViewById(R.id.plotLabel);
         String title = "";
 
