@@ -46,6 +46,9 @@ public class oRecyclerViewAdapter extends RecyclerView.Adapter<oCardViewHolder> 
         } else {
             holder.cb.setVisibility(View.GONE);
         }
+
+        holder.info.setTextColor(list.get(position).infoColor);
+
         holder.info.setText(list.get(position).info);
 
         holder.cv.setBackgroundColor(list.get(position).plotInfoColor);

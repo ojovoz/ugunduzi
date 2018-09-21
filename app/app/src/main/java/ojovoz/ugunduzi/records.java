@@ -153,6 +153,8 @@ public class records extends AppCompatActivity {
             }
             tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorPrimary));
             tt.setTextColor(ContextCompat.getColor(this,R.color.colorWhite));
+
+            tt.setTextSize(18);
         }
 
         tt.setText(title);
@@ -184,7 +186,9 @@ public class records extends AppCompatActivity {
         if (nSelected > 0) {
             menu.add(0, 0, 0, R.string.opDeleteSelectedItems);
         }
-        menu.add(1, 1, 1, R.string.opBalance);
+        if(logList.size()>0) {
+            menu.add(1, 1, 1, R.string.opBalance);
+        }
         menu.add(2, 2, 2, R.string.opUploadRecords);
         menu.add(3, 3, 3, R.string.opGoBackToFarm);
         return super.onPrepareOptionsMenu(menu);

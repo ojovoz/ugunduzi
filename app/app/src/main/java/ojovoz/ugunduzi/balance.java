@@ -108,7 +108,9 @@ public class balance extends AppCompatActivity {
             logList = l.createLog(farmId, farmVersion, userId, 0);
 
             title = farmName;
-            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillDefault));
+            tt.setTextSize(18);
+            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+            tt.setTextColor(ContextCompat.getColor(this, R.color.colorWhite));
         }
 
         tt.setText(title);
@@ -226,7 +228,8 @@ public class balance extends AppCompatActivity {
                 int month = dp.getMonth();
                 int year = dp.getYear();
                 Calendar calendar = Calendar.getInstance();
-                calendar.set(year, month, day);
+                calendar.set(year, month, day, 0, 0, 0);
+                calendar.set(Calendar.MILLISECOND, 0);
 
                 Date nd = calendar.getTime();
 
@@ -263,7 +266,7 @@ public class balance extends AppCompatActivity {
         while (logIterator.hasNext()) {
             oBalance b;
             oLog l = logIterator.next();
-            if ((l.date == date1 || l.date.after(date1)) && (l.date == date2 || l.date.before(date2))) {
+            if ((l.date.equals(date1) || l.date.after(date1)) && (l.date.equals(date2) || l.date.before(date2))) {
                 b = findBalanceItem(balanceItems, l.crop, l.treatmentIngredient, l.dataItem);
                 if (b == null) {
                     b = new oBalance();
@@ -314,19 +317,17 @@ public class balance extends AppCompatActivity {
             }
         });
 
-        oCardData cTotal = new oCardData();
-        cTotal.id = -1;
-        cTotal.plotInfoColor = ContextCompat.getColor(this, R.color.colorAccent);
-        cTotal.info = getString(R.string.totalWord) + ": " + String.valueOf(total);
-        ret.add(cTotal);
+        TextView tv = (TextView)findViewById(R.id.totalLabel);
+        tv.setText(getString(R.string.totalWord) + ": " + String.valueOf(total));
 
         int n=0;
 
         if (cropBalanceItems.size() > 0) {
             oCardData cCrops = new oCardData();
             cCrops.id = -1;
-            cCrops.plotInfoColor = ContextCompat.getColor(this, R.color.colorPrimaryLight);
+            cCrops.plotInfoColor = ContextCompat.getColor(this, R.color.colorPrimary);
             cCrops.info = getString(R.string.cropsTitle);
+            cCrops.infoColor = ContextCompat.getColor(this, R.color.colorWhite);
             ret.add(cCrops);
 
             Iterator<oBalance> cropBalanceIterator = cropBalanceItems.iterator();
@@ -336,6 +337,7 @@ public class balance extends AppCompatActivity {
                 c.id = -1;
                 c.info = b.crop.name + "\n" + getString(R.string.balanceWord) + ": " + b.cost + " " + getDefaultCostUnits();
                 c.plotInfoColor = (n%2==0) ? ContextCompat.getColor(this,R.color.colorFillFaded) : ContextCompat.getColor(this,R.color.colorWhite);
+                c.infoColor=ContextCompat.getColor(this, R.color.colorBlack);
                 ret.add(c);
                 n++;
             }
@@ -344,8 +346,9 @@ public class balance extends AppCompatActivity {
         if(treatmentBalanceItems.size() > 0){
             oCardData cTreatments = new oCardData();
             cTreatments.id = -1;
-            cTreatments.plotInfoColor = ContextCompat.getColor(this, R.color.colorPrimaryLight);
+            cTreatments.plotInfoColor = ContextCompat.getColor(this, R.color.colorPrimary);
             cTreatments.info = getString(R.string.treatmentIngredientsPhrase);
+            cTreatments.infoColor = ContextCompat.getColor(this, R.color.colorWhite);
             ret.add(cTreatments);
 
             Iterator<oBalance> treatmentBalanceIterator = treatmentBalanceItems.iterator();
@@ -358,6 +361,7 @@ public class balance extends AppCompatActivity {
                         ContextCompat.getColor(this,R.color.colorFillPestControlFaded) :
                         (b.treatmentIngredient.getTreatmentIngredientCategory(b.treatmentIngredient.id,this) == 1) ?
                         ContextCompat.getColor(this,R.color.colorFillSoilManagementFaded) : ContextCompat.getColor(this,R.color.colorWhite);
+                c.infoColor=ContextCompat.getColor(this, R.color.colorBlack);
                 ret.add(c);
                 n++;
             }
@@ -366,8 +370,9 @@ public class balance extends AppCompatActivity {
         if(otherBalanceItems.size() > 0){
             oCardData cOther = new oCardData();
             cOther.id = -1;
-            cOther.plotInfoColor = ContextCompat.getColor(this, R.color.colorPrimaryLight);
+            cOther.plotInfoColor = ContextCompat.getColor(this, R.color.colorPrimary);
             cOther.info = getString(R.string.otherWord);
+            cOther.infoColor = ContextCompat.getColor(this, R.color.colorWhite);
             ret.add(cOther);
 
             Iterator<oBalance> otherBalanceIterator = otherBalanceItems.iterator();
@@ -375,8 +380,9 @@ public class balance extends AppCompatActivity {
                 oBalance b = otherBalanceIterator.next();
                 oCardData c = new oCardData();
                 c.id = -1;
-                c.info = b.treatmentIngredient.name + "\n" + getString(R.string.balanceWord) + ": " + b.cost + " " + getDefaultCostUnits();
+                c.info = b.dataItem.name + "\n" + getString(R.string.balanceWord) + ": " + b.cost + " " + getDefaultCostUnits();
                 c.plotInfoColor = (n%2==0) ? ContextCompat.getColor(this,R.color.colorFillFaded) : ContextCompat.getColor(this,R.color.colorWhite);
+                c.infoColor=ContextCompat.getColor(this, R.color.colorBlack);
                 ret.add(c);
                 n++;
             }
@@ -390,17 +396,17 @@ public class balance extends AppCompatActivity {
         Iterator<oBalance> iterator = balanceItems.iterator();
         while (iterator.hasNext()) {
             oBalance b = iterator.next();
-            if (c != null) {
+            if (c != null && b.crop != null) {
                 if (b.crop.id == c.id) {
                     ret = b;
                     break;
                 }
-            } else if (t != null) {
+            } else if (t != null && b.treatmentIngredient != null) {
                 if (b.treatmentIngredient.id == t.id) {
                     ret = b;
                     break;
                 }
-            } else if (d != null) {
+            } else if (d != null && b.dataItem != null) {
                 if (b.dataItem.id == d.id) {
                     ret = b;
                     break;

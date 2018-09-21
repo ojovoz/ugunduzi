@@ -69,10 +69,24 @@
 
     </TableLayout>
 
+    <TextView
+        android:id="@+id/totalLabel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="3dp"
+        android:paddingLeft="3dp"
+        android:paddingRight="3dp"
+        android:paddingTop="3dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/colorAccent"
+        android:textColor="@color/colorBlack"
+        android:textSize="18dp" />
+
     <android.support.v7.widget.RecyclerView
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"/>
 
 </LinearLayout>
