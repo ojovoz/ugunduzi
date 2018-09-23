@@ -443,6 +443,10 @@ public class balance extends AppCompatActivity {
         return ret;
     }
 
+    public void editItem(View v){
+
+    }
+
     private class oBalance {
         public oCrop crop;
         public oTreatmentIngredient treatmentIngredient;
