@@ -10,7 +10,6 @@
 
 
     <TextView
-        android:id="@+id/newFarmNameLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/newFarmNameLabel"
@@ -29,7 +28,6 @@
         android:textColor="@color/colorBlack" />
 
     <TextView
-        android:id="@+id/enterAcresLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"

@@ -280,7 +280,7 @@ public class oFarm {
         farms.deleteLines(context, delete);
     }
 
-    public void updateFarmstatus(int[] delete, int status) {
+    public void updateFarmStatus(int[] delete, int status) {
         csvFileManager farms = new csvFileManager("farms");
         farms.updateStatus(context, delete, status);
     }
@@ -289,6 +289,39 @@ public class oFarm {
         oLog l = new oLog(context);
         ArrayList<oLog> logList = l.createLog(id,version,-1,2);
         return (logList.size()>0);
+    }
+
+    public int [] getFarmsPendingDelete(int userId){
+        ArrayList<oFarm> farms = getFarms(userId,-1);
+        int [] deleteList = new int[farms.size()];
+
+        Iterator<oFarm> iterator = farms.iterator();
+        int n=0;
+        while(iterator.hasNext()){
+            oFarm f = iterator.next();
+            if(f.status==1){
+                deleteList[n]=f.id;
+            } else {
+                deleteList[n]=-1;
+            }
+            n++;
+        }
+        return deleteList;
+    }
+
+    public ArrayList<oFarm> getFarmsPendingSave(int userId){
+        ArrayList<oFarm> ret = new ArrayList<>();
+        ArrayList<oFarm> farms = getFarms(userId,-1);
+
+        Iterator<oFarm> iterator = farms.iterator();
+        while(iterator.hasNext()){
+            oFarm f = iterator.next();
+            if(f.status==0){
+                ret.add(f);
+            }
+        }
+
+        return ret;
     }
 
 }

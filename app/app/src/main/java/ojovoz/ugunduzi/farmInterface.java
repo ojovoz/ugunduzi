@@ -441,7 +441,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     public void markDeletedFarm() {
         oFarm f = new oFarm(this);
         int[] idsToDelete = f.getFarmLineList(userId, farmId);
-        f.updateFarmstatus(idsToDelete, 1);
+        f.updateFarmStatus(idsToDelete, 1);
         deleteFarmLogs(farmId);
     }
 

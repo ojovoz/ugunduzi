@@ -59,10 +59,10 @@ public class oPlotMatrix {
         for(int i=0;i<matrixItems.length;i+=8){
             plot=new oPlot();
             plot.id=Integer.parseInt(matrixItems[i]);
-            plot.x=Integer.parseInt(matrixItems[i+1])*(int)(displayWidth/4);
-            plot.y=Integer.parseInt(matrixItems[i+2])*(int)(displayHeight/4);
-            plot.w=Integer.parseInt(matrixItems[i+3])*(int)(displayWidth/4);
-            plot.h=Integer.parseInt(matrixItems[i+4])*(int)(displayHeight/4);
+            plot.x=Integer.parseInt(matrixItems[i+1])* displayWidth/4;
+            plot.y=Integer.parseInt(matrixItems[i+2])* displayHeight/4;
+            plot.w=Integer.parseInt(matrixItems[i+3])* displayWidth/4;
+            plot.h=Integer.parseInt(matrixItems[i+4])* displayHeight/4;
             String crops=matrixItems[i+5];
             if(!crops.equals("-1")) {
                 String plotCropsList[] = crops.split("\\|");
@@ -89,7 +89,7 @@ public class oPlotMatrix {
             }
             plot.addAreas(iMoveW, iMoveH, iResizeW, iResizeH, iContentsW, iContentsH, iActionsW, iActionsH);
             plots.add(plot);
-            addPlotToMatrix(plot,(int)(plot.x/(displayWidth/4)),(int)(plot.y/(displayHeight/4)),(int)(plot.w/(displayWidth/4))+(int)(plot.x/(displayWidth/4)),(int)(plot.h/(displayHeight/4))+(int)(plot.y/(displayHeight/4)));
+            addPlotToMatrix(plot, plot.x/(displayWidth/4), plot.y/(displayHeight/4),(int)(plot.w/(displayWidth/4))+ plot.x/(displayWidth/4),(int)(plot.h/(displayHeight/4))+ plot.y/(displayHeight/4));
         }
     }
 
@@ -194,19 +194,11 @@ public class oPlotMatrix {
                     return true;
                 } else {
                     ghostPlot = null;
-                    if(state==1 && currentPlot.state==1){
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return state == 1 && currentPlot.state == 1;
                 }
             } else {
                 ghostPlot = null;
-                if(state==1){
-                    return true;
-                } else {
-                    return false;
-                }
+                return state == 1;
             }
 
         } else if (e.getActionMasked() == MotionEvent.ACTION_UP) {

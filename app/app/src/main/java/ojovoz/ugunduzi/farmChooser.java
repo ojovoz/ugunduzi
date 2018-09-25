@@ -244,7 +244,7 @@ public class farmChooser extends AppCompatActivity implements httpConnection.Asy
         int [] farmIds = new int[ids.length];
         for(int i=0;i<ids.length;i++){
             int[] idsToDelete = f.getFarmLineList(userId,Integer.valueOf(ids[i]));
-            f.updateFarmstatus(idsToDelete,1);
+            f.updateFarmStatus(idsToDelete,1);
             farmIds[i]=Integer.valueOf(ids[i]);
         }
         deleteFarmLogs(farmIds);
