@@ -315,7 +315,7 @@ public class oLog {
                 }
             }
             if(bFound){
-                delete[n]=n;
+                delete[n]=l.line;
             } else {
                 delete[n]=-1;
             }

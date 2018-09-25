@@ -45,7 +45,7 @@ import java.util.List;
 /**
  * Created by Eugenio on 20/08/2018.
  */
-public class records extends AppCompatActivity {
+public class records extends AppCompatActivity implements httpConnection.AsyncResponse {
 
     public oLog newItem;
 
@@ -204,12 +204,19 @@ public class records extends AppCompatActivity {
                 goToBalance();
                 break;
             case 2:
-                //uploadRecords
+                uploadRecords();
                 break;
             case 3:
                 goBack();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void uploadRecords(){
+        //if online:
+        //1. if farms pending delete, connection task = 0
+        //2. if farms pending save, connection task=1
+        //3. else, send messages
     }
 
     public void tryDeleteSelectedItems() {
@@ -261,7 +268,7 @@ public class records extends AppCompatActivity {
         recyclerViewAdapter.setList(recyclerViewAdapter.list);
         recyclerViewAdapter.notifyDataSetChanged();
         nSelected = 0;
-        setTitle(getString(R.string.financeActivity));
+        setTitle(getString(R.string.recordsActivity) + ": " + farmName);
     }
 
     public void deleteImgSndFiles(ArrayList<String> deleteFiles) {
@@ -412,8 +419,8 @@ public class records extends AppCompatActivity {
                 public void onClick(View view) {
                     if (itemChanges && !checkFields()) {
                         dialog.dismiss();
-
                         createLogList();
+                        invalidateOptionsMenu();
                         recyclerViewAdapter.list = cardDataFromLog();
                         recyclerViewAdapter.setList(recyclerViewAdapter.list);
                         recyclerViewAdapter.notifyDataSetChanged();
@@ -467,7 +474,7 @@ public class records extends AppCompatActivity {
                                     if (itemChanges && !checkFields()) {
                                         dialog.dismiss();
                                         createLogList();
-
+                                        invalidateOptionsMenu();
                                         recyclerViewAdapter.list = cardDataFromLog();
                                         recyclerViewAdapter.setList(recyclerViewAdapter.list);
                                         recyclerViewAdapter.notifyDataSetChanged();
@@ -847,9 +854,9 @@ public class records extends AppCompatActivity {
 
         nSelected = (cb.isChecked()) ? nSelected + 1 : nSelected - 1;
         if (nSelected > 0) {
-            setTitle(getString(R.string.financeActivity) + ": " + String.valueOf(nSelected) + " " + getString(R.string.selected));
+            setTitle(getString(R.string.recordsActivity) + ": " + String.valueOf(nSelected) + " " + getString(R.string.selected));
         } else {
-            setTitle(getString(R.string.financeActivity));
+            setTitle(getString(R.string.recordsActivity) + ": " + farmName);
         }
 
         invalidateOptionsMenu();
@@ -1106,8 +1113,16 @@ public class records extends AppCompatActivity {
         i.putExtra("soilManagementNames", soilManagementNames);
         i.putExtra("displayWidth", displayWidth);
         i.putExtra("displayHeight", displayHeight);
+        i.putExtra("from",1);
         startActivity(i);
         finish();
+    }
+
+    @Override
+    public void processFinish(String output) {
+        //switch connection task:
+        //0: if farms pending save, connection task = 1
+        //1: send messages
     }
 
 }

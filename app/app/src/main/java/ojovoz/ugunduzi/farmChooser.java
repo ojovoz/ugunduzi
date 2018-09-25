@@ -102,6 +102,12 @@ public class farmChooser extends AppCompatActivity implements httpConnection.Asy
                 cb.setId(n);
                 cb.setPadding(4, 4, 4, 4);
                 cb.setChecked(false);
+                cb.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        invalidateOptionsMenu();
+                    }
+                });
                 checkboxes.add(cb);
                 trow.addView(cb, lp);
 
@@ -235,21 +241,25 @@ public class farmChooser extends AppCompatActivity implements httpConnection.Asy
     public void markDeletedFarms(){
         oFarm f = new oFarm(this);
         String[] ids = deleteList.split(";");
+        int [] farmIds = new int[ids.length];
         for(int i=0;i<ids.length;i++){
             int[] idsToDelete = f.getFarmLineList(userId,Integer.valueOf(ids[i]));
             f.updateFarmstatus(idsToDelete,1);
-            deleteFarmLogs(idsToDelete);
+            farmIds[i]=Integer.valueOf(ids[i]);
         }
+        deleteFarmLogs(farmIds);
     }
 
     public void executeDeleteFarms(){
         oFarm f = new oFarm(this);
         String[] ids = deleteList.split(";");
+        int [] farmIds = new int[ids.length];
         for(int i=0;i<ids.length;i++){
             int[] idsToDelete = f.getFarmLineList(userId,Integer.valueOf(ids[i]));
             f.doDeleteFarm(idsToDelete);
-            deleteFarmLogs(idsToDelete);
+            farmIds[i]=Integer.valueOf(ids[i]);
         }
+        deleteFarmLogs(farmIds);
     }
 
     public void deleteFarmLogs(int[] ids){

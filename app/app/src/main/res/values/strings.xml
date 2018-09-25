@@ -46,7 +46,7 @@
     <string name="opDeleteSelectedFarms">Delete selected farms</string>
     <string name="opCreateNewFarm">Create new farm</string>
     <string name="opCancelNewFarm">Cancel new farm</string>
-    <string name="opGoToOtherFarm">Switch to other farm</string>
+    <string name="opGoToOtherFarm">Go to other farm</string>
     <string name="cancelNewFarmMessage">Cancel new farm?</string>
     <string name="noFarmsSelectedMessage">No farms selected</string>
     <string name="noItemsSelectedMessage">No items selected</string>
@@ -136,4 +136,5 @@
     <string name="totalWord">Total</string>
     <string name="treatmentIngredientsPhrase">Treatment ingredients</string>
     <string name="otherWord">Other</string>
+    <string name="farmHasNoRecordsMessage">Farm has no records</string>
 </resources>

@@ -187,10 +187,14 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     this.setTitle(currentFarm.name + " (" + user + ")");
                 } else {
                     currentFarm = currentFarm.getVersion(userId, farmId, initialVersion, this);
-                    farmVersion = initialVersion;
                     maxVersion = currentFarm.getMaxVersionNumber(userId, farmId, this);
-                    dateHelper dH = new dateHelper();
-                    this.setTitle(currentFarm.name + ": " + dH.dateToString(currentFarm.dateCreated) + " (" + user + ")");
+                    farmVersion = initialVersion;
+                    if(farmVersion==maxVersion){
+                        this.setTitle(currentFarm.name + " (" + user + ")");
+                    } else {
+                        dateHelper dH = new dateHelper();
+                        this.setTitle(currentFarm.name + ": " + dH.dateToString(currentFarm.dateCreated) + " (" + user + ")");
+                    }
                 }
                 farmName = currentFarm.name;
 
@@ -300,18 +304,19 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         } else if (state == 1) {
             menu.add(0, 0, 0, R.string.opManageFarmRecords);
+            menu.add(1, 1, 1, R.string.opFarmBalance);
             if (farmVersion == maxVersion) {
-                menu.add(1, 1, 1, R.string.opEditFarm);
+                menu.add(2, 2, 2, R.string.opEditFarm);
             } else {
-                menu.add(1, 1, 1, R.string.opGoToCurrentState);
+                menu.add(2, 2, 2, R.string.opGoToCurrentState);
             }
             if (farmVersion == maxVersion) {
-                menu.add(2, 2, 2, R.string.opDeleteFarm);
-                menu.add(3, 3, 3, R.string.opCreateNewFarm);
+                menu.add(3, 3, 3, R.string.opDeleteFarm);
+                menu.add(4, 4, 4, R.string.opCreateNewFarm);
                 if (currentFarm.getNumberOfFarms(userId) > 1) {
-                    menu.add(4, 4, 4, R.string.opGoToOtherFarm);
+                    menu.add(5, 5, 5, R.string.opGoToOtherFarm);
                 }
-                menu.add(5, 5, 5, R.string.opSwitchUser);
+                menu.add(6, 6, 6, R.string.opSwitchUser);
             }
 
         }
@@ -350,22 +355,25 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     goToFarmRecords();
                     break;
                 case 1:
+                    goToFarmBalance();
+                    break;
+                case 2:
                     if (farmVersion == maxVersion) {
                         startEditFarm();
                     } else {
                         goToLatestFarm();
                     }
                     break;
-                case 2:
+                case 3:
                     deleteFarm();
                     break;
-                case 3:
+                case 4:
                     createNewFarm();
                     break;
-                case 4:
+                case 5:
                     goToFarmChooser();
                     break;
-                case 5:
+                case 6:
                     confirmExit();
             }
         }
@@ -434,11 +442,13 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         oFarm f = new oFarm(this);
         int[] idsToDelete = f.getFarmLineList(userId, farmId);
         f.updateFarmstatus(idsToDelete, 1);
-        deleteFarmLogs(idsToDelete);
+        deleteFarmLogs(farmId);
     }
 
-    public void deleteFarmLogs(int[] ids) {
+    public void deleteFarmLogs(int id) {
         oLog l = new oLog(this);
+        int[] ids = new int[1];
+        ids[0] = id;
         ArrayList<String> deleteFiles = l.deleteFarmItems(ids);
         deleteImgSndFiles(deleteFiles);
     }
@@ -468,7 +478,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         oFarm f = new oFarm(this);
         int[] idsToDelete = f.getFarmLineList(userId, farmId);
         f.doDeleteFarm(idsToDelete);
-        deleteFarmLogs(idsToDelete);
+        deleteFarmLogs(farmId);
     }
 
     public void afterFarmDeletion() {
@@ -1052,6 +1062,29 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         i.putExtra("soilManagementNames", plotMatrix.currentPlot.getSoilManagementNames(this));
         i.putExtra("displayWidth", displayWidth);
         i.putExtra("displayHeight", displayHeight);
+        startActivity(i);
+        finish();
+    }
+
+    public void goToFarmBalance() {
+        dateHelper dH = new dateHelper();
+        final Context context = this;
+        Intent i = new Intent(context, balance.class);
+        i.putExtra("user", user);
+        i.putExtra("userId", userId);
+        i.putExtra("userPass", userPass);
+        i.putExtra("farmName", farmName);
+        i.putExtra("farmId", farmId);
+        i.putExtra("farmVersion", currentFarm.version);
+        i.putExtra("maxVersion", maxVersion);
+        i.putExtra("plot", -1);
+        i.putExtra("farmDate", dH.dateToString(currentFarm.dateCreated));
+        i.putExtra("cropNames", plotMatrix.currentPlot.getCropNames(this));
+        i.putExtra("pestControlNames", plotMatrix.currentPlot.getPestControlNames(this));
+        i.putExtra("soilManagementNames", plotMatrix.currentPlot.getSoilManagementNames(this));
+        i.putExtra("displayWidth", displayWidth);
+        i.putExtra("displayHeight", displayHeight);
+        i.putExtra("from",0);
         startActivity(i);
         finish();
     }

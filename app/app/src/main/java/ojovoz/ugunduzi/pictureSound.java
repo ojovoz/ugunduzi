@@ -127,6 +127,8 @@ public class pictureSound extends AppCompatActivity {
         filesToDelete = new ArrayList<>();
 
         messageDate = new Date();
+
+        setTitle(getTitle() + ": " + farmName);
     }
 
     @Override

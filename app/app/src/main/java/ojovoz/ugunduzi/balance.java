@@ -14,6 +14,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -44,6 +45,8 @@ public class balance extends AppCompatActivity {
 
     public int displayWidth;
     public int displayHeight;
+
+    public int from;
 
     public ArrayList<oLog> logList;
     oRecyclerViewAdapter recyclerViewAdapter;
@@ -81,6 +84,8 @@ public class balance extends AppCompatActivity {
         displayWidth = getIntent().getExtras().getInt("displayWidth");
         displayHeight = getIntent().getExtras().getInt("displayHeight");
 
+        from = getIntent().getExtras().getInt("from");
+
         oLog l = new oLog(this);
 
         TextView tt = (TextView) findViewById(R.id.plotLabel);
@@ -113,34 +118,40 @@ public class balance extends AppCompatActivity {
             tt.setTextColor(ContextCompat.getColor(this, R.color.colorWhite));
         }
 
-        tt.setText(title);
+        if(logList.size()==0){
+            Toast.makeText(this, R.string.farmHasNoRecordsMessage, Toast.LENGTH_SHORT).show();
+            goBack();
+        } else {
 
-        findMaxMinDates();
+            tt.setText(title);
 
-        date1 = minDate;
-        date2 = maxDate;
+            findMaxMinDates();
 
-        bDate1 = (Button) findViewById(R.id.date1Button);
-        bDate2 = (Button) findViewById(R.id.date2Button);
+            date1 = minDate;
+            date2 = maxDate;
 
-        bDate1.setText(dH.dateToString(date1));
-        bDate2.setText(dH.dateToString(date2));
+            bDate1 = (Button) findViewById(R.id.date1Button);
+            bDate2 = (Button) findViewById(R.id.date2Button);
 
-        bDate1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                displayDatePicker(1, view);
-            }
-        });
+            bDate1.setText(dH.dateToString(date1));
+            bDate2.setText(dH.dateToString(date2));
 
-        bDate2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                displayDatePicker(2, view);
-            }
-        });
+            bDate1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    displayDatePicker(1, view);
+                }
+            });
 
-        fillRecyclerView();
+            bDate2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    displayDatePicker(2, view);
+                }
+            });
+
+            fillRecyclerView();
+        }
 
     }
 
@@ -153,6 +164,9 @@ public class balance extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(android.view.Menu menu) {
         menu.clear();
         menu.add(0, 0, 0, R.string.opGoBack);
+        if(from==1){
+            menu.add(1, 1, 1, R.string.opGoBackToFarm);
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -161,6 +175,9 @@ public class balance extends AppCompatActivity {
         switch (item.getItemId()) {
             case 0:
                 goBack();
+                break;
+            case 1:
+                goToFarm();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -273,9 +290,9 @@ public class balance extends AppCompatActivity {
                     b.crop = l.crop;
                     b.treatmentIngredient = l.treatmentIngredient;
                     b.dataItem = l.dataItem;
+                    balanceItems.add(b);
                 }
                 b.cost = (l.dataItem.type == 3) ? b.cost + l.value : b.cost - l.value;
-                balanceItems.add(b);
             }
         }
 
@@ -417,21 +434,39 @@ public class balance extends AppCompatActivity {
     }
 
     public void goBack() {
-        Intent i = new Intent(this, records.class);
+        if(from==1) {
+            Intent i = new Intent(this, records.class);
+            i.putExtra("user", user);
+            i.putExtra("userId", userId);
+            i.putExtra("userPass", userPass);
+            i.putExtra("farmName", farmName);
+            i.putExtra("farmId", farmId);
+            i.putExtra("farmVersion", farmVersion);
+            i.putExtra("maxVersion", maxVersion);
+            i.putExtra("farmDate", farmDate);
+            i.putExtra("plot", plot);
+            i.putExtra("cropNames", cropNames);
+            i.putExtra("pestControlNames", pestControlNames);
+            i.putExtra("soilManagementNames", soilManagementNames);
+            i.putExtra("displayWidth", displayWidth);
+            i.putExtra("displayHeight", displayHeight);
+            startActivity(i);
+            finish();
+        } else {
+            goToFarm();
+        }
+    }
+
+    public void goToFarm(){
+        Intent i = new Intent(this, farmInterface.class);
         i.putExtra("user", user);
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
         i.putExtra("farmName", farmName);
         i.putExtra("farmId", farmId);
         i.putExtra("farmVersion", farmVersion);
-        i.putExtra("maxVersion", maxVersion);
-        i.putExtra("farmDate", farmDate);
-        i.putExtra("plot", plot);
-        i.putExtra("cropNames", cropNames);
-        i.putExtra("pestControlNames", pestControlNames);
-        i.putExtra("soilManagementNames", soilManagementNames);
-        i.putExtra("displayWidth", displayWidth);
-        i.putExtra("displayHeight", displayHeight);
+        i.putExtra("newFarm", false);
+        i.putExtra("firstFarm", false);
         startActivity(i);
         finish();
     }
