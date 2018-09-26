@@ -56,6 +56,10 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
 
         dataDownloaded = prefs.getPreferenceBoolean("dataDownloaded");
 
+        if(!prefs.preferenceExists("farmIdNumber")){
+            prefs.savePreferenceInt("farmIdNumber",0);
+        }
+
         server = prefs.getPreference("server");
         if (server.equals("")) {
             defineServer("");

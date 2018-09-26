@@ -114,17 +114,6 @@ public class oFarm {
         return ret;
     }
 
-    public ArrayList<String> getActiveFarmNames(int userId){
-        ArrayList<String> ret = new ArrayList<>();
-        ArrayList<oFarm> fList = getActiveFarms(userId);
-        Iterator<oFarm> iterator = fList.iterator();
-        while(iterator.hasNext()){
-            oFarm f = iterator.next();
-            ret.add(f.name);
-        }
-        return ret;
-    }
-
     public boolean farmNameExists(int userId, int farmId, String farmName){
         boolean ret=false;
         ArrayList<oFarm> fList = getActiveFarms(userId);
@@ -136,26 +125,6 @@ public class oFarm {
                 break;
             }
         }
-        return ret;
-    }
-
-    public int getFarmIdFromNameUser(int userId, String farmName){
-        int ret=-1;
-        int maxId=-1;
-        ArrayList<oFarm> fList = getActiveFarms(userId);
-        Iterator<oFarm> iterator = fList.iterator();
-        while(iterator.hasNext()){
-            oFarm f = iterator.next();
-            if(f.name.equals(farmName)){
-                ret=f.id;
-                break;
-            } else {
-                if(f.id>maxId){
-                    maxId=f.id;
-                }
-            }
-        }
-        if(ret==-1) ret=maxId+1;
         return ret;
     }
 
@@ -291,22 +260,19 @@ public class oFarm {
         return (logList.size()>0);
     }
 
-    public int [] getFarmsPendingDelete(int userId){
+    public ArrayList<oFarm> getFarmsPendingDelete(int userId){
+
+        ArrayList<oFarm> ret = new ArrayList<>();
         ArrayList<oFarm> farms = getFarms(userId,-1);
-        int [] deleteList = new int[farms.size()];
 
         Iterator<oFarm> iterator = farms.iterator();
-        int n=0;
         while(iterator.hasNext()){
             oFarm f = iterator.next();
             if(f.status==1){
-                deleteList[n]=f.id;
-            } else {
-                deleteList[n]=-1;
+                ret.add(f);
             }
-            n++;
         }
-        return deleteList;
+        return ret;
     }
 
     public ArrayList<oFarm> getFarmsPendingSave(int userId){

@@ -111,7 +111,7 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
 
     int connectionTask;
     boolean bConnecting;
-    int[] farmsPendingDelete;
+    ArrayList<oFarm> farmsPendingDelete;
     ArrayList<oFarm> farmsPendingSave;
     ProgressDialog deletingFarmDialog;
     ProgressDialog savingFarmsDialog;
@@ -190,7 +190,7 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
         dataItemDate = new Date();
         unitsList = new ArrayList<>();
         if(plot>=0) {
-            currentPlot = getCurrentPlot();
+            currentPlot = getCurrentPlot(plot);
             getDataItemsList();
         }
 
@@ -247,7 +247,7 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
                 bConnecting = true;
                 oFarm f = new oFarm(this);
                 farmsPendingDelete = f.getFarmsPendingDelete(userId);
-                if (farmsPendingDelete.length > 0) {
+                if (farmsPendingDelete.size() > 0) {
                     connectionTask = 0;
                     doDeleteFarms();
                 } else {
@@ -283,9 +283,12 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
                 }
             });
             String deleteList="";
-            for(int i=0; i<farmsPendingDelete.length;i++){
-                deleteList = (deleteList.isEmpty()) ? Integer.toString(farmsPendingDelete[i]) : ";" + Integer.toString(farmsPendingDelete[i]);
+            Iterator<oFarm> iterator = farmsPendingDelete.iterator();
+            while(iterator.hasNext()){
+                oFarm f = iterator.next();
+                deleteList = (deleteList.isEmpty()) ? Integer.toString(f.id) : deleteList + ";" + Integer.toString(f.id);
             }
+
             http.execute(server + "/mobile/delete_farm.php?user=" + userId + "&farm=" + deleteList, "");
         } else {
             Toast.makeText(this, R.string.pleaseConnectMessage, Toast.LENGTH_SHORT).show();
@@ -315,7 +318,7 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
             while(iterator.hasNext()){
                 oFarm f = iterator.next();
                 saveString = (saveString.isEmpty()) ? f.name.replaceAll(" ", "_") + ";" + String.valueOf(f.size) + ";" + dH.dateToString(f.dateCreated) +
-                        ";" + String.valueOf(f.id) + ";" + String.valueOf(f.version) + ";" + f.plotMatrix.toString() : "*" + f.name.replaceAll(" ", "_")
+                        ";" + String.valueOf(f.id) + ";" + String.valueOf(f.version) + ";" + f.plotMatrix.toString() : saveString + "*" + f.name.replaceAll(" ", "_")
                         + ";" + String.valueOf(f.size) + ";" + dH.dateToString(f.dateCreated) +
                         ";" + String.valueOf(f.id) + ";" + String.valueOf(f.version) + ";" + f.plotMatrix.toString();
             }
@@ -514,10 +517,22 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
                                     dialog.dismiss();
                                     if (editingItem != null) {
                                         TextView tv = (TextView) editingView;
-                                        if ((int) tv.getTag() % 2 == 0) {
-                                            tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillFaded));
+                                        if(plot>=0) {
+                                            if ((int) tv.getTag() % 2 == 0) {
+                                                tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillFaded));
+                                            } else {
+                                                tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorWhite));
+                                            }
                                         } else {
-                                            tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorWhite));
+                                            if (currentPlot.pestControlIngredients.size() > 0 && currentPlot.soilManagementIngredients.size() > 0) {
+                                                tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillSoilManagementAndPestControlFaded));
+                                            } else if (currentPlot.pestControlIngredients.size() > 0 && currentPlot.soilManagementIngredients.size() == 0) {
+                                                tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillPestControlFaded));
+                                            } else if (currentPlot.pestControlIngredients.size() == 0 && currentPlot.soilManagementIngredients.size() > 0) {
+                                                tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillSoilManagementFaded));
+                                            } else {
+                                                tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillFaded));
+                                            }
                                         }
                                         editingItem = null;
                                     }
@@ -535,10 +550,22 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
                 } else {
                     if (i == KeyEvent.KEYCODE_BACK && editingItem != null) {
                         TextView tv = (TextView) editingView;
-                        if ((int) tv.getTag() % 2 == 0) {
-                            tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillFaded));
+                        if(plot>=0) {
+                            if ((int) tv.getTag() % 2 == 0) {
+                                tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillFaded));
+                            } else {
+                                tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorWhite));
+                            }
                         } else {
-                            tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorWhite));
+                            if (currentPlot.pestControlIngredients.size() > 0 && currentPlot.soilManagementIngredients.size() > 0) {
+                                tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillSoilManagementAndPestControlFaded));
+                            } else if (currentPlot.pestControlIngredients.size() > 0 && currentPlot.soilManagementIngredients.size() == 0) {
+                                tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillPestControlFaded));
+                            } else if (currentPlot.pestControlIngredients.size() == 0 && currentPlot.soilManagementIngredients.size() > 0) {
+                                tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillSoilManagementFaded));
+                            } else {
+                                tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillFaded));
+                            }
                         }
                         editingItem = null;
                     }
@@ -1027,12 +1054,16 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
     }
 
     public void editItem(View v) {
-        if (farmVersion == maxVersion && plot>=0) {
+        if (farmVersion == maxVersion) {
             final int n = (int) v.getTag();
             if (n >= 0) {
                 TextView tv = (TextView) v;
                 tv.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight));
                 editingItem = logList.get(n);
+                if(plot==-1){
+                    currentPlot = getCurrentPlot(editingItem.plotId);
+                    getDataItemsList();
+                }
                 addItem(v);
             }
         }
@@ -1060,7 +1091,8 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
                 newItem.appendToLog(farmId, farmVersion, userId, plot, newItem.date, newItem.dataItem, newItem.value, newItem.quantity,
                         newItem.units, newItem.crop, newItem.treatmentIngredient, 0.0f, newItem.comments, "", "");
             } else {
-                newItem.updateLogItem(editingItem.line, farmId, farmVersion, userId, plot, newItem.date, newItem.dataItem, newItem.value, newItem.quantity,
+                int thisPlot = (plot >= 0) ? plot : editingItem.plotId;
+                newItem.updateLogItem(editingItem.line, farmId, farmVersion, userId, thisPlot, newItem.date, newItem.dataItem, newItem.value, newItem.quantity,
                         newItem.units, newItem.crop, newItem.treatmentIngredient, 0.0f, newItem.comments);
             }
             editingItem = null;
@@ -1226,13 +1258,13 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
         return ret;
     }
 
-    public oPlot getCurrentPlot() {
+    public oPlot getCurrentPlot(int thisPlot) {
         oPlot ret;
         oFarm f = new oFarm(this);
         f = f.getVersion(userId, farmId, farmVersion, this);
         oPlotMatrix p = new oPlotMatrix();
         p.fromString(this, f.plotMatrix, ";");
-        ret = p.plots.get(plot);
+        ret = p.plots.get(thisPlot);
         return ret;
     }
 
@@ -1283,10 +1315,12 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
     }
 
     public void localDeleteFarms(){
-        oFarm f = new oFarm(this);
-        for(int i=0;i<farmsPendingDelete.length;i++){
-            int[] idsToDelete = f.getFarmLineList(userId,farmsPendingDelete[i]);
-            f.doDeleteFarm(idsToDelete);
+        Iterator<oFarm> iterator = farmsPendingDelete.iterator();
+        while(iterator.hasNext()){
+            oFarm f = iterator.next();
+            f.context = this;
+            int[] linesToDelete = f.getFarmLineList(userId,f.id);
+            f.doDeleteFarm(linesToDelete);
         }
     }
 
@@ -1296,7 +1330,7 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
             oFarm f = iterator.next();
             f.context = this;
             int[] idsToUpdate = f.getFarmLineList(userId, f.id);
-            f.updateFarmStatus(idsToUpdate, 1);
+            f.updateFarmStatus(idsToUpdate, 2);
         }
     }
 

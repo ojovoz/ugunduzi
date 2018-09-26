@@ -1123,7 +1123,10 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             farmDateString = dH.dateToString(farmDate);
 
             if (farmId == -1) {
-                farmId = currentFarm.getFarmIdFromNameUser(userId, farmName);
+                farmId = prefs.getPreferenceInt("farmIdNumber");
+                if(state!=2){
+                    prefs.savePreferenceInt("farmIdNumber",farmId+1);
+                }
             }
 
             bChangesMade = (state == 2) ? farmHasBeenEdited() : true;
