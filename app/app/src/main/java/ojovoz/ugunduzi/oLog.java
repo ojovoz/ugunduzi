@@ -188,6 +188,75 @@ public class oLog {
         return ret;
     }
 
+    public ArrayList<oLog> createLog(int farmId, int userId, int mode){
+        ArrayList<oLog> ret = new ArrayList<>();
+        csvFileManager log;
+
+        log = new csvFileManager("log");
+        List<String[]> logCSV = log.read(context);
+        if(logCSV!=null) {
+            Iterator<String[]> iterator = logCSV.iterator();
+            int n=0;
+            while (iterator.hasNext()) {
+                String[] record = iterator.next();
+                if(Integer.parseInt(record[0])==farmId && (Integer.parseInt(record[2])==userId || userId==-1)) {
+                    oLog l = new oLog();
+                    l.line=n;
+                    l.farmId = Integer.parseInt(record[0]);
+                    l.farmVersion = Integer.parseInt(record[1]);
+                    l.userId = Integer.parseInt(record[2]);
+                    l.plotId = Integer.parseInt(record[3]);
+                    l.date = dH.stringToDate(record[4]);
+                    oDataItem di = new oDataItem(context);
+                    l.dataItem = di.getDataItemFromId(Integer.parseInt(record[5]));
+                    switch(mode){
+                        case 0:
+                            if(l.dataItem!=null){
+                                l.value = Float.parseFloat(record[6]);
+                                oUnit u = new oUnit(context);
+                                l.quantity = Float.parseFloat(record[7]);
+                                l.units = u.getUnitFromId(Integer.parseInt(record[8]));
+                                oCrop c = new oCrop(context);
+                                l.crop = c.getCropFromId(Integer.parseInt(record[9]));
+                                oTreatmentIngredient t = new oTreatmentIngredient(context);
+                                l.treatmentIngredient = t.getTreatmentIngredientFromId(Integer.parseInt(record[10]));
+                                l.cost = Float.parseFloat(record[11]);
+                                l.comments = record[12];
+                                l.sent = (record[15].equals("1"));
+                                ret.add(l);
+                            }
+                            break;
+                        case 1:
+                            if(!record[13].isEmpty()){
+                                l.picture = record[13];
+                                l.sound = record[14];
+                                l.sent = (record[15].equals("1"));
+                                ret.add(l);
+                            }
+                            break;
+                        case 2:
+                            l.value = Float.parseFloat(record[6]);
+                            oUnit u = new oUnit(context);
+                            l.quantity = Float.parseFloat(record[7]);
+                            l.units = u.getUnitFromId(Integer.parseInt(record[8]));
+                            oCrop c = new oCrop(context);
+                            l.crop = c.getCropFromId(Integer.parseInt(record[9]));
+                            oTreatmentIngredient t = new oTreatmentIngredient(context);
+                            l.treatmentIngredient = t.getTreatmentIngredientFromId(Integer.parseInt(record[10]));
+                            l.cost = Float.parseFloat(record[11]);
+                            l.comments = record[12];
+                            l.picture = record[13];
+                            l.sound = record[14];
+                            l.sent = (record[15].equals("1"));
+                            ret.add(l);
+                    }
+                }
+                n++;
+            }
+        }
+        return ret;
+    }
+
     public ArrayList<oLog> createLog(int farmId, int version, int plot, int userId, int mode){
         ArrayList<oLog> ret = new ArrayList<>();
         csvFileManager log;
@@ -357,22 +426,28 @@ public class oLog {
         return ret;
     }
 
-    public String toString(String separator){
+    public String toString(String separator, boolean isData){
         String ret="";
         dateHelper dH = new dateHelper();
-        int dataItemId = (dataItem==null) ? -1 : dataItem.id;
-        int unitsId = (units==null) ? -1 : units.id;
-        int cropId = (crop==null) ? -1 : crop.id;
-        int treatmentId = (treatmentIngredient ==null) ? -1 : treatmentIngredient.id;
-        String sendComments = comments.replaceAll(separator,"_");
-        try{
-            sendComments=URLEncoder.encode(sendComments,"UTF-8");
-        } catch(Exception e){
 
+        if(isData) {
+            int dataItemId = (dataItem == null) ? -1 : dataItem.id;
+            int unitsId = (units == null) ? -1 : units.id;
+            int cropId = (crop == null) ? -1 : crop.id;
+            int treatmentId = (treatmentIngredient == null) ? -1 : treatmentIngredient.id;
+            String sendComments = (comments == null) ? "" : comments.replaceAll(separator, "_");
+
+            try {
+                sendComments = URLEncoder.encode(sendComments, "UTF-8");
+            } catch (Exception e) {
+
+            }
+            ret = Integer.toString(farmId) + separator + Integer.toString(farmVersion) + separator + Integer.toString(userId) + separator + Integer.toString(plotId) + separator + dH.dateToString(date) + separator +
+                    Integer.toString(dataItemId) + separator + Float.toString(value) + separator + Float.toString(quantity) + separator + Integer.toString(unitsId) + separator +
+                    Integer.toString(cropId) + separator + Integer.toString(treatmentId) + separator + Float.toString(cost) + separator + sendComments;
+        } else {
+            ret = Integer.toString(farmId) + separator + Integer.toString(farmVersion) + separator + Integer.toString(userId) + separator + Integer.toString(plotId) + separator + dH.dateToString(date);
         }
-        ret=farmName+separator+Integer.toString(userId)+separator+Integer.toString(plotId)+separator+dH.dateToString(date)+separator+
-                Integer.toString(dataItemId)+separator+Float.toString(value)+separator+Float.toString(quantity)+separator+Integer.toString(unitsId)+separator+
-                Integer.toString(cropId)+separator+Integer.toString(treatmentId)+separator+Float.toString(cost)+separator+sendComments;
         return ret;
     }
 

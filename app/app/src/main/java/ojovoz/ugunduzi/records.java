@@ -8,8 +8,11 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -116,6 +119,11 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
     ProgressDialog deletingFarmDialog;
     ProgressDialog savingFarmsDialog;
     ProgressDialog downloadingParamsDialog;
+    private ProgressDialog sendingDataDialog;
+    private ProgressDialog sendingMultimediaDialog;
+    private Thread uploadMultimedia;
+    private ArrayList<oLog> multimediaSentItems;
+    private int[] multimediaCleanUpList;
 
     String ugunduziEmail = "";
     String ugunduziPass = "";
@@ -123,6 +131,8 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
     String multimediaSubject = "";
     String smtpServer = "";
     String smtpPort = "";
+
+    private Context recordsContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,6 +145,8 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
 
         prefs = new preferenceManager(this);
         server = prefs.getPreference("server");
+
+        recordsContext = this;
 
         user = getIntent().getExtras().getString("user");
         userPass = getIntent().getExtras().getString("userPass");
@@ -359,8 +371,244 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
     }
 
     public void doSendMessages(){
+        String b = "";
 
+        ArrayList<oLog> allRecords;
+        oLog l = new oLog(this);
+        allRecords = l.createLog(farmId,userId,0);
+
+        Iterator<oLog> iterator = allRecords.iterator();
+        while (iterator.hasNext()) {
+            oLog thisRecord = iterator.next();
+            if (thisRecord.dataItem != null) {
+                b = (b.isEmpty()) ? thisRecord.toString(";",true) : b + "*" + thisRecord.toString(";",true);
+            }
+        }
+
+        if (!b.isEmpty()) {
+            final String emailBody=b;
+            httpConnection http = new httpConnection(this, this);
+            if (http.isOnline()) {
+                if(!ugunduziEmail.isEmpty() && !ugunduziPass.isEmpty() && !smtpServer.isEmpty() && !smtpPort.isEmpty()){
+                    AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+
+                        @Override
+                        protected void onPreExecute() {
+                            sendingDataDialog = new ProgressDialog(recordsContext);
+                            CharSequence dialogTitle = getString(R.string.sendingRecordsMessage);
+                            sendingDataDialog.setMessage(dialogTitle);
+                            sendingDataDialog.setCancelable(true);
+                            sendingDataDialog.setCanceledOnTouchOutside(false);
+                            sendingDataDialog.setIndeterminate(true);
+                            sendingDataDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface d) {
+                                    bConnecting = false;
+                                    sendingDataDialog.dismiss();
+                                }
+                            });
+                            sendingDataDialog.show();
+                        }
+
+                        @Override
+                        protected Void doInBackground(Void... arg0) {
+                            try {
+                                Mail m = new Mail(ugunduziEmail, ugunduziPass, smtpServer, smtpPort);
+                                String[] toArr = {ugunduziEmail};
+                                m.setTo(toArr);
+                                m.setFrom(ugunduziEmail);
+                                m.setSubject(dataSubject);
+                                m.setBody(emailBody);
+                                try {
+                                    if(m.send()){
+
+                                    } else {
+                                        Toast.makeText(recordsContext, R.string.incorrectInternetParamsMessage, Toast.LENGTH_SHORT).show();
+                                        if (sendingDataDialog != null) {
+                                            sendingDataDialog.dismiss();
+                                        }
+                                        bConnecting=false;
+                                    }
+                                } catch (Exception e) {
+                                    Toast.makeText(recordsContext, R.string.incorrectInternetParamsMessage, Toast.LENGTH_SHORT).show();
+                                    if (sendingDataDialog != null) {
+                                        sendingDataDialog.dismiss();
+                                    }
+                                    bConnecting=false;
+                                }
+                            } catch (Exception e) {
+                                Toast.makeText(recordsContext, R.string.incorrectInternetParamsMessage, Toast.LENGTH_SHORT).show();
+                                if (sendingDataDialog != null) {
+                                    sendingDataDialog.dismiss();
+                                }
+                                bConnecting=false;
+                            }
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(Void result) {
+                            if (sendingDataDialog!=null) {
+                                sendingDataDialog.dismiss();
+                            }
+                            if(bConnecting) {
+                                doSendMultimediaMessages();
+                            }
+                        }
+                    };
+                    task.execute((Void[])null);
+                } else {
+                    Toast.makeText(this, R.string.incorrectInternetParamsMessage, Toast.LENGTH_SHORT).show();
+                    bConnecting=false;
+                }
+            } else {
+                Toast.makeText(this, R.string.pleaseConnectMessage, Toast.LENGTH_SHORT).show();
+                bConnecting=false;
+            }
+        } else {
+            doSendMultimediaMessages();
+        }
     }
+
+    public void doSendMultimediaMessages(){
+
+        ArrayList<String> b = new ArrayList<>();
+        ArrayList<oLog> multimediaLog;
+        final ArrayList<oLog> attachments = new ArrayList<>();
+
+        oLog l = new oLog(this);
+        multimediaLog = l.createLog(farmId,userId,1);
+
+        Iterator<oLog> iterator = multimediaLog.iterator();
+        while (iterator.hasNext()) {
+            oLog thisRecord = iterator.next();
+            if (!thisRecord.sent) {
+                b.add(thisRecord.toString(";",false));
+                attachments.add(thisRecord);
+            }
+        }
+
+        if(!b.isEmpty()){
+            final ArrayList<String> emailBody=b;
+            multimediaCleanUpList = new int[attachments.size()];
+            multimediaSentItems = new ArrayList<>();
+            httpConnection http = new httpConnection(this, this);
+            if (http.isOnline()) {
+                sendingMultimediaDialog = new ProgressDialog(this);
+                sendingMultimediaDialog.setCancelable(true);
+                sendingMultimediaDialog.setCanceledOnTouchOutside(false);
+                CharSequence dialogTitle = getString(R.string.sendingMultimediaRecordsMessage);
+                sendingMultimediaDialog.setMessage(dialogTitle);
+                sendingMultimediaDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                sendingMultimediaDialog.setProgress(0);
+                int dialogMax=attachments.size();
+                sendingMultimediaDialog.setMax(dialogMax);
+                sendingMultimediaDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface d) {
+                        bConnecting=false;
+                        uploadMultimedia.interrupt();
+                        sendingMultimediaDialog.dismiss();
+                        createLogList();
+                        recyclerViewAdapter.list = cardDataFromLog();
+                        recyclerViewAdapter.setList(recyclerViewAdapter.list);
+                        recyclerViewAdapter.notifyDataSetChanged();
+                        nSelected = 0;
+                    }
+                });
+                sendingMultimediaDialog.show();
+
+                uploadMultimedia = new Thread(new Runnable() {
+                    public void run() {
+
+                        int n=0;
+                        Iterator<oLog> iterator = attachments.iterator();
+                        while (iterator.hasNext() && bConnecting) {
+                            oLog item = iterator.next();
+                            String body = emailBody.get(n);
+
+                            Mail m = new Mail(ugunduziEmail, ugunduziPass, smtpServer, smtpPort);
+                            String[] toArr = {ugunduziEmail};
+                            m.setTo(toArr);
+                            m.setFrom(ugunduziEmail);
+                            m.setSubject(multimediaSubject);
+                            m.setBody(body);
+                            boolean proceed=true;
+
+                            try{
+                                File f1 = new File(item.picture);
+                                if(f1.exists()){
+                                    m.addAttachment(item.picture);
+                                } else {
+                                    proceed=false;
+                                }
+                                File f2 = new File(item.sound);
+                                if(f2.exists()){
+                                    m.addAttachment(item.sound);
+                                } else {
+                                    proceed=false;
+                                }
+                            } catch (Exception e){
+                                proceed=false;
+                            }
+
+                            if(proceed){
+                                try{
+                                    if(m.send()){
+                                        multimediaCleanUpList[n]=-1;
+                                        multimediaSentItems.add(item);
+                                    }
+                                } catch (Exception e){
+
+                                }
+                            } else {
+                                multimediaCleanUpList[n] = item.line;
+                            }
+                            progressHandler.sendMessage(progressHandler.obtainMessage());
+
+                            n++;
+
+                        }
+                    }
+                });
+                uploadMultimedia.start();
+
+            } else {
+                Toast.makeText(this, R.string.pleaseConnectMessage, Toast.LENGTH_SHORT).show();
+                bConnecting=false;
+            }
+        } else {
+            bConnecting=false;
+        }
+    }
+
+    Handler progressHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            sendingMultimediaDialog.incrementProgressBy(1);
+            if (sendingMultimediaDialog.getProgress() == sendingMultimediaDialog.getMax()) {
+                bConnecting=false;
+                sendingMultimediaDialog.dismiss();
+                uploadMultimedia.interrupt();
+
+                Iterator<oLog> iterator = multimediaSentItems.iterator();
+                while (iterator.hasNext()) {
+                    oLog item = iterator.next();
+                    item.setSent(recordsContext);
+                }
+
+                oLog l = new oLog(recordsContext);
+                l.deleteLogItems(multimediaCleanUpList);
+
+                createLogList();
+                recyclerViewAdapter.list = cardDataFromLog();
+                recyclerViewAdapter.setList(recyclerViewAdapter.list);
+                recyclerViewAdapter.notifyDataSetChanged();
+                nSelected = 0;
+                setTitle(getString(R.string.recordsActivity));
+            }
+        }
+    };
 
     public boolean getEmailParams(){
         boolean ret = false;

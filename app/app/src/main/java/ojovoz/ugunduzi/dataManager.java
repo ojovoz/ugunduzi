@@ -907,7 +907,7 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
         while (iterator.hasNext()) {
             oLog l = iterator.next();
             if (l.dataItem != null) {
-                b = (b.isEmpty()) ? l.toString(";") : b + "*" + l.toString(";");
+                //b = (b.isEmpty()) ? l.toString(";") : b + "*" + l.toString(";");
             }
         }
 
@@ -1004,7 +1004,7 @@ public class dataManager extends AppCompatActivity implements httpConnection.Asy
         while (iterator.hasNext()) {
             oLog l = iterator.next();
             if (l.dataItem==null && !l.sent) {
-                b.add(l.toString(";"));
+                //b.add(l.toString(";"));
                 multimediaLog.add(l);
             }
         }
