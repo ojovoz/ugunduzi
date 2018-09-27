@@ -195,6 +195,11 @@ public class oFarm {
         return farms.size();
     }
 
+    public int hasFarms(int userId){
+        ArrayList<oFarm> farms = getFarms(userId,-1);
+        return farms.size();
+    }
+
     public void addNewFarm(int id, int userId, String farmName, float size, Date date, String plotMatrix, int version, int status){
         dateHelper dH = new dateHelper();
 

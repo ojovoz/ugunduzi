@@ -36,9 +36,9 @@ function getFarmIDFromNameUser($dbh,$farm_name,$user_id){
 	return $ret;
 }
 
-function getFarmIDsFromFarmAppId($dbh,$farm_app_id){
+function getFarmIDsFromFarmAppIdUser($dbh,$farm_app_id,$user_id){
 	$ret=array();
-	$query="SELECT farm_id FROM farm WHERE farm_app_id=$farm_app_id";
+	$query="SELECT farm_id FROM farm WHERE farm_app_id=$farm_app_id AND user_id=$user_id";
 	$result = mysqli_query($dbh,$query);
 	$n=0;
 	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
@@ -48,9 +48,9 @@ function getFarmIDsFromFarmAppId($dbh,$farm_app_id){
 	return $ret;
 }
 
-function getFarmIDFromFarmAppIdVersion($dbh,$farm_app_id,$farm_version){
+function getFarmIDFromFarmAppIdVersionUser($dbh,$farm_app_id,$farm_version,$user_id){
 	$ret=-1;
-	$query="SELECT farm_id FROM farm WHERE farm_app_id=$farm_app_id AND farm_version=$farm_version";
+	$query="SELECT farm_id FROM farm WHERE farm_app_id=$farm_app_id AND farm_version=$farm_version AND user_id=$user_id";
 	$result = mysqli_query($dbh,$query);
 	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
 		$ret=$row[0];
@@ -173,25 +173,29 @@ function checkRecords($dbh,$ugunduzi_email,$ugunduzi_pass,$data_subject,$multime
 						for($i=0;$i<sizeof($log_items);$i++){
 							$log_item=str_replace('=','',$log_items[$i]);
 							$log_item_parts=explode(";",$log_item);
-							if(sizeof($log_item_parts)==9){
+							if(sizeof($log_item_parts)==13){
 								
-								$farm_name=$log_item_parts[0];
-								$user_id=$log_item_parts[1];
-								$farm_id=getFarmIDFromNameUser($dbh,$farm_name,$user_id);
-								$plot_id=getPlotIDFromFarm($dbh,$farm_id,$log_item_parts[2]);
-								$date=$log_item_parts[3];
-								$data_item_id=$log_item_parts[4];
-								$value=number_format($log_item_parts[5],2,'.','');
-								$units_id=$log_item_parts[6];
-								$crop_id=$log_item_parts[7];
-								$treatment_id=$log_item_parts[8];
+								$farm_app_id=$log_item_parts[0];
+								$farm_version=$log_item_parts[1];
+								$user_id=$log_item_parts[2];
+								$farm_id=getFarmIDFromFarmAppIdVersionUser($dbh,$farm_app_id,$farm_version,$user_id);
+								$plot_id=getPlotIDFromFarm($dbh,$farm_id,$log_item_parts[3]);
+								$date=$log_item_parts[4];
+								$data_item_id=$log_item_parts[5];
+								$value=number_format($log_item_parts[6],2,'.','');
+								$quantity=number_format($log_item_parts[7],2,'.','');
+								$units_id=$log_item_parts[8];
+								$crop_id=$log_item_parts[9];
+								$treatment_id=$log_item_parts[10];
+								$cost=$log_item_parts[11];
+								$comments=$log_item_parts[12];
 								
 								if($i==0){
 									$query="DELETE FROM log WHERE plot_id IN (SELECT plot_id FROM plot WHERE farm_id=$farm_id) AND log_data_item_id>0";
 									$result = mysqli_query($dbh,$query);
 								}
 							
-								$query="INSERT INTO log (plot_id, log_date, log_data_item_id, log_value, log_units_id, log_crop_id, log_treatment_id) VALUES ($plot_id, '$date', $data_item_id, $value, $units_id, $crop_id, $treatment_id)";
+								$query="INSERT INTO log (plot_id, log_date, log_data_item_id, log_value, log_quantity, log_units_id, log_crop_id, log_treatment_id, log_comments) VALUES ($plot_id, '$date', $data_item_id, $value, $quantity, $units_id, $crop_id, $treatment_id, '$comments')";
 								$result = mysqli_query($dbh,$query);
 								
 							}
@@ -219,11 +223,13 @@ function checkRecords($dbh,$ugunduzi_email,$ugunduzi_pass,$data_subject,$multime
 						}
 						$log_item_parts=explode(";",$text);
 						
-						$farm_name=$log_item_parts[0];
-						$user_id=$log_item_parts[1];
-						$farm_id=getFarmIDFromNameUser($dbh,$farm_name,$user_id);
-						$plot_id=getPlotIDFromFarm($dbh,$farm_id,$log_item_parts[2]);
-						$date=$log_item_parts[3];
+						$farm_app_id=$log_item_parts[0];
+						$farm_version=$log_item_parts[1];
+						$user_id=$log_item_parts[2];
+						$plot_app_id=$log_item_parts[3];
+						$date=$log_item_parts[4];
+						$farm_id=getFarmIDFromFarmAppIdVersionUser($dbh,$farm_app_id,$farm_version,$user_id);
+						$plot_id=getPlotIDFromFarm($dbh,$farm_id,$plot_app_id);
 						
 						$extension="";
 					}

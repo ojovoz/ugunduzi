@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
@@ -226,7 +227,7 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                     prefs.savePreference("user", uAS);
                     prefs.savePreference("userPass", uPS);
                     prefs.savePreferenceInt("userId", userId);
-                    startNextActivity();
+                    checkUserDataDownload();
                 } else if (userId == 0) {
                     if (dataDownloaded) {
                         connectionTask = 1;
@@ -237,6 +238,40 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                 } else {
                     Toast.makeText(this, R.string.wrongPasswordLabel, Toast.LENGTH_SHORT).show();
                 }
+            }
+        }
+    }
+
+    public void checkUserDataDownload(){
+        oFarm f = new oFarm(this);
+        if(f.hasFarms(userId)==0){
+            doDownloadUserData();
+        } else {
+            startNextActivity();
+        }
+    }
+
+    public void doDownloadUserData(){
+        httpConnection http = new httpConnection(this, this);
+        if (http.isOnline()) {
+            if (!bConnecting) {
+                CharSequence dialogTitle = getString(R.string.downloadingUserData);
+
+                dialog = new ProgressDialog(this);
+                dialog.setCancelable(true);
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.setMessage(dialogTitle);
+                dialog.setIndeterminate(true);
+                dialog.show();
+                dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface d) {
+                        bConnecting = false;
+                    }
+                });
+                bConnecting = true;
+                connectionTask = 2;
+                http.execute(server + "/mobile/get_user_farms.php?user=" + Integer.toString(userId), "");
             }
         }
     }
@@ -319,9 +354,17 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                             updateAutocomplete();
                         }
                     }
+                    break;
+                case 2:
+                    if(!output.isEmpty()){
+                        createUserFarms(output);
+                    } else {
+                        dialog.dismiss();
+                        startNextActivity();
+                    }
+                    bConnecting=false;
             }
         }
-
     }
 
     Handler progressHandler = new Handler() {
@@ -332,6 +375,68 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
             dialog.setMessage(dialogTitle);
         }
     };
+
+    public void createUserFarms(String farms){
+        dateHelper dH = new dateHelper();
+        int maxId = 0;
+        ArrayList<oFarm> newFarms = new ArrayList<>();
+        String[] lines = farms.split("\\*");
+        for(int i=0;i<lines.length;i++){
+            String[] thisFarm = lines[i].split(",");
+            String farmName = thisFarm[0].replaceAll("\"","");
+            int farmId = Integer.parseInt(thisFarm[1]);
+            int farmVersion = Integer.parseInt(thisFarm[2]);
+            float farmSize = Float.parseFloat(thisFarm[3]);
+            String date = thisFarm[4];
+            String plotId = thisFarm[6];
+            String plotX = thisFarm[7];
+            String plotY = thisFarm[8];
+            String plotW = thisFarm[9];
+            String plotH = thisFarm[10];
+            String cropsList = thisFarm[11];
+            String pestControlList = thisFarm[12];
+            String soilManagementList = thisFarm[13];
+
+            String plotMatrix = plotId + ";" + plotX + ";" + plotY + ";" + plotW + ";" + plotH + ";" + cropsList + ";" + pestControlList + ";" +
+                    soilManagementList;
+
+            Iterator<oFarm> iterator = newFarms.iterator();
+            boolean bFound = false;
+            while(iterator.hasNext()){
+                oFarm f = iterator.next();
+                if(f.id==farmId && f.version==farmVersion) {
+                    f.plotMatrix = f.plotMatrix + ";" + plotMatrix;
+                    bFound = true;
+                    break;
+                }
+            }
+            if(!bFound){
+                oFarm f = new oFarm(this);
+                f.id = farmId;
+                f.context = this;
+                f.name = farmName;
+                f.version = farmVersion;
+                f.userId = userId;
+                f.size = farmSize;
+                f.dateCreated = dH.stringToDate(date);
+                f.status = 2;
+                f.plotMatrix = plotMatrix;
+                newFarms.add(f);
+
+                maxId = (farmId>maxId) ? farmId : maxId;
+            }
+        }
+
+        Iterator<oFarm> iterator = newFarms.iterator();
+        while(iterator.hasNext()){
+            oFarm f = iterator.next();
+            f.addNewFarm(f.id,f.userId,f.name,f.size,f.dateCreated,f.plotMatrix,f.version,f.status);
+        }
+
+        if(maxId>=prefs.getPreferenceInt("farmIdNumber")){
+            prefs.savePreferenceInt("farmIdNumber",maxId+1);
+        }
+    }
 
     private void deleteCatalog(String filename) {
         this.deleteFile(filename);

@@ -1275,7 +1275,7 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
         String date = dH.dateToString(l.date);
         if (l.dataItem.type != 0) {
             String quantityUnits = String.valueOf(l.quantity) + " " + l.units.name;
-            ret = date + "\n" + dataItem + ": " + quantityUnits + "\n";
+            ret = date + "\n" + dataItem + ", " + quantityUnits + "\n";
         } else {
             ret = date + "\n" + dataItem + ": ";
         }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net
 --
 -- Servidor: 192.168.86.197
--- Tiempo de generación: 16-08-2018 a las 19:18:49
+-- Tiempo de generación: 27-09-2018 a las 13:10:17
 -- Versión del servidor: 5.5.57-0+deb7u1-log
 -- Versión de PHP: 5.3.29-1~dotdeb.0
 
@@ -94,16 +94,11 @@ CREATE TABLE IF NOT EXISTS `crop_x_plot` (
   `crop_x_plot_id` int(10) unsigned NOT NULL,
   `crop_id` int(10) unsigned NOT NULL,
   `plot_id` int(10) unsigned NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `crop_x_plot`
 --
-
-INSERT INTO `crop_x_plot` (`crop_x_plot_id`, `crop_id`, `plot_id`) VALUES
-(1, 1, 1),
-(2, 3, 1),
-(3, 4, 2);
 
 -- --------------------------------------------------------
 
@@ -115,11 +110,11 @@ CREATE TABLE IF NOT EXISTS `data_item` (
   `data_item_id` int(10) unsigned NOT NULL,
   `data_item_name` varchar(100) NOT NULL,
   `data_item_default_units_id` int(10) unsigned NOT NULL,
-  `data_item_type` int(10) unsigned NOT NULL COMMENT '0=activity (cost), 1=activity (cost with quantity), 2=input (cost), 3=output (sale)',
+  `data_item_type` int(10) unsigned NOT NULL COMMENT '0=cost, 1=quantity & units, 2=cost, quantity, units',
   `is_crop_specific` tinyint(1) NOT NULL,
   `is_treatment_specific` tinyint(1) NOT NULL,
   `data_item_name_english` varchar(30) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `data_item`
@@ -129,17 +124,18 @@ INSERT INTO `data_item` (`data_item_id`, `data_item_name`, `data_item_default_un
 (1, 'Maandalizi ya shamba', 0, 0, 0, 0, 'Land preparation'),
 (2, 'Kupanda', 0, 0, 1, 0, 'Planting'),
 (3, 'Kuvuna', 0, 0, 1, 0, 'Harvesting'),
-(4, 'Mavuno', 1, 3, 1, 0, 'Yield'),
-(5, 'Utumiaji (Matibabu)', 0, 1, 0, 1, 'Application (treatment)'),
-(6, 'Mbegu', 4, 2, 1, 0, 'Seed cost'),
-(7, 'Bei (Matibabu)', 4, 2, 0, 1, 'Costs (treatment)'),
-(8, 'Mauzo', 4, 3, 1, 0, 'Sales'),
+(4, 'Mavuno', 1, 1, 1, 0, 'Yield'),
+(5, 'Utumiaji (Matibabu)', 1, 1, 0, 1, 'Application (treatment)'),
+(6, 'Bei (Mbegu)', 1, 2, 1, 0, 'Seed cost'),
+(7, 'Bei (Matibabu)', 1, 2, 0, 1, 'Costs (treatment)'),
+(8, 'Mauzo', 1, 3, 1, 0, 'Sales'),
 (9, 'Palizi', 0, 0, 0, 0, 'Weeding'),
-(10, 'Kuandoa', 0, 0, 0, 0, 'Pruning'),
+(10, 'Kuandoa', 0, 0, 1, 0, 'Pruning'),
 (11, 'Kuhifadi', 0, 0, 1, 0, 'Storage'),
 (12, 'Usafiri', 0, 0, 1, 0, 'Transport'),
 (13, 'Kodi', 0, 0, 0, 0, 'Rent'),
-(14, 'Chombo', 0, 2, 0, 0, 'Tool');
+(14, 'Chombo', 0, 0, 0, 0, 'Tool'),
+(15, 'Gharama nyingine', 1, 0, 0, 0, 'Other costs');
 
 -- --------------------------------------------------------
 
@@ -155,14 +151,11 @@ CREATE TABLE IF NOT EXISTS `farm` (
   `farm_size_acres` float unsigned NOT NULL,
   `farm_date_created` date NOT NULL,
   `farm_version` int(10) unsigned NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `farm`
 --
-
-INSERT INTO `farm` (`farm_id`, `farm_app_id`, `user_id`, `farm_name`, `farm_size_acres`, `farm_date_created`, `farm_version`) VALUES
-(1, 0, 2, 'Shamba 1', 1, '2018-08-16', 0);
 
 -- --------------------------------------------------------
 
@@ -183,7 +176,11 @@ CREATE TABLE IF NOT EXISTS `log` (
   `log_comments` text NOT NULL,
   `log_picture` varchar(100) NOT NULL,
   `log_sound` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+
+--
+-- Volcado de datos para la tabla `log`
+--
 
 -- --------------------------------------------------------
 
@@ -199,15 +196,11 @@ CREATE TABLE IF NOT EXISTS `plot` (
   `plot_y` int(10) unsigned NOT NULL,
   `plot_w` int(10) unsigned NOT NULL,
   `plot_h` int(10) unsigned NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `plot`
 --
-
-INSERT INTO `plot` (`plot_id`, `internal_plot_id`, `farm_id`, `plot_x`, `plot_y`, `plot_w`, `plot_h`) VALUES
-(1, 0, 1, 0, 0, 4, 2),
-(2, 1, 1, 0, 2, 4, 2);
 
 -- --------------------------------------------------------
 
@@ -278,15 +271,11 @@ CREATE TABLE IF NOT EXISTS `treatment_ingredient_x_plot` (
   `treatment_ingredient_x_plot` int(10) unsigned NOT NULL,
   `treatment_ingredient_id` int(10) unsigned NOT NULL,
   `plot_id` int(10) unsigned NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `treatment_ingredient_x_plot`
 --
-
-INSERT INTO `treatment_ingredient_x_plot` (`treatment_ingredient_x_plot`, `treatment_ingredient_id`, `plot_id`) VALUES
-(1, 3, 1),
-(2, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -451,27 +440,27 @@ ALTER TABLE `crop`
 -- AUTO_INCREMENT de la tabla `crop_x_plot`
 --
 ALTER TABLE `crop_x_plot`
-  MODIFY `crop_x_plot_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
+  MODIFY `crop_x_plot_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=51;
 --
 -- AUTO_INCREMENT de la tabla `data_item`
 --
 ALTER TABLE `data_item`
-  MODIFY `data_item_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=15;
+  MODIFY `data_item_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=16;
 --
 -- AUTO_INCREMENT de la tabla `farm`
 --
 ALTER TABLE `farm`
-  MODIFY `farm_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+  MODIFY `farm_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=24;
 --
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(10) unsigned NOT NULL AUTO_INCREMENT;
+  MODIFY `log_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT de la tabla `plot`
 --
 ALTER TABLE `plot`
-  MODIFY `plot_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
+  MODIFY `plot_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=40;
 --
 -- AUTO_INCREMENT de la tabla `treatment`
 --
@@ -486,7 +475,7 @@ ALTER TABLE `treatment_ingredient`
 -- AUTO_INCREMENT de la tabla `treatment_ingredient_x_plot`
 --
 ALTER TABLE `treatment_ingredient_x_plot`
-  MODIFY `treatment_ingredient_x_plot` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
+  MODIFY `treatment_ingredient_x_plot` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=37;
 --
 -- AUTO_INCREMENT de la tabla `units`
 --
