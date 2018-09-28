@@ -55,7 +55,7 @@ public class oTreatmentIngredient {
         csvFileManager treatmentIngredientList;
 
         treatmentIngredientList = new csvFileManager("treatment_ingredients");
-        List<String[]> treatmentIngredientsCSV = treatmentIngredientList.read(context);
+        List<String[]> treatmentIngredientsCSV = treatmentIngredientList.read(c);
         if(treatmentIngredientsCSV!=null) {
             Iterator<String[]> iterator = treatmentIngredientsCSV.iterator();
             while (iterator.hasNext()) {
