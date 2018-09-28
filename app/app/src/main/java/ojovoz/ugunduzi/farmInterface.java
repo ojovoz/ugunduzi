@@ -11,6 +11,9 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -113,7 +116,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     private Handler historyHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            arrowShowing=-1;
+            arrowShowing = -1;
             canvasView.invalidate();
         }
     };
@@ -181,7 +184,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 prefs.deletePreference("user");
                 goToLogin();
             } else {
-                if(initialVersion==-1) {
+                if (initialVersion == -1) {
                     currentFarm = currentFarm.getLatestActiveVersion(userId, farmId, this);
                     maxVersion = farmVersion = currentFarm.version;
                     this.setTitle(currentFarm.name + " (" + user + ")");
@@ -189,7 +192,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     currentFarm = currentFarm.getVersion(userId, farmId, initialVersion, this);
                     maxVersion = currentFarm.getMaxVersionNumber(userId, farmId, this);
                     farmVersion = initialVersion;
-                    if(farmVersion==maxVersion){
+                    if (farmVersion == maxVersion) {
                         this.setTitle(currentFarm.name + " (" + user + ")");
                     } else {
                         dateHelper dH = new dateHelper();
@@ -240,7 +243,6 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         });
     }
-
 
 
     public void createFarm() {
@@ -316,7 +318,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 if (currentFarm.getNumberOfFarms(userId) > 1) {
                     menu.add(5, 5, 5, R.string.opGoToOtherFarm);
                 }
-                menu.add(6, 6, 6, R.string.opSwitchUser);
+                menu.add(6, 6, 6, R.string.opGoToWeb);
+                menu.add(7, 7, 7, R.string.opSwitchUser);
             }
 
         }
@@ -374,6 +377,9 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     goToFarmChooser();
                     break;
                 case 6:
+                    goToWebPage();
+                    break;
+                case 7:
                     confirmExit();
             }
         }
@@ -1005,7 +1011,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             arrowShowing = 0;
         }
         if (bChange) {
-            historyHandler.sendEmptyMessageDelayed(-1,800);
+            historyHandler.sendEmptyMessageDelayed(-1, 800);
             currentFarm = currentFarm.getVersion(userId, farmId, farmVersion, this);
             String date = dH.dateToString(currentFarm.dateCreated);
             farmName = currentFarm.name;
@@ -1022,7 +1028,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         }
     }
 
-    public void goToPlotRecords(){
+    public void goToPlotRecords() {
         dateHelper dH = new dateHelper();
         final Context context = this;
         Intent i = new Intent(context, records.class);
@@ -1084,7 +1090,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         i.putExtra("soilManagementNames", plotMatrix.currentPlot.getSoilManagementNames(this));
         i.putExtra("displayWidth", displayWidth);
         i.putExtra("displayHeight", displayHeight);
-        i.putExtra("from",0);
+        i.putExtra("from", 0);
         startActivity(i);
         finish();
     }
@@ -1124,8 +1130,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
             if (farmId == -1) {
                 farmId = prefs.getPreferenceInt("farmIdNumber");
-                if(state!=2){
-                    prefs.savePreferenceInt("farmIdNumber",farmId+1);
+                if (state != 2) {
+                    prefs.savePreferenceInt("farmIdNumber", farmId + 1);
                 }
             }
 
@@ -1207,6 +1213,28 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 }
             }
         }
+    }
+
+    public void goToWebPage() {
+        if (isOnline()) {
+            String webpage = server + "/mobile2web.php?user=" + user + "&pass=" + userPass;
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            if (i.resolveActivity(getPackageManager()) != null) {
+                i.setData(Uri.parse(webpage));
+                startActivity(i);
+            }
+        } else {
+            Toast.makeText(this, R.string.pleaseConnectMessage, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnected()) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -1321,10 +1349,10 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 drawGhostRectangle(canvas, plotMatrix.ghostPlot, ContextCompat.getColor(context, R.color.colorDrawGhostRectangle));
             }
 
-            if(arrowShowing==0){
-                canvas.drawBitmap(historyLeft,(displayWidth/4)-(historyLeft.getWidth()/2),(displayHeight/2)-(historyLeft.getHeight()/2), paint);
-            } else if (arrowShowing==1){
-                canvas.drawBitmap(historyRight,((displayWidth/4)*3)-(historyRight.getWidth()/2),(displayHeight/2)-(historyRight.getHeight()/2), paint);
+            if (arrowShowing == 0) {
+                canvas.drawBitmap(historyLeft, (displayWidth / 4) - (historyLeft.getWidth() / 2), (displayHeight / 2) - (historyLeft.getHeight() / 2), paint);
+            } else if (arrowShowing == 1) {
+                canvas.drawBitmap(historyRight, ((displayWidth / 4) * 3) - (historyRight.getWidth() / 2), (displayHeight / 2) - (historyRight.getHeight() / 2), paint);
             }
         }
 

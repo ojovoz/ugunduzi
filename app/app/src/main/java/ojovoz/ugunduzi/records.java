@@ -8,6 +8,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -230,7 +233,8 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
             menu.add(1, 1, 1, R.string.opBalance);
         }
         menu.add(2, 2, 2, R.string.opUploadRecords);
-        menu.add(3, 3, 3, R.string.opGoBackToFarm);
+        menu.add(3, 3, 3, R.string.opGoToWeb);
+        menu.add(4, 4, 4, R.string.opGoBackToFarm);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -247,6 +251,9 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
                 uploadRecords();
                 break;
             case 3:
+                goToWebPage();
+                break;
+            case 4:
                 goBack();
         }
         return super.onOptionsItemSelected(item);
@@ -1334,6 +1341,8 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
             newItem.quantity = (newItem.dataItem.type != 0) ? Float.parseFloat(etQuantity.getText().toString()) : 0.0f;
             newItem.value = Float.parseFloat(etValue.getText().toString());
             newItem.comments = etComments.getText().toString().replaceAll(";", "");
+            newItem.comments = newItem.comments.replaceAll("\\*", "");
+            newItem.comments = newItem.comments.replaceAll("\\|", "");
             newItem.context = context;
             if (editingItem == null) {
                 newItem.appendToLog(farmId, farmVersion, userId, plot, newItem.date, newItem.dataItem, newItem.value, newItem.quantity,
@@ -1580,6 +1589,28 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
             int[] idsToUpdate = f.getFarmLineList(userId, f.id);
             f.updateFarmStatus(idsToUpdate, 2);
         }
+    }
+
+    public void goToWebPage() {
+        if (isOnline()) {
+            String webpage = server + "/mobile2web.php?user=" + user + "&pass=" + userPass;
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            if (i.resolveActivity(getPackageManager()) != null) {
+                i.setData(Uri.parse(webpage));
+                startActivity(i);
+            }
+        } else {
+            Toast.makeText(this, R.string.pleaseConnectMessage, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnected()) {
+            return true;
+        }
+        return false;
     }
 
     @Override

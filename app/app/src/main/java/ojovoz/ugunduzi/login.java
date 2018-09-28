@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -57,8 +58,8 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
 
         dataDownloaded = prefs.getPreferenceBoolean("dataDownloaded");
 
-        if(!prefs.preferenceExists("farmIdNumber")){
-            prefs.savePreferenceInt("farmIdNumber",0);
+        if (!prefs.preferenceExists("farmIdNumber")) {
+            prefs.savePreferenceInt("farmIdNumber", 0);
         }
 
         server = prefs.getPreference("server");
@@ -147,7 +148,7 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                 @Override
                 public void onCancel(DialogInterface d) {
                     bConnecting = false;
-                    index=0;
+                    index = 0;
                     prefs.deletePreference("dataDownloaded");
                 }
             });
@@ -178,10 +179,10 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
             if (!bConnecting) {
                 bConnecting = true;
                 connectionTask = 1;
-                try{
-                    String arguments="alias=" + URLEncoder.encode(uAS,"UTF-8") + "&pass=" + URLEncoder.encode(uPS,"UTF-8");
+                try {
+                    String arguments = "alias=" + URLEncoder.encode(uAS, "UTF-8") + "&pass=" + URLEncoder.encode(uPS, "UTF-8");
                     http.execute(server + "/mobile/create_new_user.php?" + arguments, "");
-                } catch (IOException e){
+                } catch (IOException e) {
 
                 }
             }
@@ -212,7 +213,7 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
             if (uAS.equals("admin") && uPS.equals("admin")) { //TODO: command 'sync': downloads farms, updates local preferences & files
                 defineServer(server);
             } else if (uAS.equals("reset") && uPS.equals("reset")) {
-                user="";
+                user = "";
                 prefs.deletePreference("user");
                 prefs.deletePreference("farm");
                 prefs.deletePreference("dataDownloaded");
@@ -242,16 +243,16 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
         }
     }
 
-    public void checkUserDataDownload(){
+    public void checkUserDataDownload() {
         oFarm f = new oFarm(this);
-        if(f.hasFarms(userId)==0){
+        if (f.hasFarms(userId) == 0) {
             doDownloadUserData();
         } else {
             startNextActivity();
         }
     }
 
-    public void doDownloadUserData(){
+    public void doDownloadUserData() {
         httpConnection http = new httpConnection(this, this);
         if (http.isOnline()) {
             if (!bConnecting) {
@@ -273,12 +274,14 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                 connectionTask = 2;
                 http.execute(server + "/mobile/get_user_farms.php?user=" + Integer.toString(userId), "");
             }
+        } else {
+            Toast.makeText(this, R.string.pleaseConnectMessage, Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void processFinish(String output) {
-        if(bConnecting) {
+        if (bConnecting) {
             switch (connectionTask) {
                 case 0:
                     bConnecting = false;
@@ -356,13 +359,20 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                     }
                     break;
                 case 2:
-                    if(!output.isEmpty()){
+                    if (!output.isEmpty()) {
                         createUserFarms(output);
                     } else {
                         dialog.dismiss();
                         startNextActivity();
                     }
-                    bConnecting=false;
+                    break;
+                case 3:
+                    if(!output.isEmpty()){
+                        createUserLog(output);
+                    } else {
+                        dialog.dismiss();
+                        startNextActivity();
+                    }
             }
         }
     }
@@ -376,14 +386,14 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
         }
     };
 
-    public void createUserFarms(String farms){
+    public void createUserFarms(String farms) {
         dateHelper dH = new dateHelper();
         int maxId = 0;
         ArrayList<oFarm> newFarms = new ArrayList<>();
         String[] lines = farms.split("\\*");
-        for(int i=0;i<lines.length;i++){
+        for (int i = 0; i < lines.length; i++) {
             String[] thisFarm = lines[i].split(",");
-            String farmName = thisFarm[0].replaceAll("\"","");
+            String farmName = thisFarm[0].replaceAll("\"", "");
             int farmId = Integer.parseInt(thisFarm[1]);
             int farmVersion = Integer.parseInt(thisFarm[2]);
             float farmSize = Float.parseFloat(thisFarm[3]);
@@ -402,15 +412,15 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
 
             Iterator<oFarm> iterator = newFarms.iterator();
             boolean bFound = false;
-            while(iterator.hasNext()){
+            while (iterator.hasNext()) {
                 oFarm f = iterator.next();
-                if(f.id==farmId && f.version==farmVersion) {
+                if (f.id == farmId && f.version == farmVersion) {
                     f.plotMatrix = f.plotMatrix + ";" + plotMatrix;
                     bFound = true;
                     break;
                 }
             }
-            if(!bFound){
+            if (!bFound) {
                 oFarm f = new oFarm(this);
                 f.id = farmId;
                 f.context = this;
@@ -423,19 +433,68 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                 f.plotMatrix = plotMatrix;
                 newFarms.add(f);
 
-                maxId = (farmId>maxId) ? farmId : maxId;
+                maxId = (farmId > maxId) ? farmId : maxId;
             }
         }
 
         Iterator<oFarm> iterator = newFarms.iterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             oFarm f = iterator.next();
-            f.addNewFarm(f.id,f.userId,f.name,f.size,f.dateCreated,f.plotMatrix,f.version,f.status);
+            f.addNewFarm(f.id, f.userId, f.name, f.size, f.dateCreated, f.plotMatrix, f.version, f.status);
         }
 
-        if(maxId>=prefs.getPreferenceInt("farmIdNumber")){
-            prefs.savePreferenceInt("farmIdNumber",maxId+1);
+        if (maxId >= prefs.getPreferenceInt("farmIdNumber")) {
+            prefs.savePreferenceInt("farmIdNumber", maxId + 1);
         }
+
+        downloadUserLog();
+    }
+
+    public void downloadUserLog() {
+        httpConnection http = new httpConnection(this, this);
+        if (http.isOnline()) {
+
+            connectionTask = 3;
+            http.execute(server + "/mobile/get_user_log.php?user=" + Integer.toString(userId), "");
+
+        } else {
+            dialog.dismiss();
+            bConnecting=false;
+            Toast.makeText(this, R.string.pleaseConnectMessage, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void createUserLog(String log){
+        dateHelper dH = new dateHelper();
+        String[] lines = log.split("\\*");
+
+        for(int i=0; i<lines.length; i++){
+            oDataItem d = new oDataItem(this);
+            oUnit u = new oUnit(this);
+            oCrop c = new oCrop(this);
+            oTreatmentIngredient t = new oTreatmentIngredient(this);
+            oLog l = new oLog(this);
+            String[] thisItem = lines[i].split(",");
+            int farmId = Integer.parseInt(thisItem[0]);
+            int farmVersion = Integer.parseInt(thisItem[1]);
+            int plotId = Integer.parseInt(thisItem[2]);
+            Date date = dH.stringToDate(thisItem[3]);
+            int dataItemId = Integer.parseInt(thisItem[4]);
+            d = d.getDataItemFromId(dataItemId);
+            Float quantity = Float.parseFloat(thisItem[5]);
+            Float value = Float.parseFloat(thisItem[6]);
+            int unitsId = Integer.parseInt(thisItem[7]);
+            u = u.getUnitFromId(unitsId);
+            int cropId = Integer.parseInt(thisItem[8]);
+            c = c.getCropFromId(cropId);
+            int treatmentIngredientId = Integer.parseInt(thisItem[9]);
+            t = t.getTreatmentIngredientFromId(treatmentIngredientId);
+            String comments = (thisItem.length==11) ? thisItem[10].replaceAll("\"","") : "";
+            l.appendToLog(farmId,farmVersion,userId,plotId,date,d,value,quantity,u,c,t,0.0f,comments,"","");
+        }
+
+        dialog.dismiss();
+        startNextActivity();
     }
 
     private void deleteCatalog(String filename) {
@@ -444,13 +503,13 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
 
     private void startNextActivity() {
 
-        boolean bProceed=true;
+        boolean bProceed = true;
         final Context context = this;
 
         if (prefs.preferenceExists("farmId")) {
 
             int farmId = prefs.getPreferenceInt("farmId");
-            if (farmId>=0) {
+            if (farmId >= 0) {
 
                 Intent i = new Intent(context, farmInterface.class);
                 i.putExtra("user", user);
@@ -462,16 +521,16 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                 i.putExtra("farmVersion", -1);
                 startActivity(i);
                 finish();
-                bProceed=false;
+                bProceed = false;
             }
 
         }
 
-        if(bProceed) {
+        if (bProceed) {
             oFarm f = new oFarm(this);
             ArrayList<oFarm> userFarms = f.getActiveFarms(userId);
-            if(userFarms.size()>0){
-                if(userFarms.size()>1){
+            if (userFarms.size() > 0) {
+                if (userFarms.size() > 1) {
                     Intent i = new Intent(context, farmChooser.class);
                     i.putExtra("user", user);
                     i.putExtra("userId", userId);
@@ -480,7 +539,7 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                     finish();
                 } else {
                     int farmId = userFarms.get(0).id;
-                    prefs.savePreferenceInt("farmId",farmId);
+                    prefs.savePreferenceInt("farmId", farmId);
                     Intent i = new Intent(context, farmInterface.class);
                     i.putExtra("user", user);
                     i.putExtra("userId", userId);

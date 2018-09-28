@@ -50,8 +50,6 @@
     <string name="deletingFarmsLabel">Deleting farms</string>
     <string name="deletingFarmLabel">Deleting farm</string>
     <string name="pictureSoundButtonText">PICTURE + SOUND</string>
-    <string name="plotCropLabel">Crop</string>
-    <string name="plotTreatmentLabel">Treatment</string>
     <string name="enterNewDataItemButtonLabel">ENTER DATA</string>
     <string name="chooseDataItemButtonLabel">CHOOSE ITEM</string>
     <string name="saveButtonText">SAVE</string>
@@ -60,32 +58,24 @@
     <string name="opGoBack">Go back</string>
     <string name="valueEmptyMessage">Value cannot be empty</string>
     <string name="quantityEmptyMessage">Quantity cannot be empty</string>
-    <string name="valueNegativeMessage">Value cannot be negative</string>
     <string name="mustChooseCropMessage">You must choose a crop</string>
     <string name="mustChooseTreatmentMessage">You must choose a treatment</string>
     <string name="pictureSoundActivityTitle">Picture + sound</string>
     <string name="pictureButtonLabel">Take a picture</string>
     <string name="soundButtonLabel">Record sound</string>
-    <string name="opPictureSound">Picture + sound</string>
-    <string name="opEnterData">Enter data</string>
     <string name="pictureSoundNotSavedText">Picture and sound have not been saved. Do you really want to exit?</string>
     <string name="soundButtonRecordingLabel">Recording - press to stop</string>
     <string name="soundRecordedMessage">Sound recorded</string>
     <string name="soundButtonLabelAgain">Record sound again</string>
     <string name="pictureSoundSavedMessage">Picture and sound saved successfully</string>
-    <string name="dataManagerActivity">X records</string>
     <string name="opManageFarmRecords">Farm records</string>
-    <string name="farmWord">Farm</string>
     <string name="plotWord">Plot</string>
     <string name="selected">selected</string>
     <string name="opDeleteSelectedItems">Delete selected items</string>
-    <string name="opSendSelectedItems">Send records</string>
-    <string name="textNoCrops">No crops</string>
     <string name="downloadingParametersMessage">Downloading parameters</string>
     <string name="incorrectInternetParamsMessage">Incorrect internet parameters. Please contact the system administrator</string>
     <string name="sendingRecordsMessage">Sending records</string>
     <string name="sendingMultimediaRecordsMessage">Sending new pictures and sounds</string>
-    <string name="textNoTreatments">No treatments</string>
     <string name="cropMarker">(Mbegu)</string>
     <string name="treatmentMarker">(Matibabu)</string>
     <string name="selectCropsLabel">CROPS</string>
@@ -120,4 +110,5 @@
     <string name="farmHasNoRecordsMessage">Farm has no records</string>
     <string name="savingFarmsLabel">Saving new farms</string>
     <string name="downloadingUserData">Downloading user data</string>
+    <string name="opGoToWeb">Go to web</string>
 </resources>

@@ -3,6 +3,9 @@ package ojovoz.ugunduzi;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -59,6 +62,8 @@ public class balance extends AppCompatActivity {
     public Button bDate2;
 
     public dateHelper dH;
+    public preferenceManager prefs;
+    public String server;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +71,8 @@ public class balance extends AppCompatActivity {
         setContentView(R.layout.activity_balance);
 
         dH = new dateHelper();
+        prefs = new preferenceManager(this);
+        server = prefs.getPreference("server");
 
         user = getIntent().getExtras().getString("user");
         userPass = getIntent().getExtras().getString("userPass");
@@ -163,9 +170,10 @@ public class balance extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(android.view.Menu menu) {
         menu.clear();
-        menu.add(0, 0, 0, R.string.opGoBack);
+        menu.add(0, 0, 0, R.string.opGoToWeb);
+        menu.add(1, 1, 1, R.string.opGoBack);
         if(from==1){
-            menu.add(1, 1, 1, R.string.opGoBackToFarm);
+            menu.add(2, 2, 2, R.string.opGoBackToFarm);
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -174,9 +182,12 @@ public class balance extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case 0:
-                goBack();
+                goToWebPage();
                 break;
             case 1:
+                goBack();
+                break;
+            case 2:
                 goToFarm();
         }
         return super.onOptionsItemSelected(item);
@@ -476,6 +487,28 @@ public class balance extends AppCompatActivity {
         oUnit u = new oUnit(this);
         ret = u.getUnitNames(2).get(0);
         return ret;
+    }
+
+    public void goToWebPage() {
+        if (isOnline()) {
+            String webpage = server + "/mobile2web.php?user=" + user + "&pass=" + userPass;
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            if (i.resolveActivity(getPackageManager()) != null) {
+                i.setData(Uri.parse(webpage));
+                startActivity(i);
+            }
+        } else {
+            Toast.makeText(this, R.string.pleaseConnectMessage, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnected()) {
+            return true;
+        }
+        return false;
     }
 
     public void editItem(View v){
