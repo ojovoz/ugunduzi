@@ -1,7 +1,28 @@
 <?php
+
 function getUserIDFromAlias($dbh,$alias){
 	$ret=-1;
 	$query="SELECT user_id FROM user WHERE user_alias='$alias'";
+	$result = mysqli_query($dbh,$query);
+	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$ret=$row[0];
+	}
+	return $ret;
+}
+
+function getUserAliasFromID($dbh,$id){
+	$ret="";
+	$query="SELECT user_alias FROM user WHERE user_id=$id";
+	$result = mysqli_query($dbh,$query);
+	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$ret=$row[0];
+	}
+	return $ret;
+}
+
+function getUserIDFromAliasPass($dbh,$alias,$pass){
+	$ret=-1;
+	$query="SELECT user_id FROM user WHERE user_alias='$alias' AND user_password='$pass'";
 	$result = mysqli_query($dbh,$query);
 	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
 		$ret=$row[0];
@@ -137,6 +158,46 @@ function getPlotIDFromFarm($dbh,$farm_id,$internal_plot_id){
 		$ret=$row[0];
 	}
 	return $ret;
+}
+
+function getPlotData($dbh,$plot_id,$none_word,$plot_word,$pest_control_word,$soil_management_word){
+	$query="SELECT crop_name FROM crop, crop_x_plot WHERE crop_x_plot.plot_id=$plot_id AND crop.crop_id = crop_x_plot.crop_id";
+	$result = mysqli_query($dbh,$query);
+	$crops=$none_word;
+	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		if($crops==$none_word){
+			$crops=$row[0];
+		} else {
+			$crops.=", ".$row[0];
+		}
+	}
+	
+	$query="SELECT treatment_ingredient_name FROM treatment_ingredient, treatment_ingredient_x_plot WHERE treatment_ingredient_x_plot.plot_id=$plot_id AND treatment_ingredient.treatment_ingredient_id = treatment_ingredient_x_plot.treatment_ingredient_id AND treatment_id=1";
+	$result = mysqli_query($dbh,$query);
+	$pest_control=$none_word;
+	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		if($pest_control==$none_word){
+			$pest_control=$row[0];
+		} else {
+			$pest_control.=", ".$row[0];
+		}
+	}
+	
+	$query="SELECT treatment_ingredient_name FROM treatment_ingredient, treatment_ingredient_x_plot WHERE treatment_ingredient_x_plot.plot_id=$plot_id AND treatment_ingredient.treatment_ingredient_id = treatment_ingredient_x_plot.treatment_ingredient_id AND treatment_id=2";
+	$result = mysqli_query($dbh,$query);
+	$soil_management=$none_word;
+	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		if($soil_management==$none_word){
+			$soil_management=$row[0];
+		} else {
+			$soil_management.=", ".$row[0];
+		}
+	}
+	
+	$crops=ucfirst($plot_word).": ".$crops;
+	$pest_control=ucfirst($pest_control_word).": ".$pest_control;
+	$soil_management=ucfirst($soil_management_word).": ".$soil_management;
+	return $crops."<br>".$pest_control."<br>".$soil_management;
 }
 
 function checkRecords($dbh,$ugunduzi_email,$ugunduzi_pass,$data_subject,$multimedia_subject,$mail_server,$servpath,$root_folder,$ffmpeg_path,$sample_rate){
@@ -331,9 +392,6 @@ function getMaxFileIndex($dbh) {
 
 function ConvertAMRToMP3($file1, $file2, $servpath, $ffmpeg_path, $root_folder, $sample_rate) {
 	exec($ffmpeg_path."ffmpeg -i ".$servpath."/".$root_folder."/content/".$file1." -ar ".$sample_rate." ".$servpath.$root_folder."/content/".$file2,$output);
-	//echo($ffmpeg_path."ffmpeg -i ".$servpath.$root_folder."/content".$file1." -ar ".$sample_rate." ".$servpath.$root_folder."/content".$file2);
 }
+
 ?>
-
-
-
