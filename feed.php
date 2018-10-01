@@ -75,7 +75,7 @@ if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESS
     font-family: monospace;
     font-size: 10px; /* reduced font size */
 	width:100%; 
-	max-width:<?php echo($audio_width); ?>px; 
+	max-width:768px; 
 	background: #15420b; 
 }
 
@@ -83,7 +83,7 @@ if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESS
 </style>
 <title>Ugunduzi</title>
 </head>
-<body>
+<body class="w3-theme-l4">
 <div style="width:100%; max-width:800px; dislay:block; margin-left:auto; margin-right:auto;">
 <div class="navbar w3-theme-d4" style="width:100%; max-width:800px;">
   <a class="w3-theme-d4 w3-hover-theme" href="#"><?php echo(ucfirst($_SESSION['user_alias'])); ?></a>
@@ -112,9 +112,9 @@ if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESS
 				$image_source="./content".$row[3];
 				$audio_source="./content".$row[4];
 				?>
-				<p><div class="w3-container w3-card-4">
-				<div class="w3-text-theme"><?php echo($message_header); ?></div>
-				<img style="width:100%; max-width:700px;" src="<?php echo($image_source); ?>"><br>
+				<p><div class="w3-container w3-card-4 w3-white"><br>
+				<div class="w3-text-black"><?php echo($message_header); ?></div>
+				<img style="width:100%; max-width:768px;" src="<?php echo($image_source); ?>"><br>
 				<audio src="<? echo($audio_source); ?>" preload="none"></audio><br>
 				</div></p>
 				<?php

@@ -161,6 +161,8 @@ function getPlotIDFromFarm($dbh,$farm_id,$internal_plot_id){
 }
 
 function getPlotData($dbh,$plot_id,$none_word,$plot_word,$pest_control_word,$soil_management_word){
+	$none_word=ucfirst($none_word);
+	
 	$query="SELECT crop_name FROM crop, crop_x_plot WHERE crop_x_plot.plot_id=$plot_id AND crop.crop_id = crop_x_plot.crop_id";
 	$result = mysqli_query($dbh,$query);
 	$crops=$none_word;
