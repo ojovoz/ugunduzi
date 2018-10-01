@@ -47,7 +47,39 @@ if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESS
 	margin-top: 30px;
 }
 
-.audiojs { width: 100%; max-width: <?php echo($audio_width); ?>px; background: #15420b; }
+.audiojs .scrubber {
+    background: none repeat scroll 0 0 #5A5A5A;
+    border-bottom: 0 none;
+    border-left: 0 none;
+    border-top: 1px solid #3F3F3F;
+    float: left;
+    height: 14px;
+    margin: 10px;
+    overflow: hidden;
+    position: relative;
+    width: 50%; /* smaller width */
+}
+
+.audiojs .time {
+    border-left: 1px solid #000000;
+    color: #DDDDDD;
+    float: left;
+    height: 36px;
+    line-height: 36px;
+    margin: 0; /* no margin */
+    padding: 0 6px 0 9px; /* 2px smaller left padding */
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.audiojs {
+    font-family: monospace;
+    font-size: 10px; /* reduced font size */
+	width:100%; 
+	max-width:<?php echo($audio_width); ?>px; 
+	background: #15420b; 
+}
+
+
 </style>
 <title>Ugunduzi</title>
 </head>
