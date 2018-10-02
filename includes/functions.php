@@ -57,6 +57,16 @@ function getFarmIDFromNameUser($dbh,$farm_name,$user_id){
 	return $ret;
 }
 
+function getFarmNameFromID($dbh,$farm_id){
+	$ret="";
+	$query="SELECT farm_name FROM farm WHERE farm_id=$farm_id";
+	$result = mysqli_query($dbh,$query);
+	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$ret=$row[0];
+	}
+	return $ret;
+}
+
 function getFarmIDsFromFarmAppIdUser($dbh,$farm_app_id,$user_id){
 	$ret=array();
 	$query="SELECT farm_id FROM farm WHERE farm_app_id=$farm_app_id AND user_id=$user_id";
@@ -202,6 +212,64 @@ function getPlotData($dbh,$plot_id,$none_word,$plot_word,$pest_control_word,$soi
 	return $crops."<br>".$pest_control."<br>".$soil_management;
 }
 
+function getCropNameFromID($dbh,$crop_id){
+	$ret="";
+	$query="SELECT crop_name FROM crop WHERE crop_id=$crop_id";
+	$result = mysqli_query($dbh,$query);
+	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$ret=$row[0];
+	}
+	return $ret;
+}
+
+function getTreatmentIngredientNameFromID($dbh,$treatment_ingredient_id){
+	$ret="";
+	$query="SELECT treatment_ingredient_name FROM treatment_ingredient WHERE treatment_ingredient_id=$treatment_ingredient_id";
+	$result = mysqli_query($dbh,$query);
+	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$ret=$row[0];
+	}
+	return $ret;
+}
+
+function getDefaultMoneyUnit($dbh){
+	$ret="";
+	$query="SELECT units_name FROM units WHERE units_type=2";
+	$result = mysqli_query($dbh,$query);
+	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$ret=$row[0];
+	}
+	return $ret;
+}
+
+function getUnitsNameFromID($dbh,$units_id){
+	$ret="";
+	$query="SELECT units_name FROM units WHERE units_id=$units_id";
+	$result = mysqli_query($dbh,$query);
+	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$ret=$row[0];
+	}
+	return $ret;
+}
+
+function getLogDataItemText($dbh,$data_item_id,$quantity,$value,$units_id,$crop_id,$treatment_ingredient_id,$comments){
+	$ret="";
+	$query="SELECT data_item_name, data_item_type, is_crop_specific, is_treatment_specific FROM data_item WHERE data_item_id=$data_item_id";
+	$result = mysqli_query($dbh,$query);
+	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$data_item_name=($row[2]==1 ? str_replace("Mbegu",getCropNameFromID($dbh,$crop_id),$row[0]) : ($row[3]==1 ? str_replace("Matibabu",getTreatmentIngredientNameFromID($dbh,$treatment_ingredient_id),$row[0]) : $row[0]));
+		$item_data=($row[1]==0 ? $value." ".getDefaultMoneyUnit($dbh) : $quantity." ".getUnitsNameFromID($dbh,$units_id)."<br>".$value." ".getDefaultMoneyUnit($dbh));
+		$ret=$data_item_name.": ".$item_data;
+		$ret.=($comments=="" ? "" : "<br><br>".urldecode($comments));
+	}
+	return $ret;
+}
+
+function getTotalItems($dbh,$query){
+	$result = mysqli_query($dbh,$query);
+	return mysqli_num_rows($result);
+}
+
 function checkRecords($dbh,$ugunduzi_email,$ugunduzi_pass,$data_subject,$multimedia_subject,$mail_server,$servpath,$root_folder,$ffmpeg_path,$sample_rate){
 	if ($inbox = imap_open ($mail_server, $ugunduzi_email, $ugunduzi_pass)) {
 		$total = imap_num_msg($inbox);
@@ -233,6 +301,8 @@ function checkRecords($dbh,$ugunduzi_email,$ugunduzi_pass,$data_subject,$multime
 						
 						$log_items=explode("*",$text);
 						
+						$cleared_farms=array();
+						
 						for($i=0;$i<sizeof($log_items);$i++){
 							$log_item=str_replace('=','',$log_items[$i]);
 							$log_item_parts=explode(";",$log_item);
@@ -253,9 +323,10 @@ function checkRecords($dbh,$ugunduzi_email,$ugunduzi_pass,$data_subject,$multime
 								$cost=$log_item_parts[11];
 								$comments=$log_item_parts[12];
 								
-								if($i==0){
+								if(!in_array($farm_id,$cleared_farms)){
 									$query="DELETE FROM log WHERE plot_id IN (SELECT plot_id FROM plot WHERE farm_id=$farm_id) AND log_data_item_id>0";
 									$result = mysqli_query($dbh,$query);
+									array_push($cleared_farms,$farm_id);
 								}
 							
 								$query="INSERT INTO log (plot_id, log_date, log_data_item_id, log_value, log_quantity, log_units_id, log_crop_id, log_treatment_id, log_comments) VALUES ($plot_id, '$date', $data_item_id, $value, $quantity, $units_id, $crop_id, $treatment_id, '$comments')";

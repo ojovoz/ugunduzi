@@ -13,6 +13,10 @@ if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESS
 	} else {
 		$from=0;
 	}
+	
+	if(isset($_GET['mode'])){
+		$_SESSION['mode']=$_GET['mode'];
+	}
 ?>
 <!DOCTYPE html>
 <html>
@@ -31,6 +35,7 @@ if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESS
   overflow: hidden;
   position: fixed;
   top: 0;
+  z-index: 100;
 }
   
 .navbar a {
@@ -86,43 +91,81 @@ if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESS
 <body class="w3-theme-l4">
 <div style="width:100%; max-width:800px; dislay:block; margin-left:auto; margin-right:auto;">
 <div class="navbar w3-theme-d4" style="width:100%; max-width:800px;">
-  <a class="w3-theme-d4 w3-hover-theme" href="#"><?php echo(ucfirst($_SESSION['user_alias'])); ?></a>
-  <a class="w3-theme-d4 w3-hover-theme" href="#">Everybody</a>
+  <a class="<?php echo($_SESSION['mode']==0 ? "w3-theme-d4" : "w3-theme-d2");?> w3-hover-theme" href="feed.php?mode=1"><?php echo(ucfirst($_SESSION['user_alias'])); ?></a>
+  <a class="<?php echo($_SESSION['mode']==1 ? "w3-theme-d4" : "w3-theme-d2");?> w3-hover-theme" href="feed.php?mode=0">Everybody</a>
 </div>
 <div class="main"><p>
-<?php
+<?php	
+$user_filter = ($_SESSION['mode']==0 ? " " : " AND farm.user_id = ".$_SESSION['user_id']." ");
+$image_filter = ($_SESSION['mode']==0 ? " AND log.log_picture<>'' AND log.log_sound<>'' " : " ");
+$query_limit = " LIMIT $from, $max_items_per_page";
+$query_all="SELECT log.plot_id, log.log_date, farm.user_id, log.log_data_item_id, log.log_quantity, log.log_value, log.log_units_id, log.log_crop_id, log.log_treatment_id, log.log_comments, log.log_picture, log.log_sound, farm.farm_id FROM log, plot, farm WHERE plot.plot_id = log.plot_id AND farm.farm_id = plot.farm_id".$user_filter.$image_filter."ORDER BY log_date DESC";
+$query=$query_all.$query_limit;
+$result = mysqli_query($dbh,$query);
+while($row=mysqli_fetch_array($result,MYSQL_NUM)){
+	$user_id=$row[2];
+	$user_alias=getUserAliasFromID($dbh,$user_id);
+	$plot_data=getPlotData($dbh,$row[0],$none_word,$plot_word,$pest_control_word,$soil_management_word);
 	switch($_SESSION['mode']){
 		case 0:
-			$query="SELECT log.plot_id, log.log_date, farm.user_id, log.log_picture, log.log_sound FROM log, plot, farm WHERE log_picture<>'' AND log_sound<>'' AND plot.plot_id = log.plot_id AND farm.farm_id = plot.farm_id ORDER BY log_date DESC LIMIT $from, $max_images_per_page";
-			$result = mysqli_query($dbh,$query);
-			while($row=mysqli_fetch_array($result,MYSQL_NUM)){
-				$user_id=$row[2];
-				$user_alias=getUserAliasFromID($dbh,$user_id);
-				if($user_alias!=""){
-					$message_data=ucfirst($user_alias).": ".$row[1];
-				} else {
-					$message_data=$row[1];
-				}
-				$plot_data=getPlotData($dbh,$row[0],$none_word,$plot_word,$pest_control_word,$soil_management_word);
-				if($plot_data!=""){
-					$message_header=$message_data."<br>".$plot_data."<br>";
-				} else {
-					$message_header=$message_data."<br>";
-				}
-				$image_source="./content".$row[3];
-				$audio_source="./content".$row[4];
+			$message_data = ($user_alias!="" ? ucfirst($user_alias).": ".$row[1] : $row[1]);
+			$message_header = ($plot_data!="" ? $message_data."<br>".$plot_data."<br>" : $message_data."<br>");
+			$image_source="./content".$row[10];
+			$audio_source="./content".$row[11];
+			?>
+			<p><div class="w3-container w3-card-4 w3-white"><br>
+			<div class="w3-text-black"><?php echo($message_header); ?></div>
+			<img style="width:100%; max-width:768px;" src="<?php echo($image_source); ?>"><br>
+			<audio src="<? echo($audio_source); ?>" preload="none"></audio><br>
+			</div></p>
+			<?php
+			break;
+		case 1:
+			$farm_name=getFarmNameFromID($dbh,$row[12]);
+			$message_data = ($farm_name!="" ? ucfirst($farm_name).": ".$row[1] : $row[1]);
+			$message_header = ($plot_data!="" ? $message_data."<br>".$plot_data."<br>" : $message_data."<br>");
+			?>
+			<p><div class="w3-container w3-card-4 w3-white"><br>
+			<div class="w3-text-black"><?php echo($message_header); ?></div>
+			<?php
+			if($row[10]!="" && $row[11]!=""){
+				$image_source="./content".$row[10];
+				$audio_source="./content".$row[11];
 				?>
-				<p><div class="w3-container w3-card-4 w3-white"><br>
-				<div class="w3-text-black"><?php echo($message_header); ?></div>
 				<img style="width:100%; max-width:768px;" src="<?php echo($image_source); ?>"><br>
 				<audio src="<? echo($audio_source); ?>" preload="none"></audio><br>
 				</div></p>
 				<?php
+			} else {
+				$message_content = getLogDataItemText($dbh,$row[3],$row[4],$row[5],$row[6],$row[7],$row[8],$row[9]);
+				?>
+				<br><div class="w3-text-black"><?php echo($message_content); ?></div><br>
+				</div></p>
+				<?php
 			}
 			break;
-		case 1:
-			break;
+	}		
+}
+$total_items=getTotalItems($dbh,$query_all);
+if($from>0 || $total_items>($from+$max_items_per_page)){
+	?>
+	<p>
+	<div class="w3-bar w3-xlarge"> 
+	<?php
+	if($from>0){
+		?>
+		<a href="feed.php?from=<?php echo($from-$max_items_per_page) ?>" style="text-decoration:none;" class="w3-theme-d2 w3-hover-theme w3-button"><< Previous</a>
+		<?php
 	}
+	if($total_items>($from+$max_items_per_page)){
+		?>
+		<a href="feed.php?from=<?php echo($from+$max_items_per_page) ?>" style="text-decoration:none;" class="w3-theme-d2 w3-hover-theme w3-button">Next >></a>
+		<?php
+	}
+	?>
+	</div></p>
+	<?php
+}
 ?>
 </p>
 </div>

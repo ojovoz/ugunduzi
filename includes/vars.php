@@ -19,7 +19,6 @@ $sample_rate="22050";
 //web/
 
 $max_images_per_page=10;
-$audio_width=700;
 
 //words
 $none_word="none";
