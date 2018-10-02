@@ -6,6 +6,12 @@ include_once "includes/functions.php";
 include_once "includes/vars.php";
 $dbh = initDB();
 
+if(isset($_GET['guest'])){
+	$_SESSION['user_id']=-1;
+	$_SESSION['user_alias']="";
+	$_SESSION['mode']=0;
+}
+
 if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESSION['mode'])){
 	checkRecords($dbh,$ugunduzi_email,$ugunduzi_pass,$data_subject,$multimedia_subject,$mail_server,$servpath,$root_folder,$ffmpeg_path,$sample_rate);
 	if(isset($_GET['from'])){
@@ -91,7 +97,7 @@ if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESS
 <body class="w3-theme-l4">
 <div style="width:100%; max-width:800px; dislay:block; margin-left:auto; margin-right:auto;">
 <div class="navbar w3-theme-d4" style="width:100%; max-width:800px;">
-  <a class="<?php echo($_SESSION['mode']==0 ? "w3-theme-d4" : "w3-theme-d2");?> w3-hover-theme" href="feed.php?mode=1"><?php echo(ucfirst($_SESSION['user_alias'])); ?></a>
+  <?php if($_SESSION['user_id']>=0) { ?><a class="<?php echo($_SESSION['mode']==0 ? "w3-theme-d4" : "w3-theme-d2");?> w3-hover-theme" href="feed.php?mode=1"><?php echo(ucfirst($_SESSION['user_alias'])); ?></a><?php } ?>
   <a class="<?php echo($_SESSION['mode']==1 ? "w3-theme-d4" : "w3-theme-d2");?> w3-hover-theme" href="feed.php?mode=0">Everybody</a>
 </div>
 <div class="main"><p>
