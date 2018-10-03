@@ -110,11 +110,11 @@ $query=$query_all.$query_limit;
 $result = mysqli_query($dbh,$query);
 while($row=mysqli_fetch_array($result,MYSQL_NUM)){
 	$user_id=$row[2];
-	$user_alias=getUserAliasFromID($dbh,$user_id);
-	$plot_data=getPlotData($dbh,$row[0],$none_word,$plot_word,$pest_control_word,$soil_management_word);
+	$user_alias='<a href="feed.php?user='.$user_id.'">'.ucfirst(getUserAliasFromID($dbh,$user_id)).'</a>';
+	$plot_data=getPlotData($dbh,$row[0],$none_word,$plot_word,$pest_control_word,$soil_management_word,"feed.php");
 	switch($_SESSION['mode']){
 		case 0:
-			$message_data = ($user_alias!="" ? ucfirst($user_alias).": ".$row[1] : $row[1]);
+			$message_data = ($user_alias!="" ? $user_alias.": ".$row[1] : $row[1]);
 			$message_header = ($plot_data!="" ? $message_data."<br>".$plot_data."<br>" : $message_data."<br>");
 			$image_source="./content".$row[10];
 			$audio_source="./content".$row[11];
@@ -173,6 +173,16 @@ if($from>0 || $total_items>($from+$max_items_per_page)){
 	<?php
 }
 ?>
+<p><div class="w3-bar w3-xlarge">
+<a href="#" style="text-decoration:none;" class="w3-orange w3-button w3-hover-yellow">Filters</a>
+<?php
+if($_SESSION['mode']==1){
+	?>
+	<a href="#" style="text-decoration:none;" class="w3-blue w3-button w3-hover-yellow">Balance</a>
+	<?php
+}
+?>	
+</div></p>
 </p>
 </div>
 </div>

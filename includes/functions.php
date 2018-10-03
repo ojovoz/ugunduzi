@@ -170,39 +170,39 @@ function getPlotIDFromFarm($dbh,$farm_id,$internal_plot_id){
 	return $ret;
 }
 
-function getPlotData($dbh,$plot_id,$none_word,$plot_word,$pest_control_word,$soil_management_word){
+function getPlotData($dbh,$plot_id,$none_word,$plot_word,$pest_control_word,$soil_management_word,$page){
 	$none_word=ucfirst($none_word);
 	
-	$query="SELECT crop_name FROM crop, crop_x_plot WHERE crop_x_plot.plot_id=$plot_id AND crop.crop_id = crop_x_plot.crop_id";
+	$query="SELECT crop_name, crop.crop_id FROM crop, crop_x_plot WHERE crop_x_plot.plot_id=$plot_id AND crop.crop_id = crop_x_plot.crop_id";
 	$result = mysqli_query($dbh,$query);
 	$crops=$none_word;
 	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
 		if($crops==$none_word){
-			$crops=$row[0];
+			$crops='<a href="'.$page.'?crop='.$row[1].'">'.$row[0].'</a>';
 		} else {
-			$crops.=", ".$row[0];
+			$crops.=', <a href="'.$page.'?crop='.$row[1].'">'.$row[0].'</a>';
 		}
 	}
 	
-	$query="SELECT treatment_ingredient_name FROM treatment_ingredient, treatment_ingredient_x_plot WHERE treatment_ingredient_x_plot.plot_id=$plot_id AND treatment_ingredient.treatment_ingredient_id = treatment_ingredient_x_plot.treatment_ingredient_id AND treatment_id=1";
+	$query="SELECT treatment_ingredient_name, treatment_ingredient.treatment_ingredient_id FROM treatment_ingredient, treatment_ingredient_x_plot WHERE treatment_ingredient_x_plot.plot_id=$plot_id AND treatment_ingredient.treatment_ingredient_id = treatment_ingredient_x_plot.treatment_ingredient_id AND treatment_id=1";
 	$result = mysqli_query($dbh,$query);
 	$pest_control=$none_word;
 	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
 		if($pest_control==$none_word){
-			$pest_control=$row[0];
+			$pest_control='<a href="'.$page.'?ingredient='.$row[1].'">'.$row[0].'</a>';
 		} else {
-			$pest_control.=", ".$row[0];
+			$pest_control.=', <a href="'.$page.'?ingredient='.$row[1].'">'.$row[0].'</a>';
 		}
 	}
 	
-	$query="SELECT treatment_ingredient_name FROM treatment_ingredient, treatment_ingredient_x_plot WHERE treatment_ingredient_x_plot.plot_id=$plot_id AND treatment_ingredient.treatment_ingredient_id = treatment_ingredient_x_plot.treatment_ingredient_id AND treatment_id=2";
+	$query="SELECT treatment_ingredient_name, treatment_ingredient.treatment_ingredient_id FROM treatment_ingredient, treatment_ingredient_x_plot WHERE treatment_ingredient_x_plot.plot_id=$plot_id AND treatment_ingredient.treatment_ingredient_id = treatment_ingredient_x_plot.treatment_ingredient_id AND treatment_id=2";
 	$result = mysqli_query($dbh,$query);
 	$soil_management=$none_word;
 	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
 		if($soil_management==$none_word){
-			$soil_management=$row[0];
+			$soil_management='<a href="'.$page.'?ingredient='.$row[1].'">'.$row[0].'</a>';
 		} else {
-			$soil_management.=", ".$row[0];
+			$soil_management.=', <a href="'.$page.'?ingredient='.$row[1].'">'.$row[0].'</a>';
 		}
 	}
 	
