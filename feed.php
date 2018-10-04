@@ -12,36 +12,6 @@ if(isset($_GET['guest'])){
 	$_SESSION['mode']=0;
 }
 
-if(isset($_GET['user'])){
-	$user_filter_id=$_GET['user'];
-	if($user_filter_id>=0){
-		if(!in_array($user_filter_id,$_SESSION['user_filter'])){
-			array_push($_SESSION['user_filter'],$user_filter_id);
-		}
-	} else {
-		$user_filter_id*=-1;
-		$index=array_search($user_filter_id,$_SESSION['user_filter']);
-		if($index>=0){
-			unset($_SESSION['user_filter'][$index]);
-		}
-	}
-}
-
-if(isset($_GET['farm'])){
-	$farm_filter_id=$_GET['farm'];
-	if($farm_filter_id>=0){
-		if(!in_array($farm_filter_id,$_SESSION['farm_filter'])){
-			array_push($_SESSION['farm_filter'],$farm_filter_id);
-		}
-	} else {
-		$farm_filter_id*=-1;
-		$index=array_search($farm_filter_id,$_SESSION['farm_filter']);
-		if($index>=0){
-			unset($_SESSION['farm_filter'][$index]);
-		}
-	}
-}
-
 if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESSION['mode'])){
 	checkRecords($dbh,$ugunduzi_email,$ugunduzi_pass,$data_subject,$multimedia_subject,$mail_server,$servpath,$root_folder,$ffmpeg_path,$sample_rate);
 	if(isset($_GET['from'])){
@@ -54,6 +24,70 @@ if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESS
 		$_SESSION['mode']=$_GET['mode'];
 		$_SESSION['user_filter']=array();
 		$_SESSION['farm_filter']=array();
+		
+		$_SESSION['crop_filter']=array();
+		$_SESSION['ingredient_filter']=array();
+		
+	} else {
+		if(isset($_GET['user'])){
+			$user_filter_id=$_GET['user'];
+			if($user_filter_id>=0){
+				if(!in_array($user_filter_id,$_SESSION['user_filter'])){
+					array_push($_SESSION['user_filter'],$user_filter_id);
+				}
+			} else {
+				$user_filter_id*=-1;
+				$index=array_search($user_filter_id,$_SESSION['user_filter']);
+				if($index>=0){
+					unset($_SESSION['user_filter'][$index]);
+				}
+			}
+		}
+
+		if(isset($_GET['farm'])){
+			$farm_filter_id=$_GET['farm'];
+			if($farm_filter_id>=0){
+				if(!in_array($farm_filter_id,$_SESSION['farm_filter'])){
+					array_push($_SESSION['farm_filter'],$farm_filter_id);
+				}
+			} else {
+				$farm_filter_id*=-1;
+				$index=array_search($farm_filter_id,$_SESSION['farm_filter']);
+				if($index>=0){
+					unset($_SESSION['farm_filter'][$index]);
+				}
+			}
+		}
+
+		if(isset($_GET['crop'])){
+			$crop_filter_id=$_GET['crop'];
+			if($crop_filter_id>=0){
+				if(!in_array($crop_filter_id,$_SESSION['crop_filter'])){
+					array_push($_SESSION['crop_filter'],$crop_filter_id);
+				}
+			} else {
+				$crop_filter_id*=-1;
+				$index=array_search($crop_filter_id,$_SESSION['crop_filter']);
+				if($index>=0){
+					unset($_SESSION['crop_filter'][$index]);
+				}
+			}
+		}
+
+		if(isset($_GET['ingredient'])){
+			$ingredient_filter_id=$_GET['ingredient'];
+			if($ingredient_filter_id>=0){
+				if(!in_array($ingredient_filter_id,$_SESSION['ingredient_filter'])){
+					array_push($_SESSION['ingredient_filter'],$ingredient_filter_id);
+				}
+			} else {
+				$ingredient_filter_id*=-1;
+				$index=array_search($ingredient_filter_id,$_SESSION['ingredient_filter']);
+				if($index>=0){
+					unset($_SESSION['ingredient_filter'][$index]);
+				}
+			}
+		}
 	}
 ?>
 <!DOCTYPE html>
@@ -134,20 +168,23 @@ if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESS
 </div>
 <div class="main"><p>
 <?php	
-if(!empty($_SESSION['user_filter']) || !empty($_SESSION['farm_filter'])){
-	$user_filter_names= (!empty($_SESSION['user_filter']) ? getUserNames($dbh,$_SESSION['user_filter'],"feed.php") : "");
-	$farm_filter_names= (!empty($_SESSION['farm_filter']) ? getFarmNames($dbh,$_SESSION['farm_filter'],"feed.php") : "");
+if(!empty($_SESSION['user_filter']) || !empty($_SESSION['farm_filter']) || !empty($_SESSION['crop_filter']) || !empty($_SESSION['ingredient_filter'])){
+	$user_filter_names = (!empty($_SESSION['user_filter']) ? getUserNames($dbh,$_SESSION['user_filter'],"feed.php") : "");
+	$farm_filter_names = (!empty($_SESSION['farm_filter']) ? getFarmNames($dbh,$_SESSION['farm_filter'],"feed.php") : "");
+	$crop_filter_names = (!empty($_SESSION['crop_filter']) ? getCropNames($dbh,$_SESSION['crop_filter'],"feed.php") : "");
+	$ingredient_filter_names = (!empty($_SESSION['ingredient_filter']) ? getIngredientNames($dbh,$_SESSION['ingredient_filter'],"feed.php") : "");
 	?>
 	<p><div class="w3-container w3-card-4 w3-white w3-padding-small w3-text-black">
-	Filters: <?php echo($user_filter_names." ".$farm_filter_names); ?>
+	Filters: <?php echo($user_filter_names." ".$farm_filter_names." ".$crop_filter_names." ".$ingredient_filter_names); ?>
 	</div></p>
 	<?php
 }
 $user_filter = ($_SESSION['mode']==0 ? (!empty($_SESSION['user_filter']) ? " AND farm.user_id IN(".implode(",",$_SESSION['user_filter']).") " : " ") : " AND farm.user_id = ".$_SESSION['user_id']." ");
 $farm_filter = ($_SESSION['mode']==0 ? " " : (!empty($_SESSION['farm_filter']) ? " AND farm.farm_id IN(".getAllFarmIDS($dbh,$_SESSION['farm_filter'],$_SESSION['user_id']).") " : " "));
+$plot_filter = ((!empty($_SESSION['crop_filter']) || !empty($_SESSION['ingredient_filter'])) ? " AND plot.plot_id IN(".getPlotsWithCropIngredient($dbh,$_SESSION['crop_filter'],$_SESSION['ingredient_filter'],($_SESSION['mode'])==0 ? -1 : $_SESSION['user_id']).") " : " ");
 $image_filter = ($_SESSION['mode']==0 ? " AND log.log_picture<>'' AND log.log_sound<>'' " : " ");
 $query_limit = " LIMIT $from, $max_items_per_page";
-$query_all="SELECT log.plot_id, log.log_date, farm.user_id, log.log_data_item_id, log.log_quantity, log.log_value, log.log_units_id, log.log_crop_id, log.log_treatment_id, log.log_comments, log.log_picture, log.log_sound, farm.farm_id FROM log, plot, farm WHERE plot.plot_id = log.plot_id AND farm.farm_id = plot.farm_id".$farm_filter.$user_filter.$image_filter."ORDER BY log_date DESC";
+$query_all="SELECT log.plot_id, log.log_date, farm.user_id, log.log_data_item_id, log.log_quantity, log.log_value, log.log_units_id, log.log_crop_id, log.log_treatment_id, log.log_comments, log.log_picture, log.log_sound, farm.farm_id FROM log, plot, farm WHERE plot.plot_id = log.plot_id AND farm.farm_id = plot.farm_id".$plot_filter.$farm_filter.$user_filter.$image_filter."ORDER BY log_date DESC";
 $query=$query_all.$query_limit;
 $result = mysqli_query($dbh,$query);
 while($row=mysqli_fetch_array($result,MYSQL_NUM)){

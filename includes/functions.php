@@ -252,6 +252,42 @@ function getFarmNames($dbh,$names_list,$page){
 	return $ret;
 }
 
+function getCropNames($dbh,$names_list,$page){
+	$ret="";
+	for($i=0;$i<sizeof($names_list);$i++){
+		$id=$names_list[$i];
+		$name=ucfirst(getCropNameFromID($dbh,$id));
+		$ret = ($ret=="" ? '<a class="w3-red" href="'.$page.'?crop='.($id*-1).'">'.$name.'</a>' : $ret.= ' <a class="w3-red" href="'.$page.'?crop='.($id*-1).'">'.$name.'</a>');
+	}
+	return $ret;
+}
+
+function getIngredientNames($dbh,$names_list,$page){
+	$ret="";
+	for($i=0;$i<sizeof($names_list);$i++){
+		$id=$names_list[$i];
+		$name=ucfirst(getTreatmentIngredientNameFromID($dbh,$id));
+		$ret = ($ret=="" ? '<a class="w3-red" href="'.$page.'?ingredient='.($id*-1).'">'.$name.'</a>' : $ret.= ' <a class="w3-red" href="'.$page.'?ingredient='.($id*-1).'">'.$name.'</a>');
+	}
+	return $ret;
+}
+
+function getPlotsWithCropIngredient($dbh,$crops,$ingredients,$user_id){
+	$ret=array();
+	$user_filter_crop=($user_id==-1 ? "" : " AND plot.plot_id = crop_x_plot.plot_id AND farm.farm_id = plot.farm_id AND farm.user_id=$user_id ");
+	$user_filter_ingredient=($user_id==-1 ? "" : " AND plot.plot_id = treatment_ingredient_x_plot.plot_id AND farm.farm_id = plot.farm_id AND farm.user_id=$user_id ");
+	$query_crops = (empty($crops) ? "" : "SELECT DISTINCT crop_x_plot.plot_id FROM ".($user_filter_crop=="" ? "crop_x_plot" : "crop_x_plot,plot,farm")." WHERE crop_id IN(".implode(",",$crops).")".$user_filter_crop);
+	$query_ingredients = (empty($ingredients) ? "" : "SELECT DISTINCT treatment_ingredient_x_plot.plot_id FROM ".($user_filter_ingredient=="" ? "treatment_ingredient_x_plot" : "treatment_ingredient_x_plot,plot,farm")." WHERE treatment_ingredient_id IN(".implode(",",$ingredients).")".$user_filter_ingredient);
+	$query = ($query_crops!="" ? ($query_ingredients!="" ? $query_crops." UNION DISTINCT ".$query_ingredients : $query_crops) : $query_ingredients);
+	$result = mysqli_query($dbh,$query);
+	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		if(!in_array($row[0],$ret)){
+			array_push($ret,$row[0]);
+		}
+	}
+	return implode(",",$ret);
+}
+
 function getAllFarmIDS($dbh,$names_list,$user_id){
 	$found_farms=array();
 	for($i=0;$i<sizeof($names_list);$i++){

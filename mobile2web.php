@@ -16,7 +16,8 @@ if(isset($_GET['user']) && isset($_GET['pass'])){
 		
 		$_SESSION['user_filter']=array();
 		$_SESSION['farm_filter']=array();
-		$_SESSION['plot_filter']=array();
+		$_SESSION['crop_filter']=array();
+		$_SESSION['ingredient_filter']=array();
 		
 		header("Location: feed.php");
 	} else {

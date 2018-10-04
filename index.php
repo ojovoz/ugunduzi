@@ -21,7 +21,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 			
 			$_SESSION['user_filter']=array();
 			$_SESSION['farm_filter']=array();
-			$_SESSION['plot_filter']=array();
+			$_SESSION['crop_filter']=array();
+			$_SESSION['ingredient_filter']=array();
 			
 			header("Location: feed.php");
 		}
