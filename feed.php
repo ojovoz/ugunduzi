@@ -12,6 +12,36 @@ if(isset($_GET['guest'])){
 	$_SESSION['mode']=0;
 }
 
+if(isset($_GET['user'])){
+	$user_filter_id=$_GET['user'];
+	if($user_filter_id>=0){
+		if(!in_array($user_filter_id,$_SESSION['user_filter'])){
+			array_push($_SESSION['user_filter'],$user_filter_id);
+		}
+	} else {
+		$user_filter_id*=-1;
+		$index=array_search($user_filter_id,$_SESSION['user_filter']);
+		if($index>=0){
+			unset($_SESSION['user_filter'][$index]);
+		}
+	}
+}
+
+if(isset($_GET['farm'])){
+	$farm_filter_id=$_GET['farm'];
+	if($farm_filter_id>=0){
+		if(!in_array($farm_filter_id,$_SESSION['farm_filter'])){
+			array_push($_SESSION['farm_filter'],$farm_filter_id);
+		}
+	} else {
+		$farm_filter_id*=-1;
+		$index=array_search($farm_filter_id,$_SESSION['farm_filter']);
+		if($index>=0){
+			unset($_SESSION['farm_filter'][$index]);
+		}
+	}
+}
+
 if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESSION['mode'])){
 	checkRecords($dbh,$ugunduzi_email,$ugunduzi_pass,$data_subject,$multimedia_subject,$mail_server,$servpath,$root_folder,$ffmpeg_path,$sample_rate);
 	if(isset($_GET['from'])){
@@ -22,6 +52,8 @@ if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESS
 	
 	if(isset($_GET['mode'])){
 		$_SESSION['mode']=$_GET['mode'];
+		$_SESSION['user_filter']=array();
+		$_SESSION['farm_filter']=array();
 	}
 ?>
 <!DOCTYPE html>
@@ -102,10 +134,20 @@ if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESS
 </div>
 <div class="main"><p>
 <?php	
-$user_filter = ($_SESSION['mode']==0 ? " " : " AND farm.user_id = ".$_SESSION['user_id']." ");
+if(!empty($_SESSION['user_filter']) || !empty($_SESSION['farm_filter'])){
+	$user_filter_names= (!empty($_SESSION['user_filter']) ? getUserNames($dbh,$_SESSION['user_filter'],"feed.php") : "");
+	$farm_filter_names= (!empty($_SESSION['farm_filter']) ? getFarmNames($dbh,$_SESSION['farm_filter'],"feed.php") : "");
+	?>
+	<p><div class="w3-container w3-card-4 w3-white w3-padding-small w3-text-black">
+	Filters: <?php echo($user_filter_names." ".$farm_filter_names); ?>
+	</div></p>
+	<?php
+}
+$user_filter = ($_SESSION['mode']==0 ? (!empty($_SESSION['user_filter']) ? " AND farm.user_id IN(".implode(",",$_SESSION['user_filter']).") " : " ") : " AND farm.user_id = ".$_SESSION['user_id']." ");
+$farm_filter = ($_SESSION['mode']==0 ? " " : (!empty($_SESSION['farm_filter']) ? " AND farm.farm_id IN(".getAllFarmIDS($dbh,$_SESSION['farm_filter'],$_SESSION['user_id']).") " : " "));
 $image_filter = ($_SESSION['mode']==0 ? " AND log.log_picture<>'' AND log.log_sound<>'' " : " ");
 $query_limit = " LIMIT $from, $max_items_per_page";
-$query_all="SELECT log.plot_id, log.log_date, farm.user_id, log.log_data_item_id, log.log_quantity, log.log_value, log.log_units_id, log.log_crop_id, log.log_treatment_id, log.log_comments, log.log_picture, log.log_sound, farm.farm_id FROM log, plot, farm WHERE plot.plot_id = log.plot_id AND farm.farm_id = plot.farm_id".$user_filter.$image_filter."ORDER BY log_date DESC";
+$query_all="SELECT log.plot_id, log.log_date, farm.user_id, log.log_data_item_id, log.log_quantity, log.log_value, log.log_units_id, log.log_crop_id, log.log_treatment_id, log.log_comments, log.log_picture, log.log_sound, farm.farm_id FROM log, plot, farm WHERE plot.plot_id = log.plot_id AND farm.farm_id = plot.farm_id".$farm_filter.$user_filter.$image_filter."ORDER BY log_date DESC";
 $query=$query_all.$query_limit;
 $result = mysqli_query($dbh,$query);
 while($row=mysqli_fetch_array($result,MYSQL_NUM)){
@@ -114,7 +156,7 @@ while($row=mysqli_fetch_array($result,MYSQL_NUM)){
 	$plot_data=getPlotData($dbh,$row[0],$none_word,$plot_word,$pest_control_word,$soil_management_word,"feed.php");
 	switch($_SESSION['mode']){
 		case 0:
-			$message_data = ($user_alias!="" ? $user_alias.": ".$row[1] : $row[1]);
+			$message_data = $user_alias.": ".$row[1];
 			$message_header = ($plot_data!="" ? $message_data."<br>".$plot_data."<br>" : $message_data."<br>");
 			$image_source="./content".$row[10];
 			$audio_source="./content".$row[11];
@@ -127,8 +169,8 @@ while($row=mysqli_fetch_array($result,MYSQL_NUM)){
 			<?php
 			break;
 		case 1:
-			$farm_name=getFarmNameFromID($dbh,$row[12]);
-			$message_data = ($farm_name!="" ? ucfirst($farm_name).": ".$row[1] : $row[1]);
+			$farm_name='<a href="feed.php?farm='.$row[12].'">'.ucfirst(getFarmNameFromID($dbh,$row[12])).'</a>';
+			$message_data = $farm_name.": ".$row[1];
 			$message_header = ($plot_data!="" ? $message_data."<br>".$plot_data."<br>" : $message_data."<br>");
 			?>
 			<p><div class="w3-container w3-card-4 w3-white"><br>
@@ -173,16 +215,6 @@ if($from>0 || $total_items>($from+$max_items_per_page)){
 	<?php
 }
 ?>
-<p><div class="w3-bar w3-xlarge">
-<a href="#" style="text-decoration:none;" class="w3-orange w3-button w3-hover-yellow">Filters</a>
-<?php
-if($_SESSION['mode']==1){
-	?>
-	<a href="#" style="text-decoration:none;" class="w3-blue w3-button w3-hover-yellow">Balance</a>
-	<?php
-}
-?>	
-</div></p>
 </p>
 </div>
 </div>

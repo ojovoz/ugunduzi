@@ -13,6 +13,11 @@ if(isset($_GET['user']) && isset($_GET['pass'])){
 		$_SESSION['user_alias']=$user_alias;
 		$_SESSION['user_id']=$id;
 		$_SESSION['mode']=0; //mode: 0=everybody's images, 1=my data
+		
+		$_SESSION['user_filter']=array();
+		$_SESSION['farm_filter']=array();
+		$_SESSION['plot_filter']=array();
+		
 		header("Location: feed.php");
 	} else {
 		header("Location: index.php");

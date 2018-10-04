@@ -232,6 +232,41 @@ function getTreatmentIngredientNameFromID($dbh,$treatment_ingredient_id){
 	return $ret;
 }
 
+function getUserNames($dbh,$names_list,$page){
+	$ret="";
+	for($i=0;$i<sizeof($names_list);$i++){
+		$id=$names_list[$i];
+		$name=ucfirst(getUserAliasFromID($dbh,$id));
+		$ret = ($ret=="" ? '<a class="w3-red" href="'.$page.'?user='.($id*-1).'">'.$name.'</a>' : $ret.= ' <a class="w3-red" href="'.$page.'?user='.($id*-1).'">'.$name.'</a>');
+	}
+	return $ret;
+}
+
+function getFarmNames($dbh,$names_list,$page){
+	$ret="";
+	for($i=0;$i<sizeof($names_list);$i++){
+		$id=$names_list[$i];
+		$name=ucfirst(getFarmNameFromID($dbh,$id));
+		$ret = ($ret=="" ? '<a class="w3-red" href="'.$page.'?farm='.($id*-1).'">'.$name.'</a>' : $ret.= ' <a class="w3-red" href="'.$page.'?farm='.($id*-1).'">'.$name.'</a>');
+	}
+	return $ret;
+}
+
+function getAllFarmIDS($dbh,$names_list,$user_id){
+	$found_farms=array();
+	for($i=0;$i<sizeof($names_list);$i++){
+		$id=$names_list[$i];
+		$query="SELECT farm_id FROM farm WHERE user_id=$user_id AND farm_app_id=(SELECT farm_app_id FROM farm WHERE farm_id=$id)";
+		$result = mysqli_query($dbh,$query);
+		while($row = mysqli_fetch_array($result,MYSQL_NUM)){
+			if(!in_array($row[0],$found_farms)){
+				array_push($found_farms,$row[0]);
+			}
+		}
+	}
+	return implode(",",$found_farms);
+}
+
 function getDefaultMoneyUnit($dbh){
 	$ret="";
 	$query="SELECT units_name FROM units WHERE units_type=2";
