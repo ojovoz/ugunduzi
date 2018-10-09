@@ -239,12 +239,12 @@ if($from>0 || $total_items>($from+$max_items_per_page)){
 	<?php
 	if($from>0){
 		?>
-		<a href="feed.php?from=<?php echo($from-$max_items_per_page) ?>" style="text-decoration:none;" class="w3-theme-d2 w3-hover-theme w3-button"><< Previous</a>
+		<a href="feed.php?from=<?php echo($from-$max_items_per_page) ?>" style="text-decoration:none;" class="w3-theme-d2 w3-hover-theme w3-button"><< Uliopita</a>
 		<?php
 	}
 	if($total_items>($from+$max_items_per_page)){
 		?>
-		<a href="feed.php?from=<?php echo($from+$max_items_per_page) ?>" style="text-decoration:none;" class="w3-theme-d2 w3-hover-theme w3-button">Next >></a>
+		<a href="feed.php?from=<?php echo($from+$max_items_per_page) ?>" style="text-decoration:none;" class="w3-theme-d2 w3-hover-theme w3-button">Ijayo >></a>
 		<?php
 	}
 	?>
