@@ -21,9 +21,9 @@ $sample_rate="22050";
 $max_images_per_page=10;
 
 //words
-$none_word="none";
-$crops_word="crops";
-$plot_word="plot";
-$pest_control_word="pest control";
-$soil_management_word="soil management";
+$none_word="hakuna";
+$crops_word="mazao";
+$plot_word="kitalu";
+$pest_control_word="udhibiti wa wadudu";
+$soil_management_word="uhifadhi wa udongo";
 ?>

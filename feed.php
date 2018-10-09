@@ -164,7 +164,7 @@ if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESS
 <div style="width:100%; max-width:800px; dislay:block; margin-left:auto; margin-right:auto;">
 <div class="navbar w3-theme-d4" style="width:100%; max-width:800px;">
   <?php if($_SESSION['user_id']>=0) { ?><a class="<?php echo($_SESSION['mode']==0 ? "w3-theme-d4" : "w3-theme-d2");?> w3-hover-theme" href="feed.php?mode=1"><?php echo(ucfirst($_SESSION['user_alias'])); ?></a><?php } ?>
-  <a class="<?php echo($_SESSION['mode']==1 ? "w3-theme-d4" : "w3-theme-d2");?> w3-hover-theme" href="feed.php?mode=0">Everybody</a>
+  <a class="<?php echo($_SESSION['mode']==1 ? "w3-theme-d4" : "w3-theme-d2");?> w3-hover-theme" href="feed.php?mode=0">Kila mtu</a>
 </div>
 <div class="main"><p>
 <?php	
@@ -175,7 +175,7 @@ if(!empty($_SESSION['user_filter']) || !empty($_SESSION['farm_filter']) || !empt
 	$ingredient_filter_names = (!empty($_SESSION['ingredient_filter']) ? getIngredientNames($dbh,$_SESSION['ingredient_filter'],"feed.php") : "");
 	?>
 	<p><div class="w3-container w3-card-4 w3-white w3-padding-small w3-text-black">
-	Filters: <?php echo($user_filter_names." ".$farm_filter_names." ".$crop_filter_names." ".$ingredient_filter_names); ?>
+	Tafuta: <?php echo($user_filter_names." ".$farm_filter_names." ".$crop_filter_names." ".$ingredient_filter_names); ?>
 	</div></p>
 	<?php
 }
