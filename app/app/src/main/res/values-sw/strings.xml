@@ -110,6 +110,4 @@
     <string name="valueEmptyMessage">Thamani haipaswi kuwa wazi</string>
     <string name="wrongPasswordLabel">Neno la siri sio sahihi</string>
     <string name="yesButtonText">Ndiyo</string>
-    <string name="emptyString" translatable="false"></string>
-    <string name="app_name" translatable="false">Ugunduzi</string>
 </resources>
