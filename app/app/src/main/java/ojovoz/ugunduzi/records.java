@@ -977,13 +977,10 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
                         displayTreatmentIngredientPicker();
                     }
                 });
-            }
-        } else if (d.isTreatmentSpecific) {
-            bTreatment.setVisibility(View.VISIBLE);
-            if (currentPlot.pestControlIngredients.size() == 1) {
+            } else if (currentPlot.pestControlIngredients.size() == 1) {
                 bTreatment.setText(currentPlot.pestControlIngredients.get(0).name);
                 newItem.treatmentIngredient = currentPlot.pestControlIngredients.get(0);
-            } else {
+            } else if (currentPlot.soilManagementIngredients.size() == 1) {
                 bTreatment.setText(currentPlot.soilManagementIngredients.get(0).name);
                 newItem.treatmentIngredient = currentPlot.soilManagementIngredients.get(0);
             }

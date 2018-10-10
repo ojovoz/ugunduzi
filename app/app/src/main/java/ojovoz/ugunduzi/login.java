@@ -205,6 +205,10 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
 
+        doValidateUser();
+    }
+
+    public void doValidateUser(){
         EditText uA = (EditText) findViewById(R.id.userAlias);
         uAS = uA.getText().toString();
         EditText uP = (EditText) findViewById(R.id.userPassword);
@@ -313,20 +317,8 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                         if (!user.equals("")) {
                             startNextActivity();
                         } else {
-                            if (uAS == null || uPS == null) {
-                                updateAutocomplete();
-                            } else {
-                                if (!uAS.isEmpty() && !uPS.isEmpty()) {
-                                    if (!uAS.equals("reset") && !uAS.equals("admin")) {
-                                        connectionTask = 1;
-                                        createNewUser(uAS, uPS);
-                                    } else {
-                                        updateAutocomplete();
-                                    }
-                                } else {
-                                    updateAutocomplete();
-                                }
-                            }
+                            updateAutocomplete();
+                            doValidateUser();
                         }
                     }
                     break;
