@@ -215,12 +215,20 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
         uPS = uP.getText().toString();
         if (!uAS.equals("") && !uPS.equals("")) {
             if (uAS.equals("admin") && uPS.equals("admin")) { //TODO: command 'sync': downloads farms, updates local preferences & files
+                uAS="";
+                uPS="";
+                uA.setText(R.string.emptyString);
+                uP.setText(R.string.emptyString);
                 defineServer(server);
             } else if (uAS.equals("reset") && uPS.equals("reset")) {
                 user = "";
                 prefs.deletePreference("user");
                 prefs.deletePreference("farm");
                 prefs.deletePreference("dataDownloaded");
+                uAS="";
+                uPS="";
+                uA.setText(R.string.emptyString);
+                uP.setText(R.string.emptyString);
                 downloadData();
             } else {
                 oUser newUser = new oUser(this, uAS, uPS);
