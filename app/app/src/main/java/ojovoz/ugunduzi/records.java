@@ -851,7 +851,7 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
                 bTreatment.setText(editingItem.treatmentIngredient.name);
             }
 
-            if (editingItem.dataItem.type != 0) {
+            if (editingItem.dataItem.type > 0 && editingItem.dataItem.type < 4) {
                 bUnits.setText(editingItem.units.name);
                 etQuantity.setText(Float.toString(editingItem.quantity));
             }
@@ -997,7 +997,7 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
             }
         });
 
-        if (d.type != 0) {
+        if (d.type > 0 && d.type < 4) {
             tlQuantityUnits.setVisibility(View.VISIBLE);
             newItem.units = d.defaultUnits;
             bUnits.setText(newItem.units.name);
@@ -1277,7 +1277,7 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
         String ret = "";
         String dataItem = l.getDataItemName(this);
         String date = dH.dateToString(l.date);
-        if (l.dataItem.type != 0) {
+        if (l.dataItem.type > 0 && l.dataItem.type < 4) {
             String quantityUnits = String.valueOf(l.quantity) + " " + l.units.name;
             ret = date + "\n" + dataItem + ", " + quantityUnits + "\n";
         } else {
@@ -1327,7 +1327,7 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
             Toast.makeText(this, R.string.mustChooseCropMessage, Toast.LENGTH_SHORT).show();
         } else if (newItem.dataItem.isTreatmentSpecific && newItem.treatmentIngredient == null) {
             Toast.makeText(this, R.string.mustChooseTreatmentMessage, Toast.LENGTH_SHORT).show();
-        } else if (newItem.dataItem.type != 0 && (etQuantity.getText().toString().isEmpty())) {
+        } else if ((newItem.dataItem.type > 0 && newItem.dataItem.type <4) && (etQuantity.getText().toString().isEmpty())) {
             Toast.makeText(this, R.string.quantityEmptyMessage, Toast.LENGTH_SHORT).show();
             etQuantity.requestFocus();
         } else if (etValue.getText().toString().isEmpty()) {
@@ -1335,7 +1335,7 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
             etValue.requestFocus();
         } else {
             ret = false;
-            newItem.quantity = (newItem.dataItem.type != 0) ? Float.parseFloat(etQuantity.getText().toString()) : 0.0f;
+            newItem.quantity = (newItem.dataItem.type > 0 && newItem.dataItem.type < 4) ? Float.parseFloat(etQuantity.getText().toString()) : 0.0f;
             newItem.value = Float.parseFloat(etValue.getText().toString());
             newItem.comments = etComments.getText().toString().replaceAll(";", "");
             newItem.comments = newItem.comments.replaceAll("\\*", "");

@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
@@ -489,7 +490,14 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
             c = c.getCropFromId(cropId);
             int treatmentIngredientId = Integer.parseInt(thisItem[9]);
             t = t.getTreatmentIngredientFromId(treatmentIngredientId);
-            String comments = (thisItem.length==11) ? thisItem[10].replaceAll("\"","") : "";
+            String comments="";
+            if(thisItem.length==11){
+                try{
+                    comments=URLDecoder.decode(thisItem[10].replaceAll("\"",""),"UTF-8");
+                } catch (Exception e){
+                //
+                }
+            }
             l.appendToLog(farmId,farmVersion,userId,plotId,date,d,value,quantity,u,c,t,0.0f,comments,"","");
         }
 

@@ -157,6 +157,11 @@ public class balance extends AppCompatActivity {
                 }
             });
 
+            if(plot==-1){
+                logList = l.createLog(farmId, userId, 0);
+                findMaxMinDates();
+            }
+
             fillRecyclerView();
         }
 
@@ -303,7 +308,7 @@ public class balance extends AppCompatActivity {
                     b.dataItem = l.dataItem;
                     balanceItems.add(b);
                 }
-                b.cost = (l.dataItem.type == 3) ? b.cost + l.value : b.cost - l.value;
+                b.cost = (l.dataItem.type >= 3) ? b.cost + l.value : b.cost - l.value;
             }
         }
 
