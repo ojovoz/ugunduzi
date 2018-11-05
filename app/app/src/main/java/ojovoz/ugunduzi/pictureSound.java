@@ -40,6 +40,7 @@ public class pictureSound extends AppCompatActivity {
 
     private int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
     private int CAMERA_PERMISSION = 232323;
+    private int AUDIO_PERMISSION = 23232323;
 
     String photoFile="";
     String prevPhotoFile="";
@@ -248,7 +249,7 @@ public class pictureSound extends AppCompatActivity {
             if (checkSelfPermission(android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                 showCamera();
             } else {
-                String[] permissionRequest = {android.Manifest.permission.CAMERA};
+                String[] permissionRequest = {android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
                 requestPermissions(permissionRequest, CAMERA_PERMISSION);
             }
         } else {
@@ -260,8 +261,12 @@ public class pictureSound extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(requestCode==CAMERA_PERMISSION){
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
                 showCamera();
+            }
+        } else if (requestCode==AUDIO_PERMISSION){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
+                doRecordSound();
             }
         }
     }
@@ -380,13 +385,26 @@ public class pictureSound extends AppCompatActivity {
     }
 
     public void recordSound(View v){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                doRecordSound();
+            } else {
+                String[] permissionRequest = {android.Manifest.permission.RECORD_AUDIO, android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                requestPermissions(permissionRequest, AUDIO_PERMISSION);
+            }
+        } else {
+            doRecordSound();
+        }
+    }
+
+    private void doRecordSound() {
         if (!recording) {
             soundRecorder = new audioRecorder();
             if (!soundRecorder.getFilename().equals("null")) {
                 deleteFile(soundRecorder.getFilename(), false);
             }
             String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            soundFile=Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath() + File.separator + getString(R.string.app_name) + File.separator + "s" + timeStamp + ".amr";
+            soundFile= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath() + File.separator + getString(R.string.app_name) + File.separator + "s" + timeStamp + ".amr";
             soundRecorder.modifyPath(soundFile);
             try {
                 Button bRec = (Button) findViewById(R.id.soundButton);
