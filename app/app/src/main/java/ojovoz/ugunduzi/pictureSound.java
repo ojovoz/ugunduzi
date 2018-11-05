@@ -3,12 +3,15 @@ package ojovoz.ugunduzi;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.jar.Manifest;
 
 /**
  * Created by Eugenio on 19/04/2018.
@@ -35,6 +39,7 @@ import java.util.Iterator;
 public class pictureSound extends AppCompatActivity {
 
     private int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
+    private int CAMERA_PERMISSION = 232323;
 
     String photoFile="";
     String prevPhotoFile="";
@@ -184,13 +189,10 @@ public class pictureSound extends AppCompatActivity {
                 }
                 switch (exitAction) {
                     case 0:
-                        //
+                        goBackToFarm();
                         break;
                     case 1:
-                        //
-                        break;
-                    case 2:
-                        goBackToFarm();
+                        goBack();
                 }
 
             }
@@ -242,7 +244,26 @@ public class pictureSound extends AppCompatActivity {
     }
 
     public void startCamera(View v){
-        showCamera();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                showCamera();
+            } else {
+                String[] permissionRequest = {android.Manifest.permission.CAMERA};
+                requestPermissions(permissionRequest, CAMERA_PERMISSION);
+            }
+        } else {
+            showCamera();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode==CAMERA_PERMISSION){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                showCamera();
+            }
+        }
     }
 
     private void showCamera(){

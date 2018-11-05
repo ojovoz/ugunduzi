@@ -284,6 +284,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             } else {
                 doCancelEditedFarm();
             }
+        } else if (farmVersion != maxVersion) {
+            goToLatestFarm();
         } else {
             super.onBackPressed();
         }
