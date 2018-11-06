@@ -13,6 +13,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -281,7 +282,11 @@ public class pictureSound extends AppCompatActivity {
 
             }
             if (filename != null) {
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(filename));
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(pictureSound.this, BuildConfig.APPLICATION_ID + ".provider", filename));
+                } else {
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(filename));
+                }
                 startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
             }
         }
