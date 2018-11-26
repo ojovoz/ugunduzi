@@ -1518,7 +1518,7 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
         f = f.getVersion(userId, farmId, farmVersion, this);
         oPlotMatrix p = new oPlotMatrix();
         p.fromString(this, f.plotMatrix, ";");
-        ret = p.plots.get(thisPlot);
+        ret = p.getPlotFromId(thisPlot);
         return ret;
     }
 
