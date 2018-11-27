@@ -288,7 +288,7 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                 http.execute(server + "/mobile/get_user_farms.php?user=" + Integer.toString(userId), "");
             }
         } else {
-            Toast.makeText(this, R.string.pleaseConnectMessage, Toast.LENGTH_SHORT).show();
+            startNextActivity();
         }
     }
 

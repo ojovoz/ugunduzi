@@ -656,6 +656,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         createFarm();
         this.setTitle(farmName + " (" + user + ")");
         canvasView.invalidate();
+        invalidateOptionsMenu();
     }
 
     public void addPlot() {
