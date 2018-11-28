@@ -27,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
@@ -77,6 +78,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     boolean newFarm;
     boolean firstFarm;
     boolean bFarmSaved;
+
+    int baseTextSize;
 
     boolean bSaveEditedFarmAsNew;
 
@@ -204,42 +207,43 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             }
         }
 
-        LinearLayout root = (LinearLayout) findViewById(R.id.mainRoot);
-        root.post(new Runnable() {
+        final LinearLayout root = (LinearLayout) findViewById(R.id.mainRoot);
+        ViewTreeObserver o = root.getViewTreeObserver();
+        o.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
-            public void run() {
-                Rect rect = new Rect();
-                Window win = getWindow();
-                win.getDecorView().getWindowVisibleDisplayFrame(rect);
-                int contentViewTop = win.findViewById(Window.ID_ANDROID_CONTENT).getTop();
-                DisplayMetrics metrics = new DisplayMetrics();
-                getWindowManager().getDefaultDisplay().getMetrics(metrics);
-                displayWidth = metrics.widthPixels;
-                displayHeight = (int) (metrics.heightPixels - (contentViewTop * metrics.density));
+            public void onGlobalLayout() {
 
-                relativeLayout = (RelativeLayout) findViewById(R.id.drawingCanvas);
-                canvasView = new SketchSheetView(farmInterface.this, displayWidth, displayHeight);
-                paint = new Paint();
-                relativeLayout.addView(canvasView, new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-                paint.setDither(true);
-                paint.setColor(ContextCompat.getColor(farmInterface.this, R.color.colorDraw));
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeCap(Paint.Cap.ROUND);
-                paint.setStrokeWidth(4);
+                displayWidth = root.getWidth();
+                displayHeight = root.getHeight();
 
-                textPaint = new TextPaint();
-                textPaint.setTextSize(21);
-                textPaint.setAntiAlias(true);
-                textPaint.setTextAlign(Paint.Align.LEFT);
-                textPaint.setColor(ContextCompat.getColor(ctxt, R.color.colorBlack));
-                textPaint.setTypeface(Typeface.create("Arial", Typeface.NORMAL));
+                if(displayHeight>0) {
 
-                plotMatrix.createMatrix(displayWidth, displayHeight);
-                if (newFarm) {
-                    defineFarmNameAcres(true, false);
+                    relativeLayout = (RelativeLayout) findViewById(R.id.drawingCanvas);
+                    canvasView = new SketchSheetView(farmInterface.this, displayWidth, displayHeight);
+                    paint = new Paint();
+                    relativeLayout.addView(canvasView, new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+                    paint.setDither(true);
+                    paint.setColor(ContextCompat.getColor(farmInterface.this, R.color.colorDraw));
+                    paint.setStyle(Paint.Style.STROKE);
+                    paint.setStrokeCap(Paint.Cap.ROUND);
+                    paint.setStrokeWidth(4);
+
+                    textPaint = new TextPaint();
+                    baseTextSize = (int)(13 * getResources().getDisplayMetrics().scaledDensity);
+                    textPaint.setTextSize(baseTextSize);
+                    textPaint.setAntiAlias(true);
+                    textPaint.setTextAlign(Paint.Align.LEFT);
+                    textPaint.setColor(ContextCompat.getColor(ctxt, R.color.colorBlack));
+                    textPaint.setTypeface(Typeface.create("Arial", Typeface.NORMAL));
+
+                    plotMatrix.createMatrix(displayWidth, displayHeight);
+                    if (newFarm) {
+                        defineFarmNameAcres(true, false);
+                    }
+                    createFarm();
+
+                    relativeLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
-                createFarm();
-
             }
         });
     }
@@ -1383,7 +1387,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             canvas.drawBitmap(iResize, p.iResizeX, p.iResizeY, paint);
             canvas.drawBitmap(iContents, p.iContentsX, p.iContentsY, paint);
             int added = (state == 1) ? 15 : 0;
-            float yOffset = (((p.h / (displayHeight / 4)) - 1) * 30) + (20 - p.crops.size()) + added;
+            float yOffset = (((p.h / (displayHeight / 4)) - 1) * 30) + (baseTextSize - p.crops.size()) + added;
             drawPlotCropLabels(canvas, p, p.iContentsY + p.iContentsH + yOffset);
         }
 
@@ -1396,7 +1400,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             canvas.drawRect(p.x, p.y, p.x + p.w, p.y + p.h, paint);
             canvas.drawBitmap(iActions, p.iActionsX, p.iActionsY, paint);
             int added = (state == 1) ? 15 : 0;
-            float yOffset = (((p.h / (displayHeight / 4)) - 1) * 30) + (20 - p.crops.size()) + added;
+            float yOffset = (((p.h / (displayHeight / 4)) - 1) * 30) + (baseTextSize - p.crops.size()) + added;
             drawPlotCropLabels(canvas, p, p.iActionsY + p.iActionsH + yOffset);
         }
 
@@ -1404,7 +1408,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             Rect txtBounds = new Rect();
             float txtX;
 
-            float fontSize = ((((p.w / (displayWidth / 4) + (p.h / (displayHeight / 4))) - 2) * 10) / 14) + 21;
+            float fontSize = ((((p.w / (displayWidth / 4) + (p.h / (displayHeight / 4))) - 2) * 10) / 14) + baseTextSize;
 
             textPaint.setTextSize(fontSize);
 
@@ -1422,7 +1426,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 txtX = ((p.w - txtBounds.width()) / 2) + p.x;
                 canvas.drawText(c.name.substring(0, n), (int) txtX, (int) txtY, textPaint);
 
-                txtY += (((p.h / (displayHeight / 4)) - 1) * 3) + 24;
+                txtY += (((p.h / (displayHeight / 4)) - 1) * 3) + baseTextSize;
 
             }
         }
