@@ -1133,6 +1133,8 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
         dialog.setCancelable(true);
 
         ImageView i = (ImageView) dialog.findViewById(R.id.imageView);
+        i.setMaxWidth((int)(displayWidth*.8f));
+        i.setMaxHeight((int)(displayHeight*.8f));
         i.setImageBitmap(picture);
 
         final String s = l.sound;
@@ -1190,7 +1192,7 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
 
     public Bitmap scaleBitmap(String path) {
         Bitmap ret = null;
-        final int IMAGE_MAX_SIZE = 200000;
+        final int IMAGE_MAX_SIZE = 400000;
         try {
             InputStream in = null;
             in = new FileInputStream(path);

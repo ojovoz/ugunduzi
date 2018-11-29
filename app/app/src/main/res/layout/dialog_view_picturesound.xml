@@ -12,8 +12,6 @@
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxWidth="400dp"
-        android:maxHeight="400dp"
         android:adjustViewBounds="true"
         android:scaleType="fitStart"/>
 
