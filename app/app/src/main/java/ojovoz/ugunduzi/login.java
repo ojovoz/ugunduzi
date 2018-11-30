@@ -211,11 +211,11 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
 
     public void doValidateUser(){
         EditText uA = (EditText) findViewById(R.id.userAlias);
-        uAS = uA.getText().toString();
+        uAS = uA.getText().toString().trim();
         EditText uP = (EditText) findViewById(R.id.userPassword);
-        uPS = uP.getText().toString();
+        uPS = uP.getText().toString().trim();
         if (!uAS.equals("") && !uPS.equals("")) {
-            if (uAS.equals("admin") && uPS.equals("admin")) { //TODO: command 'sync': downloads farms, updates local preferences & files
+            if (uAS.equals("admin") && uPS.equals("admin")) {
                 uAS="";
                 uPS="";
                 uA.setText(R.string.emptyString);
