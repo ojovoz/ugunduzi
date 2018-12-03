@@ -20,6 +20,16 @@ function getUserAliasFromID($dbh,$id){
 	return $ret;
 }
 
+function getUserNameFromID($dbh,$id){
+	$ret="";
+	$query="SELECT user_name FROM user WHERE user_id=$id";
+	$result = mysqli_query($dbh,$query);
+	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$ret=$row[0];
+	}
+	return $ret;
+}
+
 function getUserIDFromAliasPass($dbh,$alias,$pass){
 	$ret=-1;
 	$query="SELECT user_id FROM user WHERE user_alias='$alias' AND user_password='$pass'";

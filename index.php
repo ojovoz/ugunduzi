@@ -52,7 +52,7 @@ if(!$success){
 <input class="w3-input w3-theme-l1 w3-border-0" name="user_password" type="password" maxlength="30"></p><br>
 <div align="center"><button class="w3-button w3-padding-large w3-theme-d4 w3-round w3-border-0" id="login" name="login">Log in</button><br><br>
 <a class="w3-text-theme" href="feed.php?guest=1">Guest login</a><br><br>
-<a class="w3-text-theme" href="download/index.html">Download app</a><br><br>
+<a class="w3-text-theme" href="download/index.html">Download app & manuals</a><br><br>
 </div></form><br>
 <?php
 if(!$success && ($user_alias!="")){

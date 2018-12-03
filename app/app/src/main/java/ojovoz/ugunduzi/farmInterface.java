@@ -226,7 +226,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     paint.setColor(ContextCompat.getColor(farmInterface.this, R.color.colorDraw));
                     paint.setStyle(Paint.Style.STROKE);
                     paint.setStrokeCap(Paint.Cap.ROUND);
-                    paint.setStrokeWidth(4);
+                    paint.setStrokeWidth(2 * getResources().getDisplayMetrics().scaledDensity);
 
                     textPaint = new TextPaint();
                     baseTextSize = (int)(13 * getResources().getDisplayMetrics().scaledDensity);

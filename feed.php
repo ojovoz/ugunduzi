@@ -189,7 +189,7 @@ $query=$query_all.$query_limit;
 $result = mysqli_query($dbh,$query);
 while($row=mysqli_fetch_array($result,MYSQL_NUM)){
 	$user_id=$row[2];
-	$user_alias='<a href="feed.php?user='.$user_id.'">'.ucfirst(getUserAliasFromID($dbh,$user_id)).'</a>';
+	$user_alias='<a href="feed.php?user='.$user_id.'">'.getUserNameFromID($dbh,$user_id).'</a>';
 	$plot_data=getPlotData($dbh,$row[0],$none_word,$plot_word,$pest_control_word,$soil_management_word,"feed.php");
 	switch($_SESSION['mode']){
 		case 0:

@@ -206,15 +206,12 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
         unitsList = new ArrayList<>();
         if(plot>=0) {
             currentPlot = getCurrentPlot(plot);
-            getDataItemsList();
+        } else {
+            currentPlot = null;
         }
+        getDataItemsList();
 
         fillRecyclerView();
-
-        if (farmVersion < maxVersion || plot==-1) {
-            TableLayout tl = (TableLayout) findViewById(R.id.actionsTable);
-            tl.setVisibility(View.GONE);
-        }
 
     }
 
@@ -844,11 +841,13 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
         if (editingItem != null) {
             bDataItem.setText(editingItem.dataItem.name);
             displayFields(editingItem.dataItem);
-            if (currentPlot.crops.size() > 1 && editingItem.dataItem.isCropSpecific) {
-                bCrop.setText(editingItem.crop.name);
-            }
-            if ((currentPlot.pestControlIngredients.size() > 0 || currentPlot.soilManagementIngredients.size() > 0) && editingItem.dataItem.isTreatmentSpecific) {
-                bTreatment.setText(editingItem.treatmentIngredient.name);
+            if(currentPlot!=null) {
+                if (currentPlot.crops.size() > 1 && editingItem.dataItem.isCropSpecific) {
+                    bCrop.setText(editingItem.crop.name);
+                }
+                if ((currentPlot.pestControlIngredients.size() > 0 || currentPlot.soilManagementIngredients.size() > 0) && editingItem.dataItem.isTreatmentSpecific) {
+                    bTreatment.setText(editingItem.treatmentIngredient.name);
+                }
             }
 
             if (editingItem.dataItem.type > 0 && editingItem.dataItem.type < 4) {
@@ -953,43 +952,47 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
 
     public void displayFields(oDataItem d) {
         dateHelper dH = new dateHelper();
-        if (currentPlot.crops.size() > 1 && d.isCropSpecific) {
-            bCrop.setVisibility(View.VISIBLE);
-            bCrop.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    displayCropPicker();
-                }
-            });
-        } else if (d.isCropSpecific) {
-            bCrop.setVisibility(View.VISIBLE);
-            bCrop.setText(currentPlot.crops.get(0).name);
-            newItem.crop = currentPlot.crops.get(0);
-        } else {
-            bCrop.setVisibility(View.GONE);
-        }
-        if ((currentPlot.pestControlIngredients.size() > 0 || currentPlot.soilManagementIngredients.size() > 0) && d.isTreatmentSpecific) {
-            bTreatment.setVisibility(View.VISIBLE);
-            if ((currentPlot.pestControlIngredients.size() + currentPlot.soilManagementIngredients.size()) > 1) {
-                bTreatment.setOnClickListener(new View.OnClickListener() {
+        if(currentPlot!=null) {
+            if (currentPlot.crops.size() > 1 && d.isCropSpecific) {
+                bCrop.setVisibility(View.VISIBLE);
+                bCrop.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        displayTreatmentIngredientPicker();
+                        displayCropPicker();
                     }
                 });
-            } else if (currentPlot.pestControlIngredients.size() == 1) {
-                bTreatment.setText(currentPlot.pestControlIngredients.get(0).name);
-                newItem.treatmentIngredient = currentPlot.pestControlIngredients.get(0);
-            } else if (currentPlot.soilManagementIngredients.size() == 1) {
-                bTreatment.setText(currentPlot.soilManagementIngredients.get(0).name);
-                newItem.treatmentIngredient = currentPlot.soilManagementIngredients.get(0);
+            } else if (d.isCropSpecific) {
+                bCrop.setVisibility(View.VISIBLE);
+                bCrop.setText(currentPlot.crops.get(0).name);
+                newItem.crop = currentPlot.crops.get(0);
+            } else {
+                bCrop.setVisibility(View.GONE);
+            }
+            if ((currentPlot.pestControlIngredients.size() > 0 || currentPlot.soilManagementIngredients.size() > 0) && d.isTreatmentSpecific) {
+                bTreatment.setVisibility(View.VISIBLE);
+                if ((currentPlot.pestControlIngredients.size() + currentPlot.soilManagementIngredients.size()) > 1) {
+                    bTreatment.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            displayTreatmentIngredientPicker();
+                        }
+                    });
+                } else if (currentPlot.pestControlIngredients.size() == 1) {
+                    bTreatment.setText(currentPlot.pestControlIngredients.get(0).name);
+                    newItem.treatmentIngredient = currentPlot.pestControlIngredients.get(0);
+                } else if (currentPlot.soilManagementIngredients.size() == 1) {
+                    bTreatment.setText(currentPlot.soilManagementIngredients.get(0).name);
+                    newItem.treatmentIngredient = currentPlot.soilManagementIngredients.get(0);
+                }
+            } else {
+                bTreatment.setVisibility(View.GONE);
             }
         } else {
+            bCrop.setVisibility(View.GONE);
             bTreatment.setVisibility(View.GONE);
         }
         bDate.setVisibility(View.VISIBLE);
         bDate.setText(dH.dateToString(newItem.date));
-
         bDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -1253,25 +1256,29 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
         f = f.getFarm(userId, farmId, farmVersion, this);
         oPlotMatrix pm = new oPlotMatrix();
         pm.fromString(this, f.plotMatrix, ";");
-        oPlot p = pm.getPlotFromId(l.plotId);
+        oPlot p = (l.plotId!=-1) ? pm.getPlotFromId(l.plotId) : null;
 
-        String title = getString(R.string.plotWord) + ": " + p.getCropNames(this);
-        String treatments = "";
-
-        if (p.pestControlIngredients.size() > 0 && p.soilManagementIngredients.size() > 0) {
-            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControlFaded);
-            treatments = "\n" + getString(R.string.soilManagementTitle) + ", " + getString(R.string.pestControlTitle);
-        } else if (p.pestControlIngredients.size() > 0 && p.soilManagementIngredients.size() == 0) {
-            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillPestControlFaded);
-            treatments = "\n" + getString(R.string.pestControlTitle);
-        } else if (p.pestControlIngredients.size() == 0 && p.soilManagementIngredients.size() > 0) {
-            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillSoilManagementFaded);
-            treatments = "\n" + getString(R.string.soilManagementTitle);
+        if(p!=null) {
+            String title = getString(R.string.plotWord) + ": " + p.getCropNames(this);
+            String treatments = "";
+            if (p.pestControlIngredients.size() > 0 && p.soilManagementIngredients.size() > 0) {
+                c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControlFaded);
+                treatments = "\n" + getString(R.string.soilManagementTitle) + ", " + getString(R.string.pestControlTitle);
+            } else if (p.pestControlIngredients.size() > 0 && p.soilManagementIngredients.size() == 0) {
+                c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillPestControlFaded);
+                treatments = "\n" + getString(R.string.pestControlTitle);
+            } else if (p.pestControlIngredients.size() == 0 && p.soilManagementIngredients.size() > 0) {
+                c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillSoilManagementFaded);
+                treatments = "\n" + getString(R.string.soilManagementTitle);
+            } else {
+                c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillFaded);
+            }
+            c.info = title + treatments;
         } else {
-            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillFaded);
+            c.info = farmName;
         }
 
-        c.info = title + treatments;
+
     }
 
     public String getDataItemText(oLog l) {
@@ -1315,7 +1322,7 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
                 tv.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight));
                 editingItem = logList.get(n);
                 if(plot==-1){
-                    currentPlot = getCurrentPlot(editingItem.plotId);
+                    currentPlot = (editingItem.plotId!=-1) ? getCurrentPlot(editingItem.plotId) : null;
                     getDataItemsList();
                 }
                 addItem(v);
@@ -1526,8 +1533,8 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
 
     public void getDataItemsList() {
         oDataItem d = new oDataItem(this);
-        boolean bExcludeCropSpecific = (currentPlot.crops.size() == 0) ? true : false;
-        boolean bExcludeTreatmentSpecific = (currentPlot.pestControlIngredients.size() == 0 && currentPlot.soilManagementIngredients.size() == 0) ? true : false;
+        boolean bExcludeCropSpecific = (currentPlot != null) ? (currentPlot.crops.size() == 0) ? true : false : true;
+        boolean bExcludeTreatmentSpecific = (currentPlot != null) ? (currentPlot.pestControlIngredients.size() == 0 && currentPlot.soilManagementIngredients.size() == 0) ? true : false : true;
         dataItemsList = d.getDataItems(bExcludeCropSpecific, bExcludeTreatmentSpecific);
         dataItemsNamesArray = d.getDataItemNames(bExcludeCropSpecific, bExcludeTreatmentSpecific).toArray(new CharSequence[dataItemsList.size()]);
     }
