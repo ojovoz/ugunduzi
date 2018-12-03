@@ -775,6 +775,8 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
                                             } else {
                                                 tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorWhite));
                                             }
+                                        } else if(currentPlot==null){
+                                            tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillFaded));
                                         } else {
                                             if (currentPlot.pestControlIngredients.size() > 0 && currentPlot.soilManagementIngredients.size() > 0) {
                                                 tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillSoilManagementAndPestControlFaded));
@@ -808,6 +810,8 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
                             } else {
                                 tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorWhite));
                             }
+                        } else if(currentPlot==null){
+                            tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillFaded));
                         } else {
                             if (currentPlot.pestControlIngredients.size() > 0 && currentPlot.soilManagementIngredients.size() > 0) {
                                 tv.setBackgroundColor(ContextCompat.getColor(tv.getContext(), R.color.colorFillSoilManagementAndPestControlFaded));
@@ -1275,6 +1279,7 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
             }
             c.info = title + treatments;
         } else {
+            c.plotInfoColor = ContextCompat.getColor(this, R.color.colorFillFaded);
             c.info = farmName;
         }
 
