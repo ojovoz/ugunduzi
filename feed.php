@@ -190,7 +190,11 @@ $result = mysqli_query($dbh,$query);
 while($row=mysqli_fetch_array($result,MYSQL_NUM)){
 	$user_id=$row[2];
 	$user_alias='<a href="feed.php?user='.$user_id.'">'.getUserNameFromID($dbh,$user_id).'</a>';
-	$plot_data=getPlotData($dbh,$row[0],$none_word,$plot_word,$pest_control_word,$soil_management_word,"feed.php");
+	if($row[0]>=0){
+		$plot_data=getPlotData($dbh,$row[0],$none_word,$plot_word,$pest_control_word,$soil_management_word,"feed.php");
+	} else {
+		$plot_data=getFarmNameFromID($dbh,$row[12]);
+	}
 	switch($_SESSION['mode']){
 		case 0:
 			$message_data = $user_alias.": ".$row[1];
