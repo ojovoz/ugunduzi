@@ -103,20 +103,27 @@ public class pictureSound extends AppCompatActivity {
         TextView tt = (TextView) findViewById(R.id.plotLabel);
         String title = "";
 
-        title= getString(R.string.cropsTitle) + ": " + cropNames;
-        title+="\n";
-        title+=getString(R.string.pestControlTitle) + ": " + pestControlNames;
-        title+="\n";
-        title+=getString(R.string.soilManagementTitle) + ": " + soilManagementNames;
+        if(plot>=0) {
 
-        if(!pestControlNames.equals(getString(R.string.textNone)) && !soilManagementNames.equals(getString(R.string.textNone))) {
-            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControl));
-        } else if(!pestControlNames.equals(getString(R.string.textNone)) && soilManagementNames.equals(getString(R.string.textNone))) {
-            tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorFillPestControl));
-        } else if(pestControlNames.equals(getString(R.string.textNone)) && !soilManagementNames.equals(getString(R.string.textNone))) {
-            tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorFillSoilManagement));
+            title = getString(R.string.cropsTitle) + ": " + cropNames;
+            title += "\n";
+            title += getString(R.string.pestControlTitle) + ": " + pestControlNames;
+            title += "\n";
+            title += getString(R.string.soilManagementTitle) + ": " + soilManagementNames;
+
+            if (!pestControlNames.equals(getString(R.string.textNone)) && !soilManagementNames.equals(getString(R.string.textNone))) {
+                tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagementAndPestControl));
+            } else if (!pestControlNames.equals(getString(R.string.textNone)) && soilManagementNames.equals(getString(R.string.textNone))) {
+                tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillPestControl));
+            } else if (pestControlNames.equals(getString(R.string.textNone)) && !soilManagementNames.equals(getString(R.string.textNone))) {
+                tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillSoilManagement));
+            } else {
+                tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillDefault));
+            }
         } else {
-            tt.setBackgroundColor(ContextCompat.getColor(this,R.color.colorFillDefault));
+            title = farmName;
+            tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+            tt.setTextColor(ContextCompat.getColor(this, R.color.colorWhite));
         }
 
         tt.setText(title);
