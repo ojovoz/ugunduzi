@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net
 --
 -- Servidor: 192.168.86.197
--- Tiempo de generación: 27-09-2018 a las 13:10:17
+-- Tiempo de generación: 05-12-2018 a las 10:10:12
 -- Versión del servidor: 5.5.57-0+deb7u1-log
 -- Versión de PHP: 5.3.29-1~dotdeb.0
 
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `crop` (
   `crop_name` varchar(30) NOT NULL,
   `crop_variety` varchar(30) NOT NULL,
   `crop_name_english` varchar(30) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `crop`
@@ -49,22 +49,22 @@ INSERT INTO `crop` (`crop_id`, `crop_name`, `crop_variety`, `crop_name_english`)
 (9, 'Matango', '', 'Cucumber'),
 (10, 'Bamia', '', 'Okra'),
 (11, 'Mipapai', '', 'Papaya'),
-(12, 'Mchungwa', '', 'Orange'),
+(12, 'Michungwa', '', 'Orange'),
 (13, 'Miembe', '', 'Mango'),
 (14, 'Matembele', '', 'Sweet Potato Leaves'),
 (15, 'Migomba', '', 'Banana'),
 (16, 'Mbaazi', '', 'Peas'),
 (17, 'Karanga', '', 'Nuts'),
 (18, 'Nyanya', '', 'Tomato'),
-(19, 'Mkorosho', '', 'Cashew nuts'),
+(19, 'Mikorosho', '', 'Cashew nuts'),
 (20, 'Mchicha', '', 'Amaranth'),
 (21, 'Matikiti', '', 'Melon'),
 (23, 'Nyanya chungu', '', 'African eggplant'),
-(24, 'Biliganya', '', 'Eggplant'),
+(24, 'Bilinganya', '', 'Eggplant'),
 (26, 'Maboga', '', 'Pumpkin'),
 (27, 'Maharage', '', 'Beans'),
 (28, 'Vitunguu maji', '', 'Tender garlic'),
-(29, 'Vitunguu swamu', '', 'Garlic'),
+(29, 'Vitunguu swaumu', '', 'Garlic'),
 (30, 'Mtama', '', 'Millet'),
 (31, 'Pilipili hoho', '', 'Bell pepper'),
 (32, 'Rozela', '', 'Rosella'),
@@ -80,9 +80,11 @@ INSERT INTO `crop` (`crop_id`, `crop_name`, `crop_variety`, `crop_name_english`)
 (42, 'Upupu', '', ''),
 (43, 'Pasheni', '', 'Passion fruit'),
 (44, 'Ulezi', '', ''),
-(45, 'Mnafu', '', ''),
+(45, 'Mnavu', '', ''),
 (46, 'Figiri', '', 'Fig'),
-(47, 'Karoti', '', 'Carrots');
+(47, 'Karoti', '', 'Carrots'),
+(48, 'Pilipili', '', 'Chili'),
+(49, 'Nanasi', '', 'Pineapple');
 
 -- --------------------------------------------------------
 
@@ -94,7 +96,7 @@ CREATE TABLE IF NOT EXISTS `crop_x_plot` (
   `crop_x_plot_id` int(10) unsigned NOT NULL,
   `crop_id` int(10) unsigned NOT NULL,
   `plot_id` int(10) unsigned NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=660 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `crop_x_plot`
@@ -113,29 +115,30 @@ CREATE TABLE IF NOT EXISTS `data_item` (
   `data_item_type` int(10) unsigned NOT NULL COMMENT '0=cost, 1=quantity & units, 2=cost, quantity, units',
   `is_crop_specific` tinyint(1) NOT NULL,
   `is_treatment_specific` tinyint(1) NOT NULL,
-  `data_item_name_english` varchar(30) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+  `data_item_name_english` varchar(30) NOT NULL,
+  `is_retroactive` tinyint(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `data_item`
 --
 
-INSERT INTO `data_item` (`data_item_id`, `data_item_name`, `data_item_default_units_id`, `data_item_type`, `is_crop_specific`, `is_treatment_specific`, `data_item_name_english`) VALUES
-(1, 'Maandalizi ya shamba', 0, 0, 0, 0, 'Land preparation'),
-(2, 'Kupanda', 0, 0, 1, 0, 'Planting'),
-(3, 'Kuvuna', 0, 0, 1, 0, 'Harvesting'),
-(4, 'Mavuno', 1, 1, 1, 0, 'Yield'),
-(5, 'Utumiaji (Matibabu)', 1, 1, 0, 1, 'Application (treatment)'),
-(6, 'Bei (Mbegu)', 1, 2, 1, 0, 'Seed cost'),
-(7, 'Bei (Matibabu)', 1, 2, 0, 1, 'Costs (treatment)'),
-(8, 'Mauzo', 1, 3, 1, 0, 'Sales'),
-(9, 'Palizi', 0, 0, 0, 0, 'Weeding'),
-(10, 'Kuandoa', 0, 0, 1, 0, 'Pruning'),
-(11, 'Kuhifadi', 0, 0, 1, 0, 'Storage'),
-(12, 'Usafiri', 0, 0, 1, 0, 'Transport'),
-(13, 'Kodi', 0, 0, 0, 0, 'Rent'),
-(14, 'Chombo', 0, 0, 0, 0, 'Tool'),
-(15, 'Gharama nyingine', 1, 0, 0, 0, 'Other costs');
+INSERT INTO `data_item` (`data_item_id`, `data_item_name`, `data_item_default_units_id`, `data_item_type`, `is_crop_specific`, `is_treatment_specific`, `data_item_name_english`, `is_retroactive`) VALUES
+(1, 'Maandalizi ya shamba', 0, 0, 0, 0, 'Land preparation', 0),
+(2, 'Kupanda', 0, 0, 1, 0, 'Planting', 0),
+(4, 'Mavuno', 1, 1, 1, 0, 'Yield', 0),
+(5, 'Utumiaji (Matibabu)', 1, 1, 0, 1, 'Application (treatment)', 0),
+(6, 'Bei (Mbegu)', 1, 2, 1, 0, 'Seed cost', 0),
+(7, 'Bei (Matibabu)', 1, 2, 0, 1, 'Costs (treatment)', 0),
+(8, 'Mauzo', 1, 3, 1, 0, 'Sales', 1),
+(9, 'Palizi', 0, 0, 0, 0, 'Weeding', 0),
+(10, 'Kupogolea', 0, 0, 1, 0, 'Pruning', 0),
+(11, 'Kuhifadhi', 0, 0, 1, 0, 'Storage', 1),
+(12, 'Usafiri', 0, 0, 1, 0, 'Transport', 0),
+(13, 'Kodi', 0, 0, 0, 0, 'Rent', 0),
+(14, 'Chombo', 0, 0, 0, 0, 'Tool', 0),
+(15, 'Gharama nyingine', 1, 0, 0, 0, 'Other costs', 1),
+(16, 'Faida nyingine', 1, 4, 0, 0, 'Other benefits', 1);
 
 -- --------------------------------------------------------
 
@@ -151,7 +154,7 @@ CREATE TABLE IF NOT EXISTS `farm` (
   `farm_size_acres` float unsigned NOT NULL,
   `farm_date_created` date NOT NULL,
   `farm_version` int(10) unsigned NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=182 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `farm`
@@ -168,7 +171,7 @@ CREATE TABLE IF NOT EXISTS `log` (
   `plot_id` int(10) unsigned NOT NULL,
   `log_date` date NOT NULL,
   `log_data_item_id` int(10) unsigned NOT NULL,
-  `log_quantity` decimal(10,0) unsigned NOT NULL,
+  `log_quantity` float unsigned NOT NULL,
   `log_value` float unsigned NOT NULL,
   `log_units_id` int(10) unsigned NOT NULL,
   `log_crop_id` int(10) unsigned NOT NULL,
@@ -176,7 +179,7 @@ CREATE TABLE IF NOT EXISTS `log` (
   `log_comments` text NOT NULL,
   `log_picture` varchar(100) NOT NULL,
   `log_sound` varchar(100) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=557 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `log`
@@ -196,7 +199,7 @@ CREATE TABLE IF NOT EXISTS `plot` (
   `plot_y` int(10) unsigned NOT NULL,
   `plot_w` int(10) unsigned NOT NULL,
   `plot_h` int(10) unsigned NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=430 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `plot`
@@ -234,7 +237,7 @@ CREATE TABLE IF NOT EXISTS `treatment_ingredient` (
   `treatment_id` int(10) unsigned NOT NULL,
   `treatment_ingredient_name` varchar(100) NOT NULL,
   `treatment_ingredient_name_english` varchar(100) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `treatment_ingredient`
@@ -245,7 +248,7 @@ INSERT INTO `treatment_ingredient` (`treatment_ingredient_id`, `treatment_id`, `
 (2, 1, 'Aloe vera', ''),
 (3, 1, 'Mwarubaini', ''),
 (4, 1, 'Sabuni', ''),
-(5, 1, 'Vitunguu', ''),
+(5, 1, 'Vitunguu swaumu', ''),
 (6, 1, 'Tangawizi', ''),
 (7, 1, 'Majivu', ''),
 (8, 1, 'Mafuta ya taa', ''),
@@ -255,11 +258,13 @@ INSERT INTO `treatment_ingredient` (`treatment_ingredient_id`, `treatment_id`, `
 (12, 2, 'Mboji', ''),
 (13, 1, 'Mpapai', ''),
 (14, 1, 'Utupa', ''),
-(15, 1, 'Mbangi', ''),
+(15, 1, 'Bangi', ''),
 (16, 1, 'Mvepe', ''),
 (17, 1, 'Lantana camara', ''),
 (18, 2, 'Chai mbolea', ''),
-(19, 2, 'Majivu', '');
+(19, 2, 'Majivu', ''),
+(20, 1, 'Vitunguu maji', 'Onion'),
+(21, 1, 'Mnyaa', '');
 
 -- --------------------------------------------------------
 
@@ -271,7 +276,7 @@ CREATE TABLE IF NOT EXISTS `treatment_ingredient_x_plot` (
   `treatment_ingredient_x_plot` int(10) unsigned NOT NULL,
   `treatment_ingredient_id` int(10) unsigned NOT NULL,
   `plot_id` int(10) unsigned NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=878 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `treatment_ingredient_x_plot`
@@ -288,7 +293,7 @@ CREATE TABLE IF NOT EXISTS `units` (
   `units_name` varchar(100) NOT NULL,
   `units_type` int(10) unsigned NOT NULL COMMENT '0=number, 1=date, 2=cost',
   `units_name_english` varchar(30) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `units`
@@ -299,7 +304,9 @@ INSERT INTO `units` (`units_id`, `units_name`, `units_type`, `units_name_english
 (2, 'Debe', 0, 'Baskets'),
 (4, 'TZS', 2, 'TZS'),
 (5, 'Gunia', 0, '100 kg package'),
-(6, 'Tenga', 0, 'Variable weight');
+(6, 'Tenga', 0, 'Variable weight'),
+(7, 'Lita', 0, 'Liters'),
+(8, 'Mti', 0, 'Sticks');
 
 -- --------------------------------------------------------
 
@@ -315,47 +322,58 @@ CREATE TABLE IF NOT EXISTS `user` (
   `user_mobile` varchar(30) NOT NULL,
   `user_group` varchar(30) NOT NULL,
   `user_association` varchar(30) NOT NULL,
-  `user_location` varchar(30) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8;
+  `user_location` varchar(30) NOT NULL,
+  `is_admin` tinyint(3) unsigned NOT NULL DEFAULT '0'
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `user`
 --
 
-INSERT INTO `user` (`user_id`, `user_name`, `user_alias`, `user_password`, `user_mobile`, `user_group`, `user_association`, `user_location`) VALUES
-(1, 'Test User', 'test', 'test', '', '', '', ''),
-(2, 'Eugenio Tisselli', 'eugenio', 'cubo23', '', '', '', ''),
-(5, 'Elias Charles Maajire', 'elias', 'maajire', '', '', '', 'Morogoro'),
-(6, 'Betina J. Mgwama', 'betina', 'mgwama', '', '', '', 'Morogoro'),
-(7, 'Teddy Kaweah', 'teddy', 'kaweah', '', '', '', 'Morogoro'),
-(8, 'Faudhia Magawa', 'faudhia', 'magawa', '', '', '', 'Morogoro'),
-(9, 'Tausi Omary Juma', 'tausi', 'juma', '', '', '', 'Morogoro'),
-(10, 'Eugenia K. Kishogo', 'eugenia', 'kishogo', '', '', '', 'Morogoro'),
-(11, 'Tabu Said', 'tabu', 'said', '', '', '', 'Morogoro'),
-(12, 'Sylvester Letus', 'sylvester', 'letus', '', '', '', 'Morogoro'),
-(13, 'Christopher Benagire', 'christopher', 'benagire', '', '', '', 'Morogoro'),
-(14, 'Parkursi Ngobwa', 'parkursi', 'ngobwa', '', '', '', 'Morogoro'),
-(15, 'Hamisi R. Shomari', 'hamisi r', 'shomari', '', '', '', 'Morogoro'),
-(16, 'Abdallah Jumanne', 'abdallah j', 'jumanne', '', '', '', 'Chambezi'),
-(17, 'Ana Macha', 'ana', 'macha', '', '', '', 'Chambezi'),
-(18, 'Renalda Msaki', 'renalda', 'msaki', '', '', '', 'Chambezi'),
-(19, 'Rehema Maganga', 'rehema', 'maganga', '', '', '', 'Chambezi'),
-(20, 'Nuru Mohamedi', 'nuru', 'mohamedi', '', '', '', 'Chambezi'),
-(21, 'Fatuma Ngomero', 'fatuma', 'ngomero', '', '', '', 'Chambezi'),
-(22, 'Mwanaidi Shabani', 'mwanaidi', 'shabani', '', '', '', 'Chambezi'),
-(23, 'Hamisi Palango', 'hamisi', 'palango', '', '', '', 'Chambezi'),
-(24, 'Fadhili Salum', 'fadhili', 'salum', '', '', '', 'Chambezi'),
-(25, 'Abdallah Mahmudu', 'abdallah m', 'mahmudu', '', '', '', 'Chambezi'),
-(26, 'Tumaini Mussa', 'tumaini', 'mussa', '', '', '', 'Masasi'),
-(27, 'Hadija Wende', 'hadija', 'wende', '', '', '', 'Masasi'),
-(28, 'Mohamedi Simosya', 'mohamedi', 'simosya', '', '', '', 'Masasi'),
-(29, 'Omari Aleka', 'omari', 'aleka', '', '', '', 'Masasi'),
-(30, 'Regina Hamisi', 'regina', 'hamisi', '', '', '', 'Masasi'),
-(31, 'Zena Rajabu', 'zena', 'rajabu', '', '', '', 'Masasi'),
-(32, 'Salima Mponda', 'salima', 'mponda', '', '', '', 'Masasi'),
-(33, 'Laina Selemani', 'laina', 'selemani', '', '', '', 'Masasi'),
-(34, 'Mable Mandova', 'mable', 'david', '', '', '', 'Masasi'),
-(35, 'Sebastian Ndimbo', 'sebastian', 'ndimbo', '', '', '', 'Masasi');
+INSERT INTO `user` (`user_id`, `user_name`, `user_alias`, `user_password`, `user_mobile`, `user_group`, `user_association`, `user_location`, `is_admin`) VALUES
+(1, 'Test User', 'test', 'test', '', '', '', '', 0),
+(2, 'Eugenio Tisselli', 'eugenio', 'cubo23', '', '', '', '', 1),
+(5, 'Elias Charles Maajire', 'elias', 'maajire', '', '', '', 'Morogoro', 0),
+(6, 'Betina J. Mgwama', 'betina', 'mgwama', '', '', '', 'Morogoro', 0),
+(7, 'Teddy Kaweah', 'teddy', 'kaweah', '', '', '', 'Morogoro', 0),
+(8, 'Faudhia Magawa', 'faudhia', 'magawa', '', '', '', 'Morogoro', 0),
+(9, 'Tausi Omary Juma', 'tausi', 'juma', '', '', '', 'Morogoro', 0),
+(10, 'Eugenia K. Kishogo', 'eugenia', 'kishogo', '', '', '', 'Morogoro', 0),
+(11, 'Tabu Said', 'tabu', 'said', '', '', '', 'Morogoro', 0),
+(12, 'Sylvester Letus', 'sylvester', 'letus', '', '', '', 'Morogoro', 0),
+(13, 'Christopher Benagire', 'christopher', 'benagire', '', '', '', 'Morogoro', 0),
+(14, 'Parkursi Ngobwa', 'parkursi', 'ngobwa', '', '', '', 'Morogoro', 0),
+(15, 'Hamisi R. Shomari', 'hamisi r', 'shomari', '', '', '', 'Morogoro', 0),
+(16, 'Abdallah Jumanne', 'abdallah j', 'jumanne', '', '', '', 'Chambezi', 0),
+(17, 'Ana Macha', 'ana', 'macha', '', '', '', 'Chambezi', 0),
+(18, 'Renalda Msaki', 'renalda', 'msaki', '', '', '', 'Chambezi', 0),
+(19, 'Rehema Maganga', 'rehema', 'maganga', '', '', '', 'Chambezi', 0),
+(20, 'Nuru Mohamedi', 'nuru', 'mohamedi', '', '', '', 'Chambezi', 0),
+(21, 'Fatuma Ngomero', 'fatuma', 'ngomero', '', '', '', 'Chambezi', 0),
+(22, 'Mwanaidi Shabani', 'mwanaidi', 'shabani', '', '', '', 'Chambezi', 0),
+(23, 'Hamisi Palango', 'hamisi', 'palango', '', '', '', 'Chambezi', 0),
+(24, 'Fadhili Salum', 'fadhili', 'salum', '', '', '', 'Chambezi', 0),
+(25, 'Abdallah Mahmudu', 'abdallah m', 'mahmudu', '', '', '', 'Chambezi', 0),
+(26, 'Tumaini Mussa', 'tumaini', 'mussa', '', '', '', 'Masasi', 0),
+(27, 'Hadija Wende', 'hadija', 'wende', '', '', '', 'Masasi', 0),
+(28, 'Mohamedi Simosya', 'mohamedi', 'simosya', '', '', '', 'Masasi', 0),
+(29, 'Omari Aleka', 'omari', 'aleka', '', '', '', 'Masasi', 0),
+(30, 'Regina Hamisi', 'regina', 'hamisi', '', '', '', 'Masasi', 0),
+(31, 'Zena Rajabu', 'zena', 'rajabu', '', '', '', 'Masasi', 0),
+(32, 'Salima Mponda', 'salima', 'mponda', '', '', '', 'Masasi', 0),
+(33, 'Laina Selemani', 'laina', 'selemani', '', '', '', 'Masasi', 0),
+(34, 'Mable Mandova', 'mable', 'david', '', '', '', 'Masasi', 0),
+(35, 'Sebastian Ndimbo', 'sebastian', 'ndimbo', '', '', '', 'Masasi', 0),
+(36, 'Luambano Kihoma', 'luambano', 'k1h0m4', '', '', 'SUA', 'Morogoro', 1),
+(37, 'Gladness Brush', 'gladness', 'brush', '', '', '', 'Masasi', 1),
+(38, 'Fadhili Stambuli', 'fadhili_swissaid', 'st4mb0l1', '', '', '', 'Masasi', 1),
+(39, 'Hamza Suleyman', 'hamza', 's0l3ym4n', '', '', '', 'Chambezi', 1),
+(40, 'Ndechihiro Maro', 'ndechi', 'm4r0', '', '', '', 'Morogoro', 1),
+(41, 'Alexander Wostry', 'alex', 'w0stry', '', '', '', 'Morogoro', 1),
+(43, 'Ayoub Ndee', 'ayoub', 'ndee', '', '', '', 'Chambezi', 1),
+(44, 'Zainabu Saidi', 'zainabu', 'saidi', '', '', '', '', 0),
+(47, '', 'abdallah_m', 'mahmudu', '', '', '', '', 0),
+(48, '', 'anna', 'macja', '', '', '', '', 0);
 
 --
 -- Índices para tablas volcadas
@@ -435,32 +453,32 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `crop`
 --
 ALTER TABLE `crop`
-  MODIFY `crop_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=48;
+  MODIFY `crop_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=50;
 --
 -- AUTO_INCREMENT de la tabla `crop_x_plot`
 --
 ALTER TABLE `crop_x_plot`
-  MODIFY `crop_x_plot_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=51;
+  MODIFY `crop_x_plot_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=660;
 --
 -- AUTO_INCREMENT de la tabla `data_item`
 --
 ALTER TABLE `data_item`
-  MODIFY `data_item_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=16;
+  MODIFY `data_item_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=17;
 --
 -- AUTO_INCREMENT de la tabla `farm`
 --
 ALTER TABLE `farm`
-  MODIFY `farm_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=24;
+  MODIFY `farm_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=182;
 --
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=7;
+  MODIFY `log_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=557;
 --
 -- AUTO_INCREMENT de la tabla `plot`
 --
 ALTER TABLE `plot`
-  MODIFY `plot_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=40;
+  MODIFY `plot_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=430;
 --
 -- AUTO_INCREMENT de la tabla `treatment`
 --
@@ -470,22 +488,22 @@ ALTER TABLE `treatment`
 -- AUTO_INCREMENT de la tabla `treatment_ingredient`
 --
 ALTER TABLE `treatment_ingredient`
-  MODIFY `treatment_ingredient_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=20;
+  MODIFY `treatment_ingredient_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=22;
 --
 -- AUTO_INCREMENT de la tabla `treatment_ingredient_x_plot`
 --
 ALTER TABLE `treatment_ingredient_x_plot`
-  MODIFY `treatment_ingredient_x_plot` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=37;
+  MODIFY `treatment_ingredient_x_plot` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=878;
 --
 -- AUTO_INCREMENT de la tabla `units`
 --
 ALTER TABLE `units`
-  MODIFY `units_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=7;
+  MODIFY `units_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=9;
 --
 -- AUTO_INCREMENT de la tabla `user`
 --
 ALTER TABLE `user`
-  MODIFY `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=36;
+  MODIFY `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=49;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

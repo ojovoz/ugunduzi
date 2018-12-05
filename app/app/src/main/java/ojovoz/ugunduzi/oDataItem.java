@@ -17,6 +17,7 @@ public class oDataItem {
     public int type; //0=activity (cost), 1=activity (cost with quantity), 2=input (cost), 3=output (sale)
     public boolean isCropSpecific;
     public boolean isTreatmentSpecific;
+    public boolean isRetroactive;
 
     private Context context;
 
@@ -28,7 +29,7 @@ public class oDataItem {
         context=c;
     }
 
-    public ArrayList<oDataItem> getDataItems(boolean bExcludeCropSpecific, boolean bExcludeTreatmentSpecific){
+    public ArrayList<oDataItem> getDataItems(boolean bExcludeCropSpecific, boolean bExcludeTreatmentSpecific, boolean bOnlyRetroactive){
         ArrayList<oDataItem> ret = new ArrayList<>();
         csvFileManager dataItemList;
 
@@ -38,7 +39,7 @@ public class oDataItem {
             Iterator<String[]> iterator = dataItemCSV.iterator();
             while (iterator.hasNext()) {
                 String[] record = iterator.next();
-                if(!((record[4].equals("1") && bExcludeCropSpecific) || (record[5].equals("1") && bExcludeTreatmentSpecific))) {
+                if(!((record[4].equals("1") && bExcludeCropSpecific) || (record[5].equals("1") && bExcludeTreatmentSpecific) || (record[6].equals("0") && bOnlyRetroactive))) {
                     oUnit u = new oUnit(context);
                     oDataItem d = new oDataItem();
                     d.id = Integer.parseInt(record[0]);
@@ -54,9 +55,9 @@ public class oDataItem {
         return ret;
     }
 
-    public ArrayList<String> getDataItemNames(boolean bExcludeCropSpecific, boolean bExcludeTreatmentSpecific){
+    public ArrayList<String> getDataItemNames(boolean bExcludeCropSpecific, boolean bExcludeTreatmentSpecific, boolean bOnlyRetroactive){
         ArrayList<String> ret = new ArrayList<>();
-        ArrayList<oDataItem> dataItemList = getDataItems(bExcludeCropSpecific, bExcludeTreatmentSpecific);
+        ArrayList<oDataItem> dataItemList = getDataItems(bExcludeCropSpecific, bExcludeTreatmentSpecific, bOnlyRetroactive);
 
         Iterator<oDataItem> iterator = dataItemList.iterator();
         while(iterator.hasNext()){
@@ -71,7 +72,7 @@ public class oDataItem {
         if(id==0){
             ret=null;
         } else {
-            ArrayList<oDataItem> dataItemList = getDataItems(false,false);
+            ArrayList<oDataItem> dataItemList = getDataItems(false,false,false);
             Iterator<oDataItem> iterator = dataItemList.iterator();
             while (iterator.hasNext()) {
                 oDataItem d = iterator.next();

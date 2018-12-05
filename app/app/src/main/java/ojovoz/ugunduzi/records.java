@@ -1540,8 +1540,9 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
         oDataItem d = new oDataItem(this);
         boolean bExcludeCropSpecific = (currentPlot != null) ? (currentPlot.crops.size() == 0) ? true : false : true;
         boolean bExcludeTreatmentSpecific = (currentPlot != null) ? (currentPlot.pestControlIngredients.size() == 0 && currentPlot.soilManagementIngredients.size() == 0) ? true : false : true;
-        dataItemsList = d.getDataItems(bExcludeCropSpecific, bExcludeTreatmentSpecific);
-        dataItemsNamesArray = d.getDataItemNames(bExcludeCropSpecific, bExcludeTreatmentSpecific).toArray(new CharSequence[dataItemsList.size()]);
+        boolean bOnlyRetroactive = (farmVersion < maxVersion) ? true : false;
+        dataItemsList = d.getDataItems(bExcludeCropSpecific, bExcludeTreatmentSpecific, bOnlyRetroactive);
+        dataItemsNamesArray = d.getDataItemNames(bExcludeCropSpecific, bExcludeTreatmentSpecific, bOnlyRetroactive).toArray(new CharSequence[dataItemsList.size()]);
     }
 
     public void goBack() {
