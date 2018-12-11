@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net
 --
 -- Servidor: 192.168.86.197
--- Tiempo de generación: 11-12-2018 a las 16:42:29
+-- Tiempo de generación: 11-12-2018 a las 20:00:56
 -- Versión del servidor: 5.5.57-0+deb7u1-log
 -- Versión de PHP: 5.3.29-1~dotdeb.0
 
@@ -128,7 +128,7 @@ INSERT INTO `data_item` (`data_item_id`, `data_item_name`, `data_item_default_un
 (2, 'Kupanda', 0, 0, 1, 0, 'Planting', 0),
 (4, 'Mavuno', 1, 1, 1, 0, 'Yield', 0),
 (5, 'Utumiaji (Matibabu)', 1, 1, 0, 1, 'Application (treatment)', 0),
-(6, 'Bei (Mbegu)', 1, 2, 1, 0, 'Seed cost', 0),
+(6, 'Bei (Mbegu)', 1, 2, 1, 0, 'Costs (seeds)', 0),
 (7, 'Bei (Matibabu)', 1, 2, 0, 1, 'Costs (treatment)', 0),
 (8, 'Mauzo', 1, 3, 1, 0, 'Sales', 1),
 (9, 'Palizi', 0, 0, 0, 0, 'Weeding', 0),
