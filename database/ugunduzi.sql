@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net
 --
 -- Servidor: 192.168.86.197
--- Tiempo de generación: 05-12-2018 a las 10:10:12
+-- Tiempo de generación: 11-12-2018 a las 16:42:29
 -- Versión del servidor: 5.5.57-0+deb7u1-log
 -- Versión de PHP: 5.3.29-1~dotdeb.0
 
@@ -72,15 +72,15 @@ INSERT INTO `crop` (`crop_id`, `crop_name`, `crop_variety`, `crop_name_english`)
 (34, 'Aloe vera', '', 'Aloe vera'),
 (35, 'Mwarubaini', '', 'Neem'),
 (36, 'Korosho', '', 'Cashew'),
-(37, 'Milonge', '', ''),
-(38, 'Utupa', '', ''),
-(39, 'Mkuna', '', ''),
+(37, 'Milonge', '', 'Milonge'),
+(38, 'Utupa', '', 'Utupa'),
+(39, 'Mkuna', '', 'Mkuna beans'),
 (40, 'Fiwi', '', 'Lima beans'),
 (41, 'Njugu', '', 'Bambara nuts'),
-(42, 'Upupu', '', ''),
+(42, 'Upupu', '', 'Upupu'),
 (43, 'Pasheni', '', 'Passion fruit'),
-(44, 'Ulezi', '', ''),
-(45, 'Mnavu', '', ''),
+(44, 'Ulezi', '', 'Ulezi'),
+(45, 'Mnavu', '', 'Mnavu'),
 (46, 'Figiri', '', 'Fig'),
 (47, 'Karoti', '', 'Carrots'),
 (48, 'Pilipili', '', 'Chili'),
@@ -244,27 +244,27 @@ CREATE TABLE IF NOT EXISTS `treatment_ingredient` (
 --
 
 INSERT INTO `treatment_ingredient` (`treatment_ingredient_id`, `treatment_id`, `treatment_ingredient_name`, `treatment_ingredient_name_english`) VALUES
-(1, 1, 'Pilipili', ''),
-(2, 1, 'Aloe vera', ''),
-(3, 1, 'Mwarubaini', ''),
-(4, 1, 'Sabuni', ''),
-(5, 1, 'Vitunguu swaumu', ''),
-(6, 1, 'Tangawizi', ''),
-(7, 1, 'Majivu', ''),
-(8, 1, 'Mafuta ya taa', ''),
-(9, 1, 'Maziwa', ''),
-(10, 2, 'Matandazo', ''),
-(11, 2, 'Samadi', ''),
-(12, 2, 'Mboji', ''),
-(13, 1, 'Mpapai', ''),
-(14, 1, 'Utupa', ''),
-(15, 1, 'Bangi', ''),
-(16, 1, 'Mvepe', ''),
-(17, 1, 'Lantana camara', ''),
-(18, 2, 'Chai mbolea', ''),
-(19, 2, 'Majivu', ''),
+(1, 1, 'Pilipili', 'Pepper'),
+(2, 1, 'Aloe vera', 'Aloe vera'),
+(3, 1, 'Mwarubaini', 'Neem'),
+(4, 1, 'Sabuni', 'Soap'),
+(5, 1, 'Vitunguu swaumu', 'Garlic'),
+(6, 1, 'Tangawizi', 'Ginger'),
+(7, 1, 'Majivu', 'Ashes'),
+(8, 1, 'Mafuta ya taa', 'Kerosene'),
+(9, 1, 'Maziwa', 'Milk'),
+(10, 2, 'Matandazo', 'Grasses'),
+(11, 2, 'Samadi', 'Manure'),
+(12, 2, 'Mboji', 'Compost'),
+(13, 1, 'Mipapai', 'Papaya'),
+(14, 1, 'Utupa', 'Utupa'),
+(15, 1, 'Bangi', 'Hemp'),
+(16, 1, 'Mvepe', 'Mvepe'),
+(17, 1, 'Lantana camara', 'Lanatana camara'),
+(18, 2, 'Chai mbolea', 'Tea manure'),
+(19, 2, 'Majivu', 'Ashes'),
 (20, 1, 'Vitunguu maji', 'Onion'),
-(21, 1, 'Mnyaa', '');
+(21, 1, 'Mnyaa', 'Mnyaa');
 
 -- --------------------------------------------------------
 
@@ -329,51 +329,6 @@ CREATE TABLE IF NOT EXISTS `user` (
 --
 -- Volcado de datos para la tabla `user`
 --
-
-INSERT INTO `user` (`user_id`, `user_name`, `user_alias`, `user_password`, `user_mobile`, `user_group`, `user_association`, `user_location`, `is_admin`) VALUES
-(1, 'Test User', 'test', 'test', '', '', '', '', 0),
-(2, 'Eugenio Tisselli', 'eugenio', 'cubo23', '', '', '', '', 1),
-(5, 'Elias Charles Maajire', 'elias', 'maajire', '', '', '', 'Morogoro', 0),
-(6, 'Betina J. Mgwama', 'betina', 'mgwama', '', '', '', 'Morogoro', 0),
-(7, 'Teddy Kaweah', 'teddy', 'kaweah', '', '', '', 'Morogoro', 0),
-(8, 'Faudhia Magawa', 'faudhia', 'magawa', '', '', '', 'Morogoro', 0),
-(9, 'Tausi Omary Juma', 'tausi', 'juma', '', '', '', 'Morogoro', 0),
-(10, 'Eugenia K. Kishogo', 'eugenia', 'kishogo', '', '', '', 'Morogoro', 0),
-(11, 'Tabu Said', 'tabu', 'said', '', '', '', 'Morogoro', 0),
-(12, 'Sylvester Letus', 'sylvester', 'letus', '', '', '', 'Morogoro', 0),
-(13, 'Christopher Benagire', 'christopher', 'benagire', '', '', '', 'Morogoro', 0),
-(14, 'Parkursi Ngobwa', 'parkursi', 'ngobwa', '', '', '', 'Morogoro', 0),
-(15, 'Hamisi R. Shomari', 'hamisi r', 'shomari', '', '', '', 'Morogoro', 0),
-(16, 'Abdallah Jumanne', 'abdallah j', 'jumanne', '', '', '', 'Chambezi', 0),
-(17, 'Ana Macha', 'ana', 'macha', '', '', '', 'Chambezi', 0),
-(18, 'Renalda Msaki', 'renalda', 'msaki', '', '', '', 'Chambezi', 0),
-(19, 'Rehema Maganga', 'rehema', 'maganga', '', '', '', 'Chambezi', 0),
-(20, 'Nuru Mohamedi', 'nuru', 'mohamedi', '', '', '', 'Chambezi', 0),
-(21, 'Fatuma Ngomero', 'fatuma', 'ngomero', '', '', '', 'Chambezi', 0),
-(22, 'Mwanaidi Shabani', 'mwanaidi', 'shabani', '', '', '', 'Chambezi', 0),
-(23, 'Hamisi Palango', 'hamisi', 'palango', '', '', '', 'Chambezi', 0),
-(24, 'Fadhili Salum', 'fadhili', 'salum', '', '', '', 'Chambezi', 0),
-(25, 'Abdallah Mahmudu', 'abdallah m', 'mahmudu', '', '', '', 'Chambezi', 0),
-(26, 'Tumaini Mussa', 'tumaini', 'mussa', '', '', '', 'Masasi', 0),
-(27, 'Hadija Wende', 'hadija', 'wende', '', '', '', 'Masasi', 0),
-(28, 'Mohamedi Simosya', 'mohamedi', 'simosya', '', '', '', 'Masasi', 0),
-(29, 'Omari Aleka', 'omari', 'aleka', '', '', '', 'Masasi', 0),
-(30, 'Regina Hamisi', 'regina', 'hamisi', '', '', '', 'Masasi', 0),
-(31, 'Zena Rajabu', 'zena', 'rajabu', '', '', '', 'Masasi', 0),
-(32, 'Salima Mponda', 'salima', 'mponda', '', '', '', 'Masasi', 0),
-(33, 'Laina Selemani', 'laina', 'selemani', '', '', '', 'Masasi', 0),
-(34, 'Mable Mandova', 'mable', 'david', '', '', '', 'Masasi', 0),
-(35, 'Sebastian Ndimbo', 'sebastian', 'ndimbo', '', '', '', 'Masasi', 0),
-(36, 'Luambano Kihoma', 'luambano', 'k1h0m4', '', '', 'SUA', 'Morogoro', 1),
-(37, 'Gladness Brush', 'gladness', 'brush', '', '', '', 'Masasi', 1),
-(38, 'Fadhili Stambuli', 'fadhili_swissaid', 'st4mb0l1', '', '', '', 'Masasi', 1),
-(39, 'Hamza Suleyman', 'hamza', 's0l3ym4n', '', '', '', 'Chambezi', 1),
-(40, 'Ndechihiro Maro', 'ndechi', 'm4r0', '', '', '', 'Morogoro', 1),
-(41, 'Alexander Wostry', 'alex', 'w0stry', '', '', '', 'Morogoro', 1),
-(43, 'Ayoub Ndee', 'ayoub', 'ndee', '', '', '', 'Chambezi', 1),
-(44, 'Zainabu Saidi', 'zainabu', 'saidi', '', '', '', '', 0),
-(47, '', 'abdallah_m', 'mahmudu', '', '', '', '', 0),
-(48, '', 'anna', 'macja', '', '', '', '', 0);
 
 --
 -- Índices para tablas volcadas
