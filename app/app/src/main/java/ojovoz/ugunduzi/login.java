@@ -243,12 +243,15 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
                     prefs.savePreferenceInt("userId", userId);
                     checkUserDataDownload();
                 } else if (userId == 0) {
+                    /*
                     if (dataDownloaded) {
                         connectionTask = 1;
                         createNewUser(uAS, uPS);
                     } else {
                         downloadData();
                     }
+                    */
+                    Toast.makeText(this, R.string.wrongPasswordLabel, Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(this, R.string.wrongPasswordLabel, Toast.LENGTH_SHORT).show();
                 }
