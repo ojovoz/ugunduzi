@@ -26,6 +26,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
@@ -43,6 +44,7 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
     private String uPS = "";
 
     private ArrayList<String> dataItems;
+    private String lang;
     private int index;
     private ProgressDialog dialog;
     private int uploadIncrement = 1;
@@ -132,6 +134,8 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
         dataItems.add("units");
         dataItems.add("data_items");
 
+        lang = Locale.getDefault().getLanguage();
+
         httpConnection http = new httpConnection(this, this);
         if (http.isOnline()) {
             index = 0;
@@ -166,7 +170,8 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
             if (!bConnecting) {
                 bConnecting = true;
                 connectionTask = 0;
-                http.execute(server + "/mobile/get_" + dataItems.get(index) + ".php", "csv");
+                String l = (lang.equals("en")) ? "?lang=en" : "";
+                http.execute(server + "/mobile/get_" + dataItems.get(index) + ".php" + l, "csv");
             }
         } else {
             Toast.makeText(this, R.string.pleaseConnectMessage, Toast.LENGTH_SHORT).show();
