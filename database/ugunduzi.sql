@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net
 --
 -- Servidor: 192.168.86.197
--- Tiempo de generación: 11-12-2018 a las 20:00:56
+-- Tiempo de generación: 13-12-2018 a las 23:13:52
 -- Versión del servidor: 5.5.57-0+deb7u1-log
 -- Versión de PHP: 5.3.29-1~dotdeb.0
 
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS `crop_x_plot` (
   `crop_x_plot_id` int(10) unsigned NOT NULL,
   `crop_id` int(10) unsigned NOT NULL,
   `plot_id` int(10) unsigned NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=660 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=662 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `crop_x_plot`
@@ -154,7 +154,7 @@ CREATE TABLE IF NOT EXISTS `farm` (
   `farm_size_acres` float unsigned NOT NULL,
   `farm_date_created` date NOT NULL,
   `farm_version` int(10) unsigned NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=182 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=184 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `farm`
@@ -198,8 +198,9 @@ CREATE TABLE IF NOT EXISTS `plot` (
   `plot_x` int(10) unsigned NOT NULL,
   `plot_y` int(10) unsigned NOT NULL,
   `plot_w` int(10) unsigned NOT NULL,
-  `plot_h` int(10) unsigned NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=430 DEFAULT CHARSET=utf8;
+  `plot_h` int(10) unsigned NOT NULL,
+  `plot_size` float NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=435 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `plot`
@@ -276,7 +277,7 @@ CREATE TABLE IF NOT EXISTS `treatment_ingredient_x_plot` (
   `treatment_ingredient_x_plot` int(10) unsigned NOT NULL,
   `treatment_ingredient_id` int(10) unsigned NOT NULL,
   `plot_id` int(10) unsigned NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=878 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=880 DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `treatment_ingredient_x_plot`
@@ -413,7 +414,7 @@ ALTER TABLE `crop`
 -- AUTO_INCREMENT de la tabla `crop_x_plot`
 --
 ALTER TABLE `crop_x_plot`
-  MODIFY `crop_x_plot_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=660;
+  MODIFY `crop_x_plot_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=662;
 --
 -- AUTO_INCREMENT de la tabla `data_item`
 --
@@ -423,7 +424,7 @@ ALTER TABLE `data_item`
 -- AUTO_INCREMENT de la tabla `farm`
 --
 ALTER TABLE `farm`
-  MODIFY `farm_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=182;
+  MODIFY `farm_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=184;
 --
 -- AUTO_INCREMENT de la tabla `log`
 --
@@ -433,7 +434,7 @@ ALTER TABLE `log`
 -- AUTO_INCREMENT de la tabla `plot`
 --
 ALTER TABLE `plot`
-  MODIFY `plot_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=430;
+  MODIFY `plot_id` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=435;
 --
 -- AUTO_INCREMENT de la tabla `treatment`
 --
@@ -448,7 +449,7 @@ ALTER TABLE `treatment_ingredient`
 -- AUTO_INCREMENT de la tabla `treatment_ingredient_x_plot`
 --
 ALTER TABLE `treatment_ingredient_x_plot`
-  MODIFY `treatment_ingredient_x_plot` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=878;
+  MODIFY `treatment_ingredient_x_plot` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=880;
 --
 -- AUTO_INCREMENT de la tabla `units`
 --
