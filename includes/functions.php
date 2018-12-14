@@ -139,8 +139,8 @@ function deleteFarmData($dbh,$farm_id){
 	$result = mysqli_query($dbh,$query);
 }
 
-function createNewPlot($dbh,$farm_id,$plot_id,$plot_x,$plot_y,$plot_w,$plot_h,$plot_crops,$plot_pest_control,$plot_soil_management){
-	$query="INSERT INTO plot(internal_plot_id, farm_id, plot_x, plot_y, plot_w, plot_h) VALUES ($plot_id, $farm_id, $plot_x,$plot_y,$plot_w,$plot_h)";
+function createNewPlot($dbh,$farm_id,$plot_id,$plot_x,$plot_y,$plot_w,$plot_h,$plot_size,$plot_crops,$plot_pest_control,$plot_soil_management){
+	$query="INSERT INTO plot(internal_plot_id, farm_id, plot_x, plot_y, plot_w, plot_h, plot_size) VALUES ($plot_id, $farm_id, $plot_x,$plot_y,$plot_w,$plot_h,$plot_size)";
 	$result = mysqli_query($dbh,$query);
 	$plot_id = mysqli_insert_id($dbh);
 	

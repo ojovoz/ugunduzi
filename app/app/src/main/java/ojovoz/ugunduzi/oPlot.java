@@ -16,6 +16,7 @@ public class oPlot {
     public int y;
     public float w;
     public float h;
+    public float size;
 
     public int state; // 0 = default; 1 = touched; 2 = moving; 3 = resizing; 4 = editing contents; 5 = choosing action
 
@@ -36,19 +37,13 @@ public class oPlot {
     public int iActionsW;
     public int iActionsH;
 
-    //delete: begin
-    public oCrop crop1;
-    public oCrop crop2;
-    public oTreatment treatment1;
-    public oTreatment treatment2;
-    //delete: end
-
     public ArrayList<oCrop> crops;
     public ArrayList<oTreatmentIngredient> pestControlIngredients;
     public ArrayList<oTreatmentIngredient> soilManagementIngredients;
 
     oPlot(){
         state=0;
+        size=0;
 
         crops = new ArrayList<>();
         pestControlIngredients = new ArrayList<>();
@@ -62,13 +57,14 @@ public class oPlot {
         h=rH;
 
         state=0;
+        size=0;
 
         crops = new ArrayList<>();
         pestControlIngredients = new ArrayList<>();
         soilManagementIngredients = new ArrayList<>();
     }
 
-    public void addAreas(int rIMoveW, int rIMoveH, int rIResizeW, int rIResizeH, int rIContentsW, int rIContentsH, int rIActionsW, int rIActionsH){
+    public void addAreas(int rIResizeW, int rIResizeH, int rIContentsW, int rIContentsH, int rIActionsW, int rIActionsH){
         iMoveW = (int)w;
         iMoveH = (int)h-(rIContentsH+rIResizeH);
         iResizeW = rIResizeW;

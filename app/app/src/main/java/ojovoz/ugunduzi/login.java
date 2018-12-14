@@ -412,11 +412,12 @@ public class login extends AppCompatActivity implements httpConnection.AsyncResp
             String plotY = thisFarm[8];
             String plotW = thisFarm[9];
             String plotH = thisFarm[10];
-            String cropsList = thisFarm[11];
-            String pestControlList = thisFarm[12];
-            String soilManagementList = thisFarm[13];
+            String plotSize = thisFarm[11];
+            String cropsList = thisFarm[12];
+            String pestControlList = thisFarm[13];
+            String soilManagementList = thisFarm[14];
 
-            String plotMatrix = plotId + ";" + plotX + ";" + plotY + ";" + plotW + ";" + plotH + ";" + cropsList + ";" + pestControlList + ";" +
+            String plotMatrix = plotId + ";" + plotX + ";" + plotY + ";" + plotW + ";" + plotH + ";" + plotSize + ";" + cropsList + ";" + pestControlList + ";" +
                     soilManagementList;
 
             Iterator<oFarm> iterator = newFarms.iterator();

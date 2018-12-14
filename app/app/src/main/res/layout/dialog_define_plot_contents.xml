@@ -17,12 +17,28 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <EditText
+                android:id="@+id/plotSize"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorInput"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:padding="10dp"
+                android:inputType="numberDecimal"
+                android:singleLine="true"
+                android:hint="@string/enterAcresLabel"
+                android:imeOptions="actionDone"
+                android:textColor="@color/colorBlack"
+                android:textSize="20dp" />
+
             <Button
                 android:id="@+id/cropButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:height="40dp"
-                android:background="@drawable/button_background_light"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/button_background_crops"
                 android:text="@string/selectCropsLabel"
                 android:textColor="@color/colorBlack"
                 android:paddingLeft="@dimen/activity_horizontal_margin"

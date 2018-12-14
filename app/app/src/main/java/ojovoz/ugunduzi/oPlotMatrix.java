@@ -51,19 +51,21 @@ public class oPlotMatrix {
         }
     }
 
-    public void fromString(Context c,String matrixString, String separator, int iMoveW, int iMoveH, int iResizeW, int iResizeH, int iContentsW, int iContentsH, int iActionsW, int iActionsH){
+    public void fromString(Context c, String matrixString, String separator, int iResizeW, int iResizeH, int iContentsW, int iContentsH, int iActionsW, int iActionsH){
         String matrixItems[] = matrixString.split(separator);
         oPlot plot;
         oCrop crop = new oCrop(c);
         oTreatmentIngredient treatmentIngredient = new oTreatmentIngredient(c);
-        for(int i=0;i<matrixItems.length;i+=8){
+        int inc = (matrixItems.length%8==0) ? 8 : 9;
+        for(int i=0;i<matrixItems.length;i+=inc){
             plot=new oPlot();
             plot.id=Integer.parseInt(matrixItems[i]);
             plot.x=Integer.parseInt(matrixItems[i+1])* displayWidth/4;
             plot.y=Integer.parseInt(matrixItems[i+2])* displayHeight/4;
             plot.w=Integer.parseInt(matrixItems[i+3])* displayWidth/4;
             plot.h=Integer.parseInt(matrixItems[i+4])* displayHeight/4;
-            String crops=matrixItems[i+5];
+            plot.size = (matrixItems.length%9==0) ? Float.parseFloat(matrixItems[i + 5]) : 0;
+            String crops=matrixItems[i+inc-3];
             if(!crops.equals("-1")) {
                 String plotCropsList[] = crops.split("\\|");
                 for (int j = 0; j < plotCropsList.length; j++) {
@@ -71,7 +73,7 @@ public class oPlotMatrix {
                     plot.crops.add(pc);
                 }
             }
-            String pestControl=matrixItems[i+6];
+            String pestControl=matrixItems[i+inc-2];
             if(!pestControl.equals("-1")) {
                 String plotPestControlList[] = pestControl.split("\\|");
                 for (int j = 0; j < plotPestControlList.length; j++) {
@@ -79,7 +81,7 @@ public class oPlotMatrix {
                     plot.pestControlIngredients.add(ti);
                 }
             }
-            String soilManagement=matrixItems[i+7];
+            String soilManagement=matrixItems[i+inc-1];
             if(!soilManagement.equals("-1")) {
                 String plotSoilManagementList[] = soilManagement.split("\\|");
                 for (int j = 0; j < plotSoilManagementList.length; j++) {
@@ -87,7 +89,7 @@ public class oPlotMatrix {
                     plot.soilManagementIngredients.add(ti);
                 }
             }
-            plot.addAreas(iMoveW, iMoveH, iResizeW, iResizeH, iContentsW, iContentsH, iActionsW, iActionsH);
+            plot.addAreas(iResizeW, iResizeH, iContentsW, iContentsH, iActionsW, iActionsH);
             plots.add(plot);
             addPlotToMatrix(plot, plot.x/(displayWidth/4), plot.y/(displayHeight/4),(int)(plot.w/(displayWidth/4))+ plot.x/(displayWidth/4),(int)(plot.h/(displayHeight/4))+ plot.y/(displayHeight/4));
         }
@@ -97,10 +99,11 @@ public class oPlotMatrix {
         String matrixItems[] = matrixString.split(separator);
         oCrop crop = new oCrop(c);
         oTreatmentIngredient treatmentIngredient = new oTreatmentIngredient(c);
-        for(int i=0;i<matrixItems.length;i+=8){
+        int inc = (matrixItems.length%8==0) ? 8 : 9;
+        for(int i=0;i<matrixItems.length;i+=inc){
             oPlot plot=new oPlot();
             plot.id=Integer.parseInt(matrixItems[i]);
-            String crops=matrixItems[i+5];
+            String crops=matrixItems[i+inc-3];
             if(!crops.equals("-1")) {
                 String plotCropsList[] = crops.split("\\|");
                 for (int j = 0; j < plotCropsList.length; j++) {
@@ -108,7 +111,7 @@ public class oPlotMatrix {
                     plot.crops.add(pc);
                 }
             }
-            String pestControl=matrixItems[i+6];
+            String pestControl=matrixItems[i+inc-2];
             if(!pestControl.equals("-1")) {
                 String plotPestControlList[] = pestControl.split("\\|");
                 for (int j = 0; j < plotPestControlList.length; j++) {
@@ -116,7 +119,7 @@ public class oPlotMatrix {
                     plot.pestControlIngredients.add(ti);
                 }
             }
-            String soilManagement=matrixItems[i+7];
+            String soilManagement=matrixItems[i+inc-1];
             if(!soilManagement.equals("-1")) {
                 String plotSoilManagementList[] = soilManagement.split("\\|");
                 for (int j = 0; j < plotSoilManagementList.length; j++) {
@@ -132,12 +135,12 @@ public class oPlotMatrix {
         currentPlot = p;
     }
 
-    public boolean addPlot(int iMoveW, int iMoveH, int iResizeW, int iResizeH, int iContentsW, int iContentsH, int iActionsW, int iActionsH) {
+    public boolean addPlot(int iResizeW, int iResizeH, int iContentsW, int iContentsH, int iActionsW, int iActionsH) {
         boolean ret;
         matrixContent cell = findFirstAvailablePosition();
         if (cell.point != null) {
             oPlot p = new oPlot(cell.point.x, cell.point.y, displayWidth / 4, displayHeight / 4);
-            p.addAreas(iMoveW, iMoveH, iResizeW, iResizeH, iContentsW, iContentsH, iActionsW, iActionsH);
+            p.addAreas(iResizeW, iResizeH, iContentsW, iContentsH, iActionsW, iActionsH);
             setCurrentPlot(p);
             getPlotIndex();
             p.id=plotIndex;
@@ -489,7 +492,7 @@ public class oPlotMatrix {
                     break;
                 }
             }
-            plotString = plotString + String.valueOf(Math.round(plot.w/(displayWidth/4))) + ";" + String.valueOf(Math.round(plot.h/(displayHeight/4))) + ";";
+            plotString = plotString + String.valueOf(Math.round(plot.w/(displayWidth/4))) + ";" + String.valueOf(Math.round(plot.h/(displayHeight/4))) + ";" + String.valueOf(plot.size) + ";";
             String crops="-1";
             Iterator<oCrop> iteratorCrops = plot.crops.iterator();
             while (iteratorCrops.hasNext()) {

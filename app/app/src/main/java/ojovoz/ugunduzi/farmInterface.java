@@ -22,7 +22,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextPaint;
-import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -250,8 +249,6 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
 
     public void createFarm() {
-        int mw = iconMove.getWidth();
-        int mh = iconMove.getHeight();
         int rw = iconResize.getWidth();
         int rh = iconResize.getHeight();
         int cw = iconContents.getWidth();
@@ -260,9 +257,9 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         int ah = iconActions.getHeight();
 
         if (newFarm) {
-            plotMatrix.addPlot(mw, mh, rw, rh, cw, ch, aw, ah);
+            plotMatrix.addPlot(rw, rh, cw, ch, aw, ah);
         } else if (state == 1 || state == 2) {
-            plotMatrix.fromString(this, currentFarm.plotMatrix, ";", mw, mh, rw, rh, cw, ch, aw, ah);
+            plotMatrix.fromString(this, currentFarm.plotMatrix, ";", rw, rh, cw, ch, aw, ah);
         }
     }
 
@@ -565,7 +562,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     public void createNewFarm() {
         plotMatrix = new oPlotMatrix();
         plotMatrix.createMatrix(displayWidth, displayHeight);
-        plotMatrix.addPlot(iconMove.getWidth(), iconMove.getHeight(), iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight());
+        plotMatrix.addPlot(iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight());
         state = 0;
         bFarmSaved = false;
         canvasView.invalidate();
@@ -627,7 +624,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 plotMatrix = new oPlotMatrix();
                 plotMatrix.createMatrix(displayWidth, displayHeight);
                 currentFarm = currentFarm.getLatestActiveVersion(userId, farmId, this);
-                plotMatrix.fromString(this, currentFarm.plotMatrix, ";", iconMove.getWidth(), iconMove.getHeight(), iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight());
+                plotMatrix.fromString(this, currentFarm.plotMatrix, ";", iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight());
                 state = 1;
                 this.setTitle(farmName + " (" + user + ")");
                 canvasView.invalidate();
@@ -664,7 +661,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
     }
 
     public void addPlot() {
-        if (!plotMatrix.addPlot(iconMove.getWidth(), iconMove.getHeight(), iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight())) {
+        if (!plotMatrix.addPlot(iconResize.getWidth(), iconResize.getHeight(), iconContents.getWidth(), iconContents.getHeight(), iconActions.getWidth(), iconActions.getHeight())) {
             Toast.makeText(this, R.string.noSpaceForNewPlotMessage, Toast.LENGTH_SHORT).show();
         }
     }

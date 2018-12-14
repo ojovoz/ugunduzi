@@ -25,18 +25,28 @@ if(isset($_GET['farm'])){
 		$farm_id=createNewFarm($dbh,$farm_name,$farm_size,$farm_date_created,$user_id,$farm_app_id,$farm_version);
 		
 		$output_part_2=$farm_id;
-		for($i=7;$i<sizeof($farm_parts);$i+=8){
+		if($farm_parts%8==0){
+			$inc=8;
+		} else {
+			$inc=9;
+		}
+		for($i=7;$i<sizeof($farm_parts);$i+=$inc){
 			$plot_id=$farm_parts[$i];
 			$plot_x=$farm_parts[$i+1];
 			$plot_y=$farm_parts[$i+2];
 			$plot_w=$farm_parts[$i+3];
 			$plot_h=$farm_parts[$i+4];
+			if($inc==9){
+				$plot_size=$farm_parts[$i+5];
+			} else {
+				$plot_size=0;
+			}
 			
-			$plot_crops=explode("|",$farm_parts[$i+5]);
-			$plot_pest_control=explode("|",$farm_parts[$i+6]);
-			$plot_soil_management=explode("|",$farm_parts[$i+7]);
+			$plot_crops=explode("|",$farm_parts[$i+$inc-3]);
+			$plot_pest_control=explode("|",$farm_parts[$i+$inc-2]);
+			$plot_soil_management=explode("|",$farm_parts[$i+$inc-1]);
 			
-			createNewPlot($dbh,$farm_id,$plot_id,$plot_x,$plot_y,$plot_w,$plot_h,$plot_crops,$plot_pest_control,$plot_soil_management);
+			createNewPlot($dbh,$farm_id,$plot_id,$plot_x,$plot_y,$plot_w,$plot_h,$plot_size,$plot_crops,$plot_pest_control,$plot_soil_management);
 		}
 		echo($output_part_1.",".$output_part_2);
 	} else {
