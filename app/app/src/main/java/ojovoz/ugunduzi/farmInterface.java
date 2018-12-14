@@ -33,6 +33,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -277,7 +278,11 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                 logoutDialog.setPositiveButton(R.string.yesButtonText, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        finish();
+                        if(state==2) {
+                            doCancelEditedFarm();
+                        } else {
+                            finish();
+                        }
                     }
                 });
                 logoutDialog.create();

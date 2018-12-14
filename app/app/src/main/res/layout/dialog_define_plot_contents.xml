@@ -17,20 +17,46 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/plotSize"
+            <TableLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorInput"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:padding="10dp"
-                android:inputType="numberDecimal"
-                android:singleLine="true"
-                android:hint="@string/enterAcresLabel"
-                android:imeOptions="actionDone"
-                android:textColor="@color/colorBlack"
-                android:textSize="20dp" />
+                android:id="@+id/plotSizeRow"
+                android:stretchColumns="*">
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="1">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/enterAcresLabel"
+                        android:textColor="@color/colorPrimary"
+                        android:id="@+id/plotSizeLabel"
+                        android:padding="@dimen/activity_view_padding"
+                        android:layout_column="0"
+                        android:textSize="20dp" />
+
+                    <EditText
+                        android:id="@+id/plotSize"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:background="@color/colorInput"
+                        android:paddingLeft="@dimen/activity_horizontal_margin"
+                        android:paddingRight="@dimen/activity_horizontal_margin"
+                        android:padding="10dp"
+                        android:inputType="numberDecimal"
+                        android:singleLine="true"
+                        android:layout_column="1"
+                        android:imeOptions="actionDone"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="20dp" />
+
+                </TableRow>
+
+
+            </TableLayout>
 
             <Button
                 android:id="@+id/cropButton"
