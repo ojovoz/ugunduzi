@@ -110,4 +110,7 @@
     <string name="valueEmptyMessage">Thamani haipaswi kuwa wazi</string>
     <string name="wrongPasswordLabel">Neno la siri sio sahihi</string>
     <string name="yesButtonText">Ndiyo</string>
+    <string name="plotSizeCannotBeEmpty">Plot size cannot be empty</string>
+    <string name="plotSizeCannotBeZero">Plot size cannot be empty</string>
+    <string name="sizeOfPlotsGreaterThanFarmSize">Size of plots is greater than farm size</string>
 </resources>

@@ -27,12 +27,14 @@ public class oFarm {
     oFarm(){
         dH = new dateHelper();
         status=0;
+        size=1;
     }
 
     oFarm(Context c){
         dH = new dateHelper();
         context=c;
         status=0;
+        size=1;
     }
 
     public ArrayList<oFarm> getFarms(int userId, int id){

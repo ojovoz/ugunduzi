@@ -37,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -85,7 +86,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
     int farmId = -1;
     String farmName = "";
-    float farmSize;
+    float farmSize = 1;
     String farmDateString;
 
     oFarm currentFarm;
@@ -719,16 +720,27 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.okButton:
-                        plotMatrix.currentPlot.state = 1;
-                        copyContentsFromTempPlot();
-                        dialog.dismiss();
-                        canvasView.invalidate();
+                        EditText plotSize = (EditText) dialog.findViewById(R.id.plotSize);
+                        if(verifyPlotSize(plotSize.getText().toString())) {
+                            plotMatrix.currentPlot.state = 1;
+                            plotMatrix.currentPlot.size = Float.valueOf(plotSize.getText().toString());
+                            copyContentsFromTempPlot();
+                            dialog.dismiss();
+                            canvasView.invalidate();
+                        }
                         break;
                     default:
                         break;
                 }
             }
         });
+
+        EditText plotSize = (EditText) dialog.findViewById(R.id.plotSize);
+        if(plotMatrix.currentPlot.size>0){
+            plotSize.setText(String.valueOf(plotMatrix.currentPlot.size));
+        } else {
+            plotSize.setText(String.valueOf(calculatePlotSize()));
+        }
 
         Button crops = (Button) dialog.findViewById(R.id.cropButton);
         crops.setOnClickListener(new View.OnClickListener() {
@@ -773,6 +785,33 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         });
 
         dialog.show();
+    }
+
+    BigDecimal calculatePlotSize(){
+        float fs = (currentFarm.size>0) ? currentFarm.size : farmSize;
+        float pw = Math.round(plotMatrix.currentPlot.w/(displayWidth/4));
+        float ph = Math.round(plotMatrix.currentPlot.h/(displayHeight/4));
+        float pa = pw*ph;
+        float proportion = pa/16;
+        float size = fs*proportion;
+        BigDecimal bd = new BigDecimal(Float.toString(size));
+        BigDecimal ret = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
+        return ret;
+    }
+
+    public boolean verifyPlotSize(String size){
+        boolean ret=true;
+        if(size.isEmpty()){
+            Toast.makeText(this, R.string.plotSizeCannotBeEmpty, Toast.LENGTH_SHORT).show();
+            ret=false;
+        } else {
+            float plotSize = Float.valueOf(size);
+            if(plotSize==0f){
+                Toast.makeText(this, R.string.plotSizeCannotBeZero, Toast.LENGTH_SHORT).show();
+                ret=false;
+            }
+        }
+        return ret;
     }
 
     void copyContentsToTempPlot() {
@@ -970,7 +1009,11 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
 
         EditText fSize = (EditText) dialog.findViewById(R.id.acres);
         if (farmSize > 0) {
-            fSize.setText(Float.toString(farmSize));
+            if(farmSize<getPlotSum()){
+                fSize.setText(Float.toString(getPlotSum()));
+            } else {
+                fSize.setText(Float.toString(farmSize));
+            }
         } else {
             fSize.setText(Float.toString(1f));
         }
@@ -992,10 +1035,16 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                         if (farmSize <= 0) {
                             Toast.makeText(view.getContext(), R.string.farmSizeMustBeAboveZero, Toast.LENGTH_SHORT).show();
                         } else {
-                            updateFarmData(fName, farmSize);
-                            dialog.dismiss();
-                            if (isSaving) {
-                                saveFarm();
+                            float sum = getPlotSum();
+                            if(sum>farmSize){
+                                Toast.makeText(view.getContext(), R.string.sizeOfPlotsGreaterThanFarmSize, Toast.LENGTH_SHORT).show();
+                                fSize.setText(String.valueOf(sum));
+                            } else {
+                                updateFarmData(fName, farmSize);
+                                dialog.dismiss();
+                                if (isSaving) {
+                                    saveFarm();
+                                }
                             }
                         }
                     }
@@ -1004,6 +1053,16 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         });
 
         dialog.show();
+    }
+
+    public float getPlotSum() {
+        Iterator<oPlot> iterator = plotMatrix.plots.iterator();
+        float sum=0f;
+        while(iterator.hasNext()){
+            oPlot p = iterator.next();
+            sum+=p.size;
+        }
+        return sum;
     }
 
     public void farmHistory(boolean bNext, boolean bPrev) {
@@ -1133,7 +1192,8 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
             farmName = getDefaultFarmName();
             defineFarmNameAcres(false, true);
         } else {
-
+            float sum=getPlotSum();
+            farmSize=(farmSize<sum) ? sum : farmSize;
             Date farmDate = new Date();
             farmDateString = dH.dateToString(farmDate);
 

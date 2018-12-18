@@ -112,4 +112,7 @@
     <string name="yesButtonText">Ndiyo</string>
     <string name="emptyString" translatable="false"></string>
     <string name="app_name" translatable="false">Ugunduzi</string>
+    <string name="plotSizeCannotBeEmpty">Plot size cannot be empty</string>
+    <string name="plotSizeCannotBeZero">Plot size cannot be zero</string>
+    <string name="sizeOfPlotsGreaterThanFarmSize">Size of plots is greater than farm size</string>
 </resources>

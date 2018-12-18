@@ -110,4 +110,7 @@
     <string name="savingFarmsLabel">Saving new farms</string>
     <string name="downloadingUserData">Downloading user data</string>
     <string name="opGoToWeb">Go to web</string>
+    <string name="plotSizeCannotBeEmpty">Plot size cannot be empty</string>
+    <string name="plotSizeCannotBeZero">Plot size cannot be zero</string>
+    <string name="sizeOfPlotsGreaterThanFarmSize">Size of plots is greater than farm size</string>
 </resources>
