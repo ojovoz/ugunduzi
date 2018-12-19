@@ -40,6 +40,7 @@ public class balance extends AppCompatActivity {
     public int farmVersion;
     public int maxVersion;
     public int plot;
+    public float plotSize;
     public String farmDate;
 
     public String cropNames;
@@ -82,6 +83,7 @@ public class balance extends AppCompatActivity {
         farmVersion = getIntent().getExtras().getInt("farmVersion");
         maxVersion = getIntent().getExtras().getInt("maxVersion");
         plot = getIntent().getExtras().getInt("plot");
+        plotSize = getIntent().getExtras().getFloat("plotSize");
         farmDate = getIntent().getExtras().getString("farmDate");
 
         cropNames = getIntent().getExtras().getString("cropNames");
@@ -101,7 +103,7 @@ public class balance extends AppCompatActivity {
         if (plot != -1) {
             logList = l.createLog(farmId, farmVersion, plot, userId, 0);
 
-            title = getString(R.string.cropsTitle) + ": " + cropNames;
+            title = getString(R.string.cropsTitle) + ": " + cropNames + " (" + String.valueOf(plotSize) + " " + getString(R.string.acresWord) + ")";
             title += "\n";
             title += getString(R.string.pestControlTitle) + ": " + pestControlNames;
             title += "\n";
@@ -464,6 +466,7 @@ public class balance extends AppCompatActivity {
             i.putExtra("cropNames", cropNames);
             i.putExtra("pestControlNames", pestControlNames);
             i.putExtra("soilManagementNames", soilManagementNames);
+            i.putExtra("plotSize", plotSize);
             i.putExtra("displayWidth", displayWidth);
             i.putExtra("displayHeight", displayHeight);
             startActivity(i);

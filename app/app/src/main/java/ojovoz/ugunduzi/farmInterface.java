@@ -1112,6 +1112,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         i.putExtra("cropNames", plotMatrix.currentPlot.getCropNames(this));
         i.putExtra("pestControlNames", plotMatrix.currentPlot.getPestControlNames(this));
         i.putExtra("soilManagementNames", plotMatrix.currentPlot.getSoilManagementNames(this));
+        i.putExtra("plotSize", plotMatrix.currentPlot.size);
         i.putExtra("displayWidth", displayWidth);
         i.putExtra("displayHeight", displayHeight);
         startActivity(i);
@@ -1134,6 +1135,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         i.putExtra("cropNames", plotMatrix.currentPlot.getCropNames(this));
         i.putExtra("pestControlNames", plotMatrix.currentPlot.getPestControlNames(this));
         i.putExtra("soilManagementNames", plotMatrix.currentPlot.getSoilManagementNames(this));
+        i.putExtra("plotSize", plotMatrix.currentPlot.size);
         i.putExtra("displayWidth", displayWidth);
         i.putExtra("displayHeight", displayHeight);
         startActivity(i);
@@ -1156,6 +1158,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         i.putExtra("cropNames", plotMatrix.currentPlot.getCropNames(this));
         i.putExtra("pestControlNames", plotMatrix.currentPlot.getPestControlNames(this));
         i.putExtra("soilManagementNames", plotMatrix.currentPlot.getSoilManagementNames(this));
+        i.putExtra("plotSize", plotMatrix.currentPlot.size);
         i.putExtra("displayWidth", displayWidth);
         i.putExtra("displayHeight", displayHeight);
         i.putExtra("from", 0);
