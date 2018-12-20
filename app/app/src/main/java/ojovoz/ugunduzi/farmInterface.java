@@ -1104,6 +1104,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
         i.putExtra("farmName", farmName);
+        i.putExtra("farmSize",farmSize);
         i.putExtra("farmId", farmId);
         i.putExtra("farmVersion", currentFarm.version);
         i.putExtra("maxVersion", maxVersion);
@@ -1127,6 +1128,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
         i.putExtra("farmName", farmName);
+        i.putExtra("farmSize",farmSize);
         i.putExtra("farmId", farmId);
         i.putExtra("farmVersion", currentFarm.version);
         i.putExtra("maxVersion", maxVersion);
@@ -1150,6 +1152,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
         i.putExtra("farmName", farmName);
+        i.putExtra("farmSize",farmSize);
         i.putExtra("farmId", farmId);
         i.putExtra("farmVersion", currentFarm.version);
         i.putExtra("maxVersion", maxVersion);

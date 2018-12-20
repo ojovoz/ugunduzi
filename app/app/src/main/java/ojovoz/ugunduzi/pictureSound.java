@@ -61,6 +61,7 @@ public class pictureSound extends AppCompatActivity {
     public String userPass;
     public int userId;
     public String farmName;
+    public float farmSize;
     public int farmId;
     public int farmVersion;
     public int maxVersion;
@@ -88,6 +89,7 @@ public class pictureSound extends AppCompatActivity {
         userPass = getIntent().getExtras().getString("userPass");
         userId = getIntent().getExtras().getInt("userId");
         farmName = getIntent().getExtras().getString("farmName");
+        farmSize = getIntent().getExtras().getFloat("farmSize");
         farmId = getIntent().getExtras().getInt("farmId");
         farmVersion = getIntent().getExtras().getInt("farmVersion");
         maxVersion = getIntent().getExtras().getInt("maxVersion");
@@ -123,7 +125,7 @@ public class pictureSound extends AppCompatActivity {
                 tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFillDefault));
             }
         } else {
-            title = farmName;
+            title = farmName + " (" + String.valueOf(farmSize) + " " + getString(R.string.acresWord) + ")";
             tt.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
             tt.setTextColor(ContextCompat.getColor(this, R.color.colorWhite));
         }
@@ -233,6 +235,7 @@ public class pictureSound extends AppCompatActivity {
         i.putExtra("userId", userId);
         i.putExtra("userPass", userPass);
         i.putExtra("farmName",farmName);
+        i.putExtra("farmSize",farmSize);
         i.putExtra("farmId", farmId);
         i.putExtra("farmVersion", farmVersion);
         i.putExtra("maxVersion", maxVersion);
