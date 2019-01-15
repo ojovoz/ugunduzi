@@ -410,13 +410,17 @@ function checkRecords($dbh,$ugunduzi_email,$ugunduzi_pass,$data_subject,$multime
 						for($i=0;$i<sizeof($log_items);$i++){
 							$log_item=str_replace('=','',$log_items[$i]);
 							$log_item_parts=explode(";",$log_item);
-							if(sizeof($log_item_parts)==13){
+							
+							if(sizeof($log_item_parts)==13 || sizeof($log_item_parts)==12){
 								
 								$farm_app_id=$log_item_parts[0];
 								$farm_version=$log_item_parts[1];
 								$user_id=$log_item_parts[2];
 								$farm_id=getFarmIDFromFarmAppIdVersionUser($dbh,$farm_app_id,$farm_version,$user_id);
 								$plot_id=getPlotIDFromFarm($dbh,$farm_id,$log_item_parts[3]);
+								if($plot_id==-1){
+									$plot_id=$farm_id*-1;
+								}
 								$date=$log_item_parts[4];
 								$data_item_id=$log_item_parts[5];
 								$value=number_format($log_item_parts[6],2,'.','');
@@ -425,7 +429,7 @@ function checkRecords($dbh,$ugunduzi_email,$ugunduzi_pass,$data_subject,$multime
 								$crop_id=$log_item_parts[9];
 								$treatment_id=$log_item_parts[10];
 								$cost=$log_item_parts[11];
-								$comments=$log_item_parts[12];
+								$comments=(sizeof($log_item_parts)==13 ? trim($log_item_parts[12]) : "");
 								
 								if(!in_array($farm_id,$cleared_farms)){
 									$query="DELETE FROM log WHERE plot_id IN (SELECT plot_id FROM plot WHERE farm_id=$farm_id) AND log_data_item_id>0";
@@ -434,6 +438,7 @@ function checkRecords($dbh,$ugunduzi_email,$ugunduzi_pass,$data_subject,$multime
 								}
 							
 								$query="INSERT INTO log (plot_id, log_date, log_data_item_id, log_value, log_quantity, log_units_id, log_crop_id, log_treatment_id, log_comments) VALUES ($plot_id, '$date', $data_item_id, $value, $quantity, $units_id, $crop_id, $treatment_id, '$comments')";
+								
 								$result = mysqli_query($dbh,$query);
 								
 							}
