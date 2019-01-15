@@ -101,6 +101,12 @@ if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESS
   audiojs.events.ready(function() {
     var as = audiojs.createAll();
   });
+  
+  function deleteContent(id){
+	  if(confirm("Je kweli unataka kufuta kitu ulichokichagua?")){
+		  location.href="delete.php?id=" + id;
+	  }
+  }
 </script>
 <style>
 .navbar {
@@ -184,7 +190,7 @@ $farm_filter = ($_SESSION['mode']==0 ? " " : (!empty($_SESSION['farm_filter']) ?
 $plot_filter = ((!empty($_SESSION['crop_filter']) || !empty($_SESSION['ingredient_filter'])) ? " AND plot.plot_id IN(".getPlotsWithCropIngredient($dbh,$_SESSION['crop_filter'],$_SESSION['ingredient_filter']).") " : " ");
 $image_filter = ($_SESSION['mode']==0 ? " AND log.log_picture<>'' AND log.log_sound<>'' " : " ");
 $query_limit = " LIMIT $from, $max_items_per_page";
-$query_all="SELECT log.plot_id, log.log_date, farm.user_id, log.log_data_item_id, log.log_quantity, log.log_value, log.log_units_id, log.log_crop_id, log.log_treatment_id, log.log_comments, log.log_picture, log.log_sound, farm.farm_id FROM log, plot, farm WHERE plot.plot_id = log.plot_id AND farm.farm_id = plot.farm_id".$plot_filter.$farm_filter.$user_filter.$image_filter."ORDER BY log_date DESC";
+$query_all="SELECT log.plot_id, log.log_date, farm.user_id, log.log_data_item_id, log.log_quantity, log.log_value, log.log_units_id, log.log_crop_id, log.log_treatment_id, log.log_comments, log.log_picture, log.log_sound, farm.farm_id, log.log_id FROM log, plot, farm WHERE plot.plot_id = log.plot_id AND farm.farm_id = plot.farm_id".$plot_filter.$farm_filter.$user_filter.$image_filter."ORDER BY log_date DESC";
 $query=$query_all.$query_limit;
 $result = mysqli_query($dbh,$query);
 while($row=mysqli_fetch_array($result,MYSQL_NUM)){
@@ -222,7 +228,8 @@ while($row=mysqli_fetch_array($result,MYSQL_NUM)){
 				$audio_source="./content".$row[11];
 				?>
 				<img style="width:100%; max-width:768px;" src="<?php echo($image_source); ?>"><br>
-				<audio src="<? echo($audio_source); ?>" preload="none"></audio><br>
+				<audio src="<? echo($audio_source); ?>" preload="none"></audio>
+				<a class="w3-red" href="#" onclick="deleteContent(<?php echo($row[13]); ?>);">Delete</a><br><br>
 				</div></p>
 				<?php
 			} else {
