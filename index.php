@@ -8,6 +8,11 @@ $dbh = initDB();
 $success=false;
 $user_alias="";
 
+$_SESSION['user_filter']=array();
+$_SESSION['farm_filter']=array();
+$_SESSION['crop_filter']=array();
+$_SESSION['ingredient_filter']=array();
+
 if($_SERVER["REQUEST_METHOD"] == "POST") {
 	if(isset($_POST['login'])){
 		$user_alias=$_POST['user_alias'];
@@ -18,11 +23,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 			$_SESSION['user_alias']=$user_alias;
 			$_SESSION['user_id']=$id;
 			$_SESSION['mode']=1; //mode: 0=everybody's images, 1=my data
-			
-			$_SESSION['user_filter']=array();
-			$_SESSION['farm_filter']=array();
-			$_SESSION['crop_filter']=array();
-			$_SESSION['ingredient_filter']=array();
 			
 			header("Location: feed.php");
 		}
@@ -46,7 +46,7 @@ if(!$success){
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
 <p>      
 <label class="w3-text-theme">Your name:</label>
-<input class="w3-input w3-theme-l1 w3-border-0" name="user_alias" type="text" maxlength="10"></p>
+<input class="w3-input w3-theme-l1 w3-border-0" name="user_alias" type="text" maxlength="20"></p>
 <p>      
 <label class="w3-text-theme">Your password:</label>
 <input class="w3-input w3-theme-l1 w3-border-0" name="user_password" type="password" maxlength="30"></p><br>
