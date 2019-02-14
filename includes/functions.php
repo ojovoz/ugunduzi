@@ -137,6 +137,9 @@ function deleteFarmPlots($dbh,$farm_id){
 function deleteFarmData($dbh,$farm_id){
 	$query="DELETE FROM log WHERE plot_id IN (SELECT plot_id FROM plot WHERE farm_id=$farm_id)";
 	$result = mysqli_query($dbh,$query);
+	$farm_id=$farm_id*-1;
+	$query="DELETE FROM log WHERE plot_id = $farm_id";
+	$result = mysqli_query($dbh,$query);
 }
 
 function createNewPlot($dbh,$farm_id,$plot_id,$plot_x,$plot_y,$plot_w,$plot_h,$plot_size,$plot_crops,$plot_pest_control,$plot_soil_management){
@@ -362,7 +365,7 @@ function getLogDataItemText($dbh,$data_item_id,$quantity,$value,$units_id,$crop_
 	$result = mysqli_query($dbh,$query);
 	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
 		$data_item_name=($row[2]==1 ? str_replace("Mbegu",getCropNameFromID($dbh,$crop_id),$row[0]) : ($row[3]==1 ? str_replace("Matibabu",getTreatmentIngredientNameFromID($dbh,$treatment_ingredient_id),$row[0]) : $row[0]));
-		$item_data=($row[1]==0 ? $value." ".getDefaultMoneyUnit($dbh) : $quantity." ".getUnitsNameFromID($dbh,$units_id)."<br>".$value." ".getDefaultMoneyUnit($dbh));
+		$item_data=($row[1]==0 || $row[1]==4 ? $value." ".getDefaultMoneyUnit($dbh) : $quantity." ".getUnitsNameFromID($dbh,$units_id)."<br>".$value." ".getDefaultMoneyUnit($dbh));
 		$ret=$data_item_name.": ".$item_data;
 		$ret.=($comments=="" ? "" : "<br><br>".urldecode($comments));
 	}
@@ -470,9 +473,15 @@ function checkRecords($dbh,$ugunduzi_email,$ugunduzi_pass,$data_subject,$multime
 						$farm_version=$log_item_parts[1];
 						$user_id=$log_item_parts[2];
 						$plot_app_id=$log_item_parts[3];
-						$date=$log_item_parts[4];
+						
 						$farm_id=getFarmIDFromFarmAppIdVersionUser($dbh,$farm_app_id,$farm_version,$user_id);
-						$plot_id=getPlotIDFromFarm($dbh,$farm_id,$plot_app_id);
+						
+						if($plot_app_id==-1){
+							$plot_id=$farm_id*-1;
+						} else {
+							$plot_id=getPlotIDFromFarm($dbh,$farm_id,$plot_app_id);
+						}
+						$date=$log_item_parts[4];
 						
 						$extension="";
 					}
