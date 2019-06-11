@@ -50,6 +50,26 @@ function getUserPassFromId($dbh,$id){
 	return $ret;
 }
 
+function userIsAdmin($dbh,$id){
+	$ret=false;
+	$query="SELECT is_admin FROM user WHERE user_id=$id";
+	$result = mysqli_query($dbh,$query);
+	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$ret=($row[0]==1);
+	}
+	return $ret;
+}
+
+function getUserFarms($dbh,$id){
+	$ret="";
+	$query="SELECT farm_id, farm_name, farm_size_acres, farm_date_created FROM farm WHERE user_id=$id ORDER BY farm_date_created";
+	$result = mysqli_query($dbh,$query);
+	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$ret=($ret=="" ? implode(",",$row) : $ret.";".implode(",",$row));
+	}
+	return $ret;
+}
+
 function createNewUser($dbh,$alias,$pass){
 	$query="INSERT INTO user (user_alias, user_password) VALUES('$alias', '$pass')";
 	$result = mysqli_query($dbh,$query);

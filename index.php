@@ -23,7 +23,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 			$_SESSION['user_alias']=$user_alias;
 			$_SESSION['user_id']=$id;
 			$_SESSION['mode']=1; //mode: 0=everybody's images, 1=my data
-			
+			$_SESSION['admin']=userIsAdmin($dbh,$id);
 			header("Location: feed.php");
 		}
 	}
