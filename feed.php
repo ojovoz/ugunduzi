@@ -172,7 +172,7 @@ if(isset($_SESSION['user_id']) && isset($_SESSION['user_alias']) && isset($_SESS
 <div class="navbar w3-theme-d4" style="width:100%; max-width:800px;">
   <?php if($_SESSION['user_id']>=0) { ?><a class="<?php echo($_SESSION['mode']==0 ? "w3-theme-d4" : "w3-theme-d2");?> w3-hover-theme" href="feed.php?mode=1"><?php echo(ucfirst($_SESSION['user_alias'])); ?></a><?php } ?>
   <a class="<?php echo($_SESSION['mode']==1 ? "w3-theme-d4" : "w3-theme-d2");?> w3-hover-theme" href="feed.php?mode=0">Kila mtu</a>
-  <?php if($_SESSION['admin']) { ?><a class="w3-theme-d4 w3-hover-theme" href="study.php" target="_blank">Admin</a> <?php } ?>
+  <?php if($_SESSION['admin']) { ?><a class="w3-theme-d4 w3-hover-theme" href="study.php" target="_blank">Study</a> <?php } ?>
 </div>
 <div class="main"><p>
 <?php	

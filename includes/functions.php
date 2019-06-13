@@ -62,11 +62,87 @@ function userIsAdmin($dbh,$id){
 
 function getUserFarms($dbh,$id){
 	$ret="";
-	$query="SELECT farm_id, farm_name, farm_size_acres, farm_date_created FROM farm WHERE user_id=$id ORDER BY farm_date_created";
+	$query="SELECT farm_id, farm_app_id, farm_name, farm_size_acres, farm_date_created, farm_version FROM farm WHERE user_id=$id ORDER BY farm_app_id, farm_version";
 	$result = mysqli_query($dbh,$query);
+	$i=0;
+	$prev_app_id="";
 	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
-		$ret=($ret=="" ? implode(",",$row) : $ret.";".implode(",",$row));
+		if($i==0){
+			$farm_id=$row[0];
+			$farm_app_id=$row[1];
+			$farm_name=$row[2];
+			$farm_size=$row[3];
+			$farm_date=$row[4];
+			$prev_app_id=$farm_app_id;
+		} else {
+			if($row[1]==$prev_app_id){
+				$farm_id=$farm_id.":".$row[0];
+				$farm_name=$row[2];
+				$farm_size=$row[3];
+				$farm_date=$row[4];
+			} else {
+				$ret=($ret=="" ? $farm_id.",".$farm_name.",".$farm_size.",".$farm_date : $ret.";".$farm_id.",".$farm_name.",".$farm_size.",".$farm_date);
+				$farm_id=$row[0];
+				$farm_app_id=$row[1];
+				$farm_name=$row[2];
+				$farm_size=$row[3];
+				$farm_date=$row[4];
+				$prev_app_id=$farm_app_id;
+			}
+		}
+		$i++;
 	}
+	$ret=($ret=="" ? $farm_id.",".$farm_name.",".$farm_size.",".$farm_date : $ret.";".$farm_id.",".$farm_name.",".$farm_size.",".$farm_date);
+	return $ret;
+}
+
+function getFarmPlots($dbh,$id){
+	$ret="";
+	
+	$farm_ids=explode(":",$id);
+	
+	for($i=count($farm_ids)-1;$i>=0;$i--){
+		
+		$this_farm=$farm_ids[$i];
+		
+		$query_plot="SELECT plot_id, plot_x, plot_y, plot_w, plot_h, plot_size FROM plot WHERE farm_id=$this_farm ORDER BY plot_y, plot_x";
+		$result_plot = mysqli_query($dbh,$query_plot);
+		while($row_plot = mysqli_fetch_array($result_plot,MYSQL_NUM)){
+			$plot_id=$row_plot[0];
+			$plot_x=$row_plot[1];
+			$plot_y=$row_plot[2];
+			$plot_w=$row_plot[3];
+			$plot_h=$row_plot[4];
+			$plot_size=$row_plot[5];
+		
+			$query_crop="SELECT crop_name FROM crop, crop_x_plot WHERE crop_x_plot.plot_id = $plot_id AND crop.crop_id = crop_x_plot.crop_id";
+			$result_crop = mysqli_query($dbh,$query_crop);
+			$crop_names="";
+			while($row_crop = mysqli_fetch_array($result_crop,MYSQL_NUM)){
+				$crop_names=($crop_names=="" ? $row_crop[0] : $crop_names.",".$row_crop[0]);
+			}
+		
+			$query_pest_control="SELECT treatment_ingredient_name FROM treatment_ingredient, treatment_ingredient_x_plot WHERE treatment_ingredient_x_plot.plot_id = $plot_id AND treatment_ingredient.treatment_ingredient_id = treatment_ingredient_x_plot.treatment_ingredient_id AND treatment_id = 1";
+			$result_pest_control = mysqli_query($dbh,$query_pest_control);
+			$pest_control_names="";
+			while($row_pest_control = mysqli_fetch_array($result_pest_control,MYSQL_NUM)){
+				$pest_control_names=($pest_control_names=="" ? $row_pest_control[0] : $pest_control_names.",".$row_pest_control[0]);
+			}
+		
+			$query_soil_management="SELECT treatment_ingredient_name FROM treatment_ingredient, treatment_ingredient_x_plot WHERE treatment_ingredient_x_plot.plot_id = $plot_id AND treatment_ingredient.treatment_ingredient_id = treatment_ingredient_x_plot.treatment_ingredient_id AND treatment_id = 2";
+			$result_soil_management = mysqli_query($dbh,$query_soil_management);
+			$soil_management_names="";
+			while($row_soil_management = mysqli_fetch_array($result_soil_management,MYSQL_NUM)){
+				$soil_management_names=($soil_management_names=="" ? $row_soil_management[0] : $soil_management_names.",".$row_soil_management[0]);
+			}
+		
+			$this_plot=$plot_id.";".$plot_x.";".$plot_y.";".$plot_w.";".$plot_h.";".$plot_size.";".$crop_names.";".$pest_control_names.";".$soil_management_names;
+			$ret=($ret=="" ? $this_plot : (substr($ret,-1)=="*" ? $ret.$this_plot : $ret."|".$this_plot));
+		}
+		
+		$ret=($i==0 ? $ret : $ret."*");
+	}
+	
 	return $ret;
 }
 
