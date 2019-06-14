@@ -29,6 +29,9 @@ function getUserFarms(){
 	var id = u.options[u.selectedIndex].value; 
 	
 	if(id!=""){
+		
+		var plot_grid = document.getElementById("farm_grid");
+		plot_grid.style.display="none";
 	
 		var xmlhttp = new XMLHttpRequest();
 
@@ -72,6 +75,13 @@ function getUserFarms(){
 						farm_select.removeChild(farm_select.firstChild);
 					}
 					
+					var option = document.createElement("option");
+					option.setAttribute("value","");
+					option.setAttribute("selected",true);
+					option.setAttribute("disabled",true);
+					option.appendChild(document.createTextNode("Select farm"));
+					farm_select.appendChild(option);
+					
 					for(var i=0;i<farms_array.length;i++){
 						var this_farm_parts = farms_array[i].split(",");
 						var farm_id = this_farm_parts[0];
@@ -89,9 +99,9 @@ function getUserFarms(){
 	}
 }
 
-function getFarmPlots(var id){
+function getFarmPlots(id){
 	
-	if(id==""){
+	if(id==-1){
 		var farm = document.getElementById("farm");
 		var id = farm.options[farm.selectedIndex].value;
 	}
@@ -128,7 +138,7 @@ function drawCurrentFarm(){
 	var this_farm = farm_versions[current_version];
 	
 	var plot_grid = document.getElementById("farm_grid");
-	plot_grid.style.display="block";
+	plot_grid.style.display="grid";
 	
 	while(plot_grid.hasChildNodes()){
 		plot_grid.removeChild(plot_grid.firstChild);
@@ -171,9 +181,9 @@ function drawCurrentFarm(){
 			bgcolor="#4CAF50";
 		}
 		
-		var css_style="";
-		//TODO: add css attributes to the grid item, incl position, size and background color
-		div.style.cssText=css_style;
+		var cssString="grid-area: "+(parseInt(this_plot_y)+1).toString()+" / "+(parseInt(this_plot_x)+1).toString()+" / span "+this_plot_h+" / span "+this_plot_w+"; background-color: "+bgcolor;
+		
+		div.style.cssText=cssString;
 		
 		plot_grid.appendChild(div);
 	}
@@ -190,10 +200,11 @@ function drawCurrentFarm(){
 
 .grid-container {
   display: grid;
-  grid-template-columns: auto auto auto auto;
+  grid-template-columns: 170px 170px 170px 170px;
   grid-template-rows: 100px 100px 100px 100px;
   background-color: #ffffff;
-  padding: 1px;
+  padding: 5px;
+  grid-gap: 2px;
 }
 
 .grid-item {
@@ -221,11 +232,11 @@ function drawCurrentFarm(){
   </select>
   <br><br>
   <div style="display:none;" id="farm_chooser">
-	<select class="w3-select w3-text-black w3-border" id="farm" onclick="getFarmPlots('');">
+	<select class="w3-select w3-text-black w3-border" id="farm" onclick="getFarmPlots(-1);">
 	</select>
   </div>
-  <span id="farm_name"></span>
-  <div class="grid-container" id="farm_grid" style="display:none;">
+  <span id="farm_name"></span><br><br>
+  <div class="grid-container" id="farm_grid" style="display:none; align:center;">
   <div class="grid-item">1</div>
   <div class="grid-item">2</div>
   <div class="grid-item">3</div>
