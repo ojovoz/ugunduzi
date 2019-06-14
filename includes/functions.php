@@ -92,7 +92,9 @@ function getUserFarms($dbh,$id){
 		}
 		$i++;
 	}
-	$ret=($ret=="" ? $farm_id.",".$farm_name.",".$farm_size.",".$farm_date : $ret.";".$farm_id.",".$farm_name.",".$farm_size.",".$farm_date);
+	if($i>0){
+		$ret=($ret=="" ? $farm_id.",".$farm_name.",".$farm_size.",".$farm_date : $ret.";".$farm_id.",".$farm_name.",".$farm_size.",".$farm_date);
+	}
 	return $ret;
 }
 

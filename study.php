@@ -168,6 +168,7 @@ function drawCurrentFarm(){
 		for(var j=0;j<crops.length;j++){
 			crop_names = (crop_names == "")? crops[j] : crop_names+"<br>"+crops[j];
 		}
+		crop_names = (crop_names=="")? "Empty" : crop_names;
 		crop_names = '<a href="#" onclick="displayPlotData('+this_plot_id+')">'+crop_names+'</a>';
 		div.innerHTML = crop_names;
 		
@@ -249,7 +250,7 @@ function goToNextFarm(){
 <div class="main"><p>
 <div class="w3-container w3-card-4 w3-white w3-padding-medium w3-text-black">
 <strong>Ugunduzi - Study</strong><br><br>
- <select class="w3-select w3-text-black w3-border" id="u" onclick="getUserFarms();">
+ <select class="w3-select w3-text-black w3-border" id="u" onchange="getUserFarms();">
     <option value="" disabled selected>Choose a user</option>
 	<?php
 	$query="SELECT user_name, user_id FROM user WHERE user_name<>'' ORDER BY user_name";
