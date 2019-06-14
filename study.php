@@ -158,6 +158,7 @@ function drawCurrentFarm(){
 		var this_plot_crops = this_plot[6];
 		var this_plot_pest_control = this_plot[7];
 		var this_plot_soil_management = this_plot[8];
+		var this_farm_date = this_plot[9];
 		
 		var div = document.createElement("div");
 		div.className="grid-item";
@@ -188,7 +189,35 @@ function drawCurrentFarm(){
 		plot_grid.appendChild(div);
 	}
 	
+	var navigation = document.getElementById("navigation");
 	
+	if(farm_versions.length>1){
+		navigation.style.display="block";
+		
+		var prev = document.getElementById("prev");
+		var next = document.getElementById("next");
+		
+		prev.style.display = (current_version>0)? "inline" : "none";
+		next.style.display = (current_version<(farm_versions.length-1))? "inline" : "none";
+		
+	} else {
+		navigation.style.display="none";
+	}
+	
+	var farm_date = document.getElementById("farm_date");
+	farm_date.style.display = "inline";
+	farm_date.innerHTML = "Farm date: "+this_farm_date;
+	
+}
+
+function goToPrevFarm(){
+	current_version--;
+	drawCurrentFarm();
+}
+
+function goToNextFarm(){
+	current_version++;
+	drawCurrentFarm();
 }
 
 </script>
@@ -232,28 +261,18 @@ function drawCurrentFarm(){
   </select>
   <br><br>
   <div style="display:none;" id="farm_chooser">
-	<select class="w3-select w3-text-black w3-border" id="farm" onclick="getFarmPlots(-1);">
+	<select class="w3-select w3-text-black w3-border" id="farm" onchange="getFarmPlots(-1);">
 	</select>
   </div>
   <span id="farm_name"></span><br><br>
   <div class="grid-container" id="farm_grid" style="display:none; align:center;">
-  <div class="grid-item">1</div>
-  <div class="grid-item">2</div>
-  <div class="grid-item">3</div>
-  <div class="grid-item">4</div>
-  <div class="grid-item">1</div>
-  <div class="grid-item">2</div>
-  <div class="grid-item">3</div>
-  <div class="grid-item">4</div>
-  <div class="grid-item">1</div>
-  <div class="grid-item">2</div>
-  <div class="grid-item">3</div>
-  <div class="grid-item">4</div>
-  <div class="grid-item">1</div>
-  <div class="grid-item">2</div>
-  <div class="grid-item">3</div>
-  <div class="grid-item">4</div>
   </div><br>
+  <div id="navigation" style="display:none;">
+  <span id="prev" style="display:none;"><a href="#" onclick="goToPrevFarm();" style="text-decoration:none;" class="w3-theme-d2 w3-hover-theme w3-button"><<</a></span>
+  &nbsp;
+  <span id="next" style="display:none;"><a href="#" onclick="goToNextFarm();" style="text-decoration:none;" class="w3-theme-d2 w3-hover-theme w3-button">>></a></span>
+  </div>
+  <span id="farm_date" style="display:none; align:right;"></span>
 </div> 
 </p></div>
 </div>

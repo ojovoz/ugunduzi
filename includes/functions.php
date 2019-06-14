@@ -105,6 +105,8 @@ function getFarmPlots($dbh,$id){
 		
 		$this_farm=$farm_ids[$i];
 		
+		$farm_date=getFarmDate($dbh,$this_farm);
+		
 		$query_plot="SELECT plot_id, plot_x, plot_y, plot_w, plot_h, plot_size FROM plot WHERE farm_id=$this_farm ORDER BY plot_y, plot_x";
 		$result_plot = mysqli_query($dbh,$query_plot);
 		while($row_plot = mysqli_fetch_array($result_plot,MYSQL_NUM)){
@@ -139,10 +141,20 @@ function getFarmPlots($dbh,$id){
 			$this_plot=$plot_id.";".$plot_x.";".$plot_y.";".$plot_w.";".$plot_h.";".$plot_size.";".$crop_names.";".$pest_control_names.";".$soil_management_names;
 			$ret=($ret=="" ? $this_plot : (substr($ret,-1)=="*" ? $ret.$this_plot : $ret."|".$this_plot));
 		}
-		
+		$ret.=";".$farm_date;
 		$ret=($i==0 ? $ret : $ret."*");
 	}
 	
+	return $ret;
+}
+
+function getFarmDate($dbh,$id){
+	$ret="";
+	$query="SELECT farm_date_created FROM farm WHERE farm_id=$id";
+	$result = mysqli_query($dbh,$query);
+	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$ret=$row[0];
+	}
 	return $ret;
 }
 
