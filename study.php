@@ -213,7 +213,7 @@ function drawCurrentFarm(){
 	
 	var farm_date = document.getElementById("farm_date");
 	farm_date.style.display = "inline";
-	farm_date.innerHTML = '<strong>Farm created on:</strong> '+this_farm_date+', <strong>Size:</strong> '+this_farm_size+' acres. <a href="#" onclick="getFarmData('+this_farm_id+','+data_index+');">Review farm data</a>';
+	farm_date.innerHTML = '<strong>Farm created on:</strong> '+this_farm_date+', <strong>Size:</strong> '+this_farm_size+' acres. <a href="#" onclick="getFarmData('+this_farm_id+','+data_index+');">See all farm data</a>';
 	
 }
 
@@ -243,8 +243,8 @@ function getFarmData(id,index){
 				} else {
 					this_data = response_data.split("*");
 					total_data = parseInt(this_data[0]);
-					data_container.innerHTML = "<strong>Entire farm</strong><br><hr>";
-					displayData();
+					var msg="<strong>Entire farm</strong><br><hr>";
+					displayData(msg);
 					
 				}
 			}
@@ -269,7 +269,7 @@ function getPlotData(id,index){
 					this_data = response_data.split("*");
 					total_data = parseInt(this_data[0]);
 					//TODO: display plot info
-					displayData();
+					displayData("");
 					
 				}
 			}
@@ -277,14 +277,22 @@ function getPlotData(id,index){
 	}
 }
 
-function displayData(){
+function displayData(msg){
 	var data_container = document.getElementById("data_container");
-	data_container.innerHTML="";
+	
+	data_html="";
 	
 	for(var i=1;i<this_data.length;i++){
 		this_data_parts=this_data[i].split(";");
-		//TODO
+		if(this_data_parts.length==4){
+			this_data_html="Date: "+this_data_parts[0]+"<br>"+this_data_parts[1]+"<br><br>"+this_data_parts[2]+"<br>";
+			this_data_html=(this_data_parts[3]=="")? this_data_html : this_data_html+"Comments: "+data_parts[3]+"<br>";
+			data_html=(data_html=="")? this_data_html : data_html+"<hr>"+this_data_html;
+		} else {
+			//TODO: image + snd
+		}
 	}
+	data_container.innerHTML=msg+data_html;
 }
 
 </script>
@@ -343,7 +351,7 @@ function displayData(){
 </div> 
 </p></div>
 </div>
-<div class="w3-container w3-card-4 w3-white w3-padding-medium w3-text-black" style="width:48%; max-width:800px; display:inline; position:fixed; left:50%; top:32px; margin-right:10px; height:700px; overflow:auto;" id="data_container">Choose a plot or entire farm to review data</div>
+<div class="w3-container w3-card-4 w3-white w3-padding-medium w3-text-black" style="width:48%; max-width:800px; display:inline; position:fixed; left:50%; top:32px; margin-right:10px; height:700px; overflow:auto;" id="data_container">Choose a plot or entire farm to see data</div>
 </div>
 </body>
 </html>

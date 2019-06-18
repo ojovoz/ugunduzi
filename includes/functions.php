@@ -245,21 +245,35 @@ function farmHasData($dbh,$farm_id){
 }
 
 function getFarmDataEntries($dbh,$id,$from){
-	$id=$id*-1;
 	
-	$query="SELECT COUNT(log_id) FROM log WHERE log.plot_id=$id";
+	$in=strval($id*-1);
+	
+	$query="SELECT plot_id FROM plot WHERE farm_id=$id";
+	$result = mysqli_query($dbh,$query);
+	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$in.=",".$row[0];
+	}
+	
+	$in="(".$in.")";
+	
+	$query="SELECT COUNT(log_id) FROM log WHERE log.plot_id IN ".$in;
 	$result = mysqli_query($dbh,$query);
 	$ret=($row = mysqli_fetch_array($result,MYSQL_NUM))? $row[0] : "0";
 	
-	$query="SELECT log_date, log_data_item_id, log_quantity, log_value, log_units_id, log_crop_id, log_treatment_id, log_comments, log_picture, log_sound FROM log WHERE log.plot_id=$id ORDER BY log_date DESC LIMIT $from, 10";
+	$query="SELECT log_date, log_data_item_id, log_quantity, log_value, log_units_id, log_crop_id, log_treatment_id, log_comments, log_picture, log_sound, plot_id FROM log WHERE log.plot_id IN ".$in." ORDER BY log_date DESC LIMIT $from, 10";
 	$result = mysqli_query($dbh,$query);
 	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
 		$this_entry=$row[0];
+		if($row[10]!=($id*-1)){
+			//TODO: add plot info
+		} else {
+			$this_entry.=";Entire farm";
+		}
 		if($row[8]!="" && $row[9]!=""){
 			$this_entry.=";".$row[7].";".$row[8].";".$row[9];
 		} else {
-			$data_item_name=getDataItemName($dbh,$row[1],$row[5],$row[6]);
-			$this_entry.=";".$data_item_name.";".$row[2].";".$row[3].";".getUnitsNameFromID($dbh,$row[4]).";".$row[7];
+			$data_item_string=getDataItemString($dbh,$row[1],$row[5],$row[6],$row[2],$row[3],$row[4]);
+			$this_entry.=";".$data_item_string.";".$row[7];
 		}
 		$ret=$ret."*".$this_entry;
 	}
@@ -278,8 +292,8 @@ function getPlotDataEntries($dbh,$id,$from){
 		if($row[8]!="" && $row[9]!=""){
 			$this_entry.=";".$row[7].";".$row[8].";".$row[9];
 		} else {
-			$data_item_name=getDataItemName($dbh,$row[1],$row[5],$row[6]);
-			$this_entry.=";".$data_item_name.";".$row[2].";".$row[3].";".getUnitsNameFromID($dbh,$row[4]).";".$row[7];
+			$data_item_string=getDataItemString($dbh,$row[1],$row[5],$row[6],$row[2],$row[3],$row[4]);
+			$this_entry.=";".$data_item_string.";".$row[7];
 		}
 		$ret=$ret."*".$this_entry;
 	}
@@ -535,12 +549,14 @@ function getLogDataItemText($dbh,$data_item_id,$quantity,$value,$units_id,$crop_
 	return $ret;
 }
 
-function getDataItemName($dbh,$data_item_id,$crop_id,$treatment_ingredient_id){
+function getDataItemString($dbh,$data_item_id,$crop_id,$treatment_ingredient_id,$quantity,$value,$units_id){
 	$ret="";
 	$query="SELECT data_item_name, data_item_type, is_crop_specific, is_treatment_specific FROM data_item WHERE data_item_id=$data_item_id";
 	$result = mysqli_query($dbh,$query);
 	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
-		$ret=($row[2]==1 ? str_replace("Mbegu",getCropNameFromID($dbh,$crop_id),$row[0]) : ($row[3]==1 ? str_replace("Matibabu",getTreatmentIngredientNameFromID($dbh,$treatment_ingredient_id),$row[0]) : $row[0]));
+		$data_item_name=($row[2]==1 ? str_replace("Mbegu",getCropNameFromID($dbh,$crop_id),$row[0]) : ($row[3]==1 ? str_replace("Matibabu",getTreatmentIngredientNameFromID($dbh,$treatment_ingredient_id),$row[0]) : $row[0]));
+		$item_data=($row[1]==0 || $row[1]==4 ? ". Cost: ".$value." ".getDefaultMoneyUnit($dbh) : ", ".$quantity." ".getUnitsNameFromID($dbh,$units_id).". Cost:".$value." ".getDefaultMoneyUnit($dbh));
+		$ret=$data_item_name.$item_data;
 	}
 	return $ret;
 }
