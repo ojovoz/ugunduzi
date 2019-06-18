@@ -23,6 +23,10 @@ if(isset($_SESSION['admin'])){
 
 var farm_versions = [];
 var current_version = 0;
+var this_farm_id = -1;
+var this_data = [];
+var data_index = 0;
+var total_data = 0;
 
 function getUserFarms(){
 	var u = document.getElementById("u");
@@ -56,7 +60,7 @@ function getUserFarms(){
 					var farm_size = this_farm_parts[2];
 				
 					var farm_placeholder = document.getElementById("farm_name");
-					farm_placeholder.innerHTML = "<strong>Farm name:</strong> " + farm_name + ", <strong>Size:</strong> " + farm_size + " acres";
+					farm_placeholder.innerHTML = farm_name;
 					
 					var farm_chooser = document.getElementById("farm_chooser");
 					farm_chooser.style.display="none";
@@ -90,7 +94,7 @@ function getUserFarms(){
 						
 						var option = document.createElement("option");
 						option.setAttribute("value",farm_id);
-						option.appendChild(document.createTextNode("Farm name: " + farm_name + ", Size: " + farm_size + " acres"));
+						option.appendChild(document.createTextNode(farm_name));
 						farm_select.appendChild(option);
 					}
 				}
@@ -159,6 +163,8 @@ function drawCurrentFarm(){
 		var this_plot_pest_control = this_plot[7];
 		var this_plot_soil_management = this_plot[8];
 		var this_farm_date = this_plot[9];
+		var this_farm_size = this_plot[10];
+		this_farm_id = this_plot[11];
 		
 		var div = document.createElement("div");
 		div.className="grid-item";
@@ -169,7 +175,7 @@ function drawCurrentFarm(){
 			crop_names = (crop_names == "")? crops[j] : crop_names+"<br>"+crops[j];
 		}
 		crop_names = (crop_names=="")? "Empty" : crop_names;
-		crop_names = '<a href="#" onclick="displayPlotData('+this_plot_id+')">'+crop_names+'</a>';
+		crop_names = '<a href="#" onclick="getPlotData('+this_plot_id+','+data_index+')">'+crop_names+'</a>';
 		div.innerHTML = crop_names;
 		
 		var bgcolor;
@@ -207,7 +213,7 @@ function drawCurrentFarm(){
 	
 	var farm_date = document.getElementById("farm_date");
 	farm_date.style.display = "inline";
-	farm_date.innerHTML = "Farm date: "+this_farm_date;
+	farm_date.innerHTML = '<strong>Farm created on:</strong> '+this_farm_date+', <strong>Size:</strong> '+this_farm_size+' acres. <a href="#" onclick="getFarmData('+this_farm_id+','+data_index+');">Review farm data</a>';
 	
 }
 
@@ -219,6 +225,66 @@ function goToPrevFarm(){
 function goToNextFarm(){
 	current_version++;
 	drawCurrentFarm();
+}
+
+function getFarmData(id,index){
+	if(id>0){
+		
+		var xmlhttp = new XMLHttpRequest();
+
+		xmlhttp.open("GET", "includes/get_farm_data.php?id=" + id + "&from=" + index);
+		xmlhttp.send();
+		xmlhttp.onreadystatechange = function() {
+			if (this.readyState === 4 && this.status === 200) {
+				var response_data = this.responseText;
+				var data_container = document.getElementById("data_container");
+				if(response_data==""){
+					data_container.innerHTML="No data";
+				} else {
+					this_data = response_data.split("*");
+					total_data = parseInt(this_data[0]);
+					data_container.innerHTML = "<strong>Entire farm</strong><br><hr>";
+					displayData();
+					
+				}
+			}
+		};
+	}
+}
+
+function getPlotData(id,index){
+	if(id>0){
+		
+		var xmlhttp = new XMLHttpRequest();
+
+		xmlhttp.open("GET", "includes/get_plot_data.php?id=" + id + "&from=" + index);
+		xmlhttp.send();
+		xmlhttp.onreadystatechange = function() {
+			if (this.readyState === 4 && this.status === 200) {
+				var response_data = this.responseText;
+				if(response_data==""){
+					var data_container = document.getElementById("data_container");
+					data_container.innerHTML="No data";
+				} else {
+					this_data = response_data.split("*");
+					total_data = parseInt(this_data[0]);
+					//TODO: display plot info
+					displayData();
+					
+				}
+			}
+		};
+	}
+}
+
+function displayData(){
+	var data_container = document.getElementById("data_container");
+	data_container.innerHTML="";
+	
+	for(var i=1;i<this_data.length;i++){
+		this_data_parts=this_data[i].split(";");
+		//TODO
+	}
 }
 
 </script>
@@ -276,6 +342,8 @@ function goToNextFarm(){
   <span id="farm_date" style="display:none; align:right;"></span>
 </div> 
 </p></div>
+</div>
+<div class="w3-container w3-card-4 w3-white w3-padding-medium w3-text-black" style="width:48%; max-width:800px; display:inline; position:fixed; left:50%; top:32px; margin-right:10px; height:700px; overflow:auto;" id="data_container">Choose a plot or entire farm to review data</div>
 </div>
 </body>
 </html>

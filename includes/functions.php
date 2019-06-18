@@ -108,6 +108,7 @@ function getFarmPlots($dbh,$id){
 		$this_farm=$farm_ids[$i];
 		
 		$farm_date=getFarmDate($dbh,$this_farm);
+		$farm_size=getFarmSize($dbh,$this_farm);
 		
 		$query_plot="SELECT plot_id, plot_x, plot_y, plot_w, plot_h, plot_size FROM plot WHERE farm_id=$this_farm ORDER BY plot_y, plot_x";
 		$result_plot = mysqli_query($dbh,$query_plot);
@@ -143,7 +144,7 @@ function getFarmPlots($dbh,$id){
 			$this_plot=$plot_id.";".$plot_x.";".$plot_y.";".$plot_w.";".$plot_h.";".$plot_size.";".$crop_names.";".$pest_control_names.";".$soil_management_names;
 			$ret=($ret=="" ? $this_plot : (substr($ret,-1)=="*" ? $ret.$this_plot : $ret."|".$this_plot));
 		}
-		$ret.=";".$farm_date;
+		$ret.=";".$farm_date.";".$farm_size.";".$this_farm;
 		$ret=($i==0 ? $ret : $ret."*");
 	}
 	
@@ -153,6 +154,16 @@ function getFarmPlots($dbh,$id){
 function getFarmDate($dbh,$id){
 	$ret="";
 	$query="SELECT farm_date_created FROM farm WHERE farm_id=$id";
+	$result = mysqli_query($dbh,$query);
+	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$ret=$row[0];
+	}
+	return $ret;
+}
+
+function getFarmSize($dbh,$id){
+	$ret="";
+	$query="SELECT farm_size_acres FROM farm WHERE farm_id=$id";
 	$result = mysqli_query($dbh,$query);
 	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
 		$ret=$row[0];
@@ -229,6 +240,48 @@ function farmHasData($dbh,$farm_id){
 		if($row[0]>0){
 			$ret=true;
 		}
+	}
+	return $ret;
+}
+
+function getFarmDataEntries($dbh,$id,$from){
+	$id=$id*-1;
+	
+	$query="SELECT COUNT(log_id) FROM log WHERE log.plot_id=$id";
+	$result = mysqli_query($dbh,$query);
+	$ret=($row = mysqli_fetch_array($result,MYSQL_NUM))? $row[0] : "0";
+	
+	$query="SELECT log_date, log_data_item_id, log_quantity, log_value, log_units_id, log_crop_id, log_treatment_id, log_comments, log_picture, log_sound FROM log WHERE log.plot_id=$id ORDER BY log_date DESC LIMIT $from, 10";
+	$result = mysqli_query($dbh,$query);
+	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$this_entry=$row[0];
+		if($row[8]!="" && $row[9]!=""){
+			$this_entry.=";".$row[7].";".$row[8].";".$row[9];
+		} else {
+			$data_item_name=getDataItemName($dbh,$row[1],$row[5],$row[6]);
+			$this_entry.=";".$data_item_name.";".$row[2].";".$row[3].";".getUnitsNameFromID($dbh,$row[4]).";".$row[7];
+		}
+		$ret=$ret."*".$this_entry;
+	}
+	return $ret;
+}
+
+function getPlotDataEntries($dbh,$id,$from){
+	$query="SELECT COUNT(log_id) FROM log WHERE log.plot_id=$id";
+	$result = mysqli_query($dbh,$query);
+	$ret=($row = mysqli_fetch_array($result,MYSQL_NUM))? $row[0] : "0";
+	
+	$query="SELECT log_date, log_data_item_id, log_quantity, log_value, log_units_id, log_crop_id, log_treatment_id, log_comments, log_picture, log_sound FROM log WHERE log.plot_id=$id ORDER BY log_date DESC LIMIT $from, 10";
+	$result = mysqli_query($dbh,$query);
+	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$this_entry=$row[0];
+		if($row[8]!="" && $row[9]!=""){
+			$this_entry.=";".$row[7].";".$row[8].";".$row[9];
+		} else {
+			$data_item_name=getDataItemName($dbh,$row[1],$row[5],$row[6]);
+			$this_entry.=";".$data_item_name.";".$row[2].";".$row[3].";".getUnitsNameFromID($dbh,$row[4]).";".$row[7];
+		}
+		$ret=$ret."*".$this_entry;
 	}
 	return $ret;
 }
@@ -478,6 +531,16 @@ function getLogDataItemText($dbh,$data_item_id,$quantity,$value,$units_id,$crop_
 		$item_data=($row[1]==0 || $row[1]==4 ? $value." ".getDefaultMoneyUnit($dbh) : $quantity." ".getUnitsNameFromID($dbh,$units_id)."<br>".$value." ".getDefaultMoneyUnit($dbh));
 		$ret=$data_item_name.": ".$item_data;
 		$ret.=($comments=="" ? "" : "<br><br>".urldecode($comments));
+	}
+	return $ret;
+}
+
+function getDataItemName($dbh,$data_item_id,$crop_id,$treatment_ingredient_id){
+	$ret="";
+	$query="SELECT data_item_name, data_item_type, is_crop_specific, is_treatment_specific FROM data_item WHERE data_item_id=$data_item_id";
+	$result = mysqli_query($dbh,$query);
+	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$ret=($row[2]==1 ? str_replace("Mbegu",getCropNameFromID($dbh,$crop_id),$row[0]) : ($row[3]==1 ? str_replace("Matibabu",getTreatmentIngredientNameFromID($dbh,$treatment_ingredient_id),$row[0]) : $row[0]));
 	}
 	return $ret;
 }
