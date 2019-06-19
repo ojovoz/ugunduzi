@@ -18,6 +18,7 @@ if(isset($_SESSION['admin'])){
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="css/w3.css">
 <link rel="stylesheet" href="css/green_theme.css">
+<script src="includes/audio.min.js"></script>
 <title>Ugunduzi - Study</title>
 <script>
 
@@ -28,6 +29,10 @@ var this_data = [];
 var data_index = 0;
 var total_data = 0;
 var plot_contents = "";
+
+audiojs.events.ready(function() {
+	var as = audiojs.createAll();
+});
 
 function getUserFarms(){
 	var u = document.getElementById("u");
@@ -331,17 +336,30 @@ function displayData(msg){
 		this_data_parts=this_data[i].split(";");
 		if(this_data_parts.length==3){
 			this_data_html="Date: "+this_data_parts[0]+"<br><br>"+this_data_parts[1]+"<br>";
-			this_data_html=(this_data_parts[2]=="")? this_data_html : this_data_html+"Comments: "+data_parts[2]+"<br>";
+			this_data_html=(this_data_parts[2]=="")? this_data_html : this_data_html+"Comments: "+this_data_parts[2]+"<br>";
 			data_html=(data_html=="")? this_data_html : data_html+"<hr>"+this_data_html;
 		} else if(this_data_parts.length==4){
 			this_data_html="Date: "+this_data_parts[0]+"<br>"+this_data_parts[1]+"<br><br>"+this_data_parts[2]+"<br>";
-			this_data_html=(this_data_parts[3]=="")? this_data_html : this_data_html+"Comments: "+data_parts[3]+"<br>";
+			this_data_html=(this_data_parts[3]=="")? this_data_html : this_data_html+"Comments: "+this_data_parts[3]+"<br>";
 			data_html=(data_html=="")? this_data_html : data_html+"<hr>"+this_data_html;
-		} else {
-			//TODO: image + snd
+		} else if(this_data_parts.length==5){
+			if(this_data_parts[0]=="-"){
+				this_data_html="Date: "+this_data_parts[1]+"<br><br>";
+				this_data_html+='<img style="width:100%; max-width:600px;" src="./content'+this_data_parts[2]+'"><br>';
+				this_data_html+='<audio src="./content'+this_data_parts[3]+'" preload="none"></audio><br>';
+				this_data_html=(this_data_parts[4]=="")? this_data_html : this_data_html+"Comments: "+this_data_parts[4]+"<br>";
+			} else {
+				this_data_html="Date: "+this_data_parts[0]+"<br>"+this_data_parts[1]+"<br><br>";
+				this_data_html+='<img style="width:100%; max-width:600px;" src="./content'+this_data_parts[2]+'"><br>';
+				this_data_html+='<audio src="./content'+this_data_parts[3]+'" preload="none"></audio><br>';
+				this_data_html=(this_data_parts[4]=="")? this_data_html : this_data_html+"Comments: "+this_data_parts[4]+"<br>";
+			}
+			data_html=(data_html=="")? this_data_html : data_html+"<hr>"+this_data_html;
 		}
 	}
 	data_container.innerHTML=msg+data_html;
+
+	var as = audiojs.createAll();
 	//TODO: pagination
 }
 
@@ -366,6 +384,38 @@ function displayData(msg){
   padding: 1px;
   font-size: 14px;
   text-align: center;
+}
+
+.audiojs .scrubber {
+    background: none repeat scroll 0 0 #5A5A5A;
+    border-bottom: 0 none;
+    border-left: 0 none;
+    border-top: 1px solid #3F3F3F;
+    float: left;
+    height: 14px;
+    margin: 10px;
+    overflow: hidden;
+    position: relative;
+    width: 50%; /* smaller width */
+}
+
+.audiojs .time {
+    border-left: 1px solid #000000;
+    color: #DDDDDD;
+    float: left;
+    height: 36px;
+    line-height: 36px;
+    margin: 0; /* no margin */
+    padding: 0 6px 0 9px; /* 2px smaller left padding */
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.audiojs {
+    font-family: monospace;
+    font-size: 10px; /* reduced font size */
+	width:100%; 
+	max-width:600px; 
+	background: #15420b; 
 }
 </style>
 </head>

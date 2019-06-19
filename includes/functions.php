@@ -260,7 +260,7 @@ function getFarmDataEntries($dbh,$id,$from){
 	$result = mysqli_query($dbh,$query);
 	$ret=($row = mysqli_fetch_array($result,MYSQL_NUM))? $row[0] : "0";
 	
-	$query="SELECT log_date, log_data_item_id, log_quantity, log_value, log_units_id, log_crop_id, log_treatment_id, log_comments, log_picture, log_sound, plot_id FROM log WHERE log.plot_id IN ".$in." ORDER BY log_date DESC LIMIT $from, 10";
+	$query="SELECT log_date, log_data_item_id, log_quantity, log_value, log_units_id, log_crop_id, log_treatment_id, log_comments, log_picture, log_sound, plot_id FROM log WHERE log.plot_id IN ".$in." ORDER BY log_date DESC";
 	$result = mysqli_query($dbh,$query);
 	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
 		$this_entry=$row[0];
@@ -270,7 +270,7 @@ function getFarmDataEntries($dbh,$id,$from){
 			$this_entry.=";Entire farm";
 		}
 		if($row[8]!="" && $row[9]!=""){
-			$this_entry.=";".$row[7].";".$row[8].";".$row[9];
+			$this_entry.=";".$row[8].";".$row[9].";".$row[7];
 		} else {
 			$data_item_string=getDataItemString($dbh,$row[1],$row[5],$row[6],$row[2],$row[3],$row[4]);
 			$this_entry.=";".$data_item_string.";".$row[7];
@@ -285,12 +285,12 @@ function getPlotDataEntries($dbh,$id,$from){
 	$result = mysqli_query($dbh,$query);
 	$ret=($row = mysqli_fetch_array($result,MYSQL_NUM))? $row[0] : "0";
 	
-	$query="SELECT log_date, log_data_item_id, log_quantity, log_value, log_units_id, log_crop_id, log_treatment_id, log_comments, log_picture, log_sound FROM log WHERE log.plot_id=$id ORDER BY log_date DESC LIMIT $from, 10";
+	$query="SELECT log_date, log_data_item_id, log_quantity, log_value, log_units_id, log_crop_id, log_treatment_id, log_comments, log_picture, log_sound FROM log WHERE log.plot_id=$id ORDER BY log_date DESC";
 	$result = mysqli_query($dbh,$query);
 	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
-		$this_entry=$row[0];
+		$this_entry="-;".$row[0];
 		if($row[8]!="" && $row[9]!=""){
-			$this_entry.=";".$row[7].";".$row[8].";".$row[9];
+			$this_entry.=";".$row[8].";".$row[9].";".$row[7];
 		} else {
 			$data_item_string=getDataItemString($dbh,$row[1],$row[5],$row[6],$row[2],$row[3],$row[4]);
 			$this_entry.=";".$data_item_string.";".$row[7];
