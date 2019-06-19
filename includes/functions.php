@@ -265,7 +265,7 @@ function getFarmDataEntries($dbh,$id,$from){
 	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
 		$this_entry=$row[0];
 		if($row[10]!=($id*-1)){
-			//TODO: add plot info
+			$this_entry.=";".getPlotContents($dbh,$row[10]);
 		} else {
 			$this_entry.=";Entire farm";
 		}
@@ -357,6 +357,33 @@ function getPlotIDFromFarm($dbh,$farm_id,$internal_plot_id){
 	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
 		$ret=$row[0];
 	}
+	return $ret;
+}
+
+function getPlotContents($dbh,$plot_id){
+	
+	$query="SELECT crop_name FROM crop, crop_x_plot WHERE crop_x_plot.plot_id=$plot_id AND crop.crop_id = crop_x_plot.crop_id";
+	$result = mysqli_query($dbh,$query);
+	$crops="Empty";
+	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$crops=($crops=="Empty" ? $row[0] : $crops.", ".$row[0]);
+	}
+	
+	$query="SELECT treatment_ingredient_name FROM treatment_ingredient, treatment_ingredient_x_plot WHERE treatment_ingredient_x_plot.plot_id=$plot_id AND treatment_ingredient.treatment_ingredient_id = treatment_ingredient_x_plot.treatment_ingredient_id AND treatment_id=1";
+	$result = mysqli_query($dbh,$query);
+	$pest_control="None";
+	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$pest_control=($pest_control=="None" ? $row[0] : $pest_control.", ".$row[0]);
+	}
+	
+	$query="SELECT treatment_ingredient_name FROM treatment_ingredient, treatment_ingredient_x_plot WHERE treatment_ingredient_x_plot.plot_id=$plot_id AND treatment_ingredient.treatment_ingredient_id = treatment_ingredient_x_plot.treatment_ingredient_id AND treatment_id=2";
+	$result = mysqli_query($dbh,$query);
+	$soil_management="None";
+	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
+		$soil_management=($soil_management=="None" ? $row[0] : $soil_management.", ".$row[0]);
+	}
+	
+	$ret="Plot: ".$crops."<br>Pest control: ".$pest_control."<br>Soil management: ".$soil_management;
 	return $ret;
 }
 

@@ -27,6 +27,7 @@ var this_farm_id = -1;
 var this_data = [];
 var data_index = 0;
 var total_data = 0;
+var plot_contents = "";
 
 function getUserFarms(){
 	var u = document.getElementById("u");
@@ -34,8 +35,14 @@ function getUserFarms(){
 	
 	if(id!=""){
 		
+		var farm_date = document.getElementById("farm_date");
+		farm_date.innerHTML = "";
+		
 		var plot_grid = document.getElementById("farm_grid");
 		plot_grid.style.display="none";
+		
+		var data_container = document.getElementById("data_container");
+		data_container.innerHTML="";
 	
 		var xmlhttp = new XMLHttpRequest();
 
@@ -44,6 +51,7 @@ function getUserFarms(){
 	
 		xmlhttp.onreadystatechange = function() {
 			if (this.readyState === 4 && this.status === 200) {
+				
 				var farms = this.responseText;
 				var farms_array = farms.split(";");
 				if(farms_array.length==0 || farms==""){
@@ -52,6 +60,7 @@ function getUserFarms(){
 					
 					var farm_chooser = document.getElementById("farm_chooser");
 					farm_chooser.style.display="none";
+					
 				} else if(farms_array.length==1){
 					var this_farm = farms_array[0];
 					var this_farm_parts = this_farm.split(",");
@@ -175,7 +184,7 @@ function drawCurrentFarm(){
 			crop_names = (crop_names == "")? crops[j] : crop_names+"<br>"+crops[j];
 		}
 		crop_names = (crop_names=="")? "Empty" : crop_names;
-		crop_names = '<a href="#" onclick="getPlotData('+this_plot_id+','+data_index+')">'+crop_names+'</a>';
+		crop_names = '<a href="#" onclick="getPlotData('+this_plot_id+','+data_index+',\''+this_plot_crops+'\',\''+this_plot_pest_control+'\',\''+this_plot_soil_management+'\','+this_plot_size+')">'+crop_names+'</a>';
 		div.innerHTML = crop_names;
 		
 		var bgcolor;
@@ -215,6 +224,9 @@ function drawCurrentFarm(){
 	farm_date.style.display = "inline";
 	farm_date.innerHTML = '<strong>Farm created on:</strong> '+this_farm_date+', <strong>Size:</strong> '+this_farm_size+' acres. <a href="#" onclick="getFarmData('+this_farm_id+','+data_index+');">See all farm data</a>';
 	
+	var data_container = document.getElementById("data_container");
+	data_container.innerHTML="Choose a plot or entire farm to see data";
+	
 }
 
 function goToPrevFarm(){
@@ -252,8 +264,42 @@ function getFarmData(id,index){
 	}
 }
 
-function getPlotData(id,index){
+function getPlotData(id,index,crops,pest_control,soil_management,size){
+	
 	if(id>0){
+		
+		if(crops==""){
+			plot_contents = "<strong>Plot:</strong> Empty ("+size.toString()+" acres). ";
+		} else {
+			var plot_crops="";
+			var crop_list=crops.split(",");
+			for(var i=0;i<crop_list.length;i++){
+				plot_crops = (plot_crops=="")? crop_list[i] : plot_crops+", "+crop_list[i];
+			}
+			plot_contents = "<strong>Plot:</strong> "+plot_crops+" ("+size.toString()+" acres). ";
+		}
+		
+		if(pest_control==""){
+			plot_contents += "<strong>Pest control:</strong> None. ";
+		} else {
+			var plot_pc="";
+			var pc_list=pest_control.split(",");
+			for(var i=0;i<pc_list.length;i++){
+				plot_pc = (plot_pc=="")? pc_list[i] : plot_pc+", "+pc_list[i];
+			}
+			plot_contents += "<strong>Pest control:</strong> "+plot_pc+". ";
+		}
+		
+		if(soil_management==""){
+			plot_contents += "<strong>Soil management:</strong> None.";
+		} else {
+			var plot_sm="";
+			var sm_list=soil_management.split(",");
+			for(var i=0;i<sm_list.length;i++){
+				plot_sm = (plot_sm=="")? sm_list[i] : plot_sm+", "+sm_list[i];
+			}
+			plot_contents += "<strong>Soil management:</strong> "+plot_sm+".";
+		}
 		
 		var xmlhttp = new XMLHttpRequest();
 
@@ -268,8 +314,7 @@ function getPlotData(id,index){
 				} else {
 					this_data = response_data.split("*");
 					total_data = parseInt(this_data[0]);
-					//TODO: display plot info
-					displayData("");
+					displayData(plot_contents+"<br><hr>");
 					
 				}
 			}
@@ -284,7 +329,11 @@ function displayData(msg){
 	
 	for(var i=1;i<this_data.length;i++){
 		this_data_parts=this_data[i].split(";");
-		if(this_data_parts.length==4){
+		if(this_data_parts.length==3){
+			this_data_html="Date: "+this_data_parts[0]+"<br><br>"+this_data_parts[1]+"<br>";
+			this_data_html=(this_data_parts[2]=="")? this_data_html : this_data_html+"Comments: "+data_parts[2]+"<br>";
+			data_html=(data_html=="")? this_data_html : data_html+"<hr>"+this_data_html;
+		} else if(this_data_parts.length==4){
 			this_data_html="Date: "+this_data_parts[0]+"<br>"+this_data_parts[1]+"<br><br>"+this_data_parts[2]+"<br>";
 			this_data_html=(this_data_parts[3]=="")? this_data_html : this_data_html+"Comments: "+data_parts[3]+"<br>";
 			data_html=(data_html=="")? this_data_html : data_html+"<hr>"+this_data_html;
@@ -293,6 +342,7 @@ function displayData(msg){
 		}
 	}
 	data_container.innerHTML=msg+data_html;
+	//TODO: pagination
 }
 
 </script>
@@ -351,7 +401,7 @@ function displayData(msg){
 </div> 
 </p></div>
 </div>
-<div class="w3-container w3-card-4 w3-white w3-padding-medium w3-text-black" style="width:48%; max-width:800px; display:inline; position:fixed; left:50%; top:32px; margin-right:10px; height:700px; overflow:auto;" id="data_container">Choose a plot or entire farm to see data</div>
+<div class="w3-container w3-card-4 w3-white w3-padding-medium w3-text-black" style="width:48%; max-width:800px; display:inline; position:fixed; left:50%; top:32px; margin-right:10px; height:700px; overflow:auto;" id="data_container"></div>
 </div>
 </body>
 </html>
