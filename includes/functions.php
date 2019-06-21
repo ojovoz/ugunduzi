@@ -288,12 +288,11 @@ function getPlotDataEntries($dbh,$id,$from){
 	$query="SELECT log_date, log_data_item_id, log_quantity, log_value, log_units_id, log_crop_id, log_treatment_id, log_comments, log_picture, log_sound FROM log WHERE log.plot_id=$id ORDER BY log_date DESC";
 	$result = mysqli_query($dbh,$query);
 	while($row = mysqli_fetch_array($result,MYSQL_NUM)){
-		$this_entry="-;".$row[0];
 		if($row[8]!="" && $row[9]!=""){
-			$this_entry.=";".$row[8].";".$row[9].";".$row[7];
+			$this_entry="-;".$row[0].";".$row[8].";".$row[9].";".$row[7];
 		} else {
 			$data_item_string=getDataItemString($dbh,$row[1],$row[5],$row[6],$row[2],$row[3],$row[4]);
-			$this_entry.=";".$data_item_string.";".$row[7];
+			$this_entry=$row[0].";".$data_item_string.";".$row[7];
 		}
 		$ret=$ret."*".$this_entry;
 	}
@@ -582,7 +581,7 @@ function getDataItemString($dbh,$data_item_id,$crop_id,$treatment_ingredient_id,
 	$result = mysqli_query($dbh,$query);
 	if($row = mysqli_fetch_array($result,MYSQL_NUM)){
 		$data_item_name=($row[2]==1 ? str_replace("Mbegu",getCropNameFromID($dbh,$crop_id),$row[0]) : ($row[3]==1 ? str_replace("Matibabu",getTreatmentIngredientNameFromID($dbh,$treatment_ingredient_id),$row[0]) : $row[0]));
-		$item_data=($row[1]==0 || $row[1]==4 ? ". Cost: ".$value." ".getDefaultMoneyUnit($dbh) : ", ".$quantity." ".getUnitsNameFromID($dbh,$units_id).". Cost:".$value." ".getDefaultMoneyUnit($dbh));
+		$item_data=($row[1]==0 || $row[1]==4 ? ". Cost: ".$value." ".getDefaultMoneyUnit($dbh) : ", ".$quantity." ".getUnitsNameFromID($dbh,$units_id).". Cost: ".$value." ".getDefaultMoneyUnit($dbh));
 		$ret=$data_item_name.$item_data;
 	}
 	return $ret;
@@ -652,6 +651,9 @@ function checkRecords($dbh,$ugunduzi_email,$ugunduzi_pass,$data_subject,$multime
 								
 								if(!in_array($farm_id,$cleared_farms)){
 									$query="DELETE FROM log WHERE plot_id IN (SELECT plot_id FROM plot WHERE farm_id=$farm_id) AND log_data_item_id>0";
+									$result = mysqli_query($dbh,$query);
+									$entire_farm=$farm_id*-1;
+									$query="DELETE FROM log WHERE plot_id=$entire_farm AND log_data_item_id>0";
 									$result = mysqli_query($dbh,$query);
 									array_push($cleared_farms,$farm_id);
 								}

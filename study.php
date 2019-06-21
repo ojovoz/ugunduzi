@@ -29,6 +29,8 @@ var this_data = [];
 var data_index = 0;
 var total_data = 0;
 var plot_contents = "";
+var max_items_per_page = <?php echo($max_items_per_page); ?>;
+var data_header = "";
 
 audiojs.events.ready(function() {
 	var as = audiojs.createAll();
@@ -48,6 +50,8 @@ function getUserFarms(){
 		
 		var data_container = document.getElementById("data_container");
 		data_container.innerHTML="";
+		
+		data_index=0;
 	
 		var xmlhttp = new XMLHttpRequest();
 
@@ -125,7 +129,6 @@ function getFarmPlots(id){
 	}
 	
 	if(id!=""){
-		
 	
 		var xmlhttp = new XMLHttpRequest();
 
@@ -154,6 +157,8 @@ function getFarmPlots(id){
 function drawCurrentFarm(){
 	
 	var this_farm = farm_versions[current_version];
+	
+	data_index=0;
 	
 	var plot_grid = document.getElementById("farm_grid");
 	plot_grid.style.display="grid";
@@ -260,8 +265,8 @@ function getFarmData(id,index){
 				} else {
 					this_data = response_data.split("*");
 					total_data = parseInt(this_data[0]);
-					var msg="<strong>Entire farm</strong><br><hr>";
-					displayData(msg);
+					data_header="<strong>Entire farm</strong><br><hr>";
+					displayData();
 					
 				}
 			}
@@ -319,7 +324,8 @@ function getPlotData(id,index,crops,pest_control,soil_management,size){
 				} else {
 					this_data = response_data.split("*");
 					total_data = parseInt(this_data[0]);
-					displayData(plot_contents+"<br><hr>");
+					data_header=plot_contents+"<br><hr>";
+					displayData();
 					
 				}
 			}
@@ -327,40 +333,67 @@ function getPlotData(id,index,crops,pest_control,soil_management,size){
 	}
 }
 
-function displayData(msg){
+function displayData(){
+	
+	msg=data_header;
+	
 	var data_container = document.getElementById("data_container");
 	
 	data_html="";
 	
-	for(var i=1;i<this_data.length;i++){
+	var start=data_index+1;
+	var end=((start+max_items_per_page)>this_data.length)? this_data.length : start+max_items_per_page;
+	
+	for(var i=start;i<end;i++){
 		this_data_parts=this_data[i].split(";");
 		if(this_data_parts.length==3){
 			this_data_html="Date: "+this_data_parts[0]+"<br><br>"+this_data_parts[1]+"<br>";
-			this_data_html=(this_data_parts[2]=="")? this_data_html : this_data_html+"Comments: "+this_data_parts[2]+"<br>";
+			this_data_html=(this_data_parts[2]=="")? this_data_html : this_data_html+"Comments: "+decodeURIComponent(this_data_parts[2].replace(/\+/g, ' '))+"<br>";
 			data_html=(data_html=="")? this_data_html : data_html+"<hr>"+this_data_html;
 		} else if(this_data_parts.length==4){
 			this_data_html="Date: "+this_data_parts[0]+"<br>"+this_data_parts[1]+"<br><br>"+this_data_parts[2]+"<br>";
-			this_data_html=(this_data_parts[3]=="")? this_data_html : this_data_html+"Comments: "+this_data_parts[3]+"<br>";
+			this_data_html=(this_data_parts[3]=="")? this_data_html : this_data_html+"Comments: "+decodeURIComponent(this_data_parts[3].replace(/\+/g, ' '))+"<br>";
 			data_html=(data_html=="")? this_data_html : data_html+"<hr>"+this_data_html;
 		} else if(this_data_parts.length==5){
 			if(this_data_parts[0]=="-"){
 				this_data_html="Date: "+this_data_parts[1]+"<br><br>";
-				this_data_html+='<img style="width:100%; max-width:600px;" src="./content'+this_data_parts[2]+'"><br>';
+				this_data_html+='<img style="width:100%;" src="./content'+this_data_parts[2]+'"><br>';
 				this_data_html+='<audio src="./content'+this_data_parts[3]+'" preload="none"></audio><br>';
-				this_data_html=(this_data_parts[4]=="")? this_data_html : this_data_html+"Comments: "+this_data_parts[4]+"<br>";
+				this_data_html=(this_data_parts[4]=="")? this_data_html : this_data_html+"Comments: "+decodeURIComponent(this_data_parts[4].replace(/\+/g, ' '))+"<br>";
 			} else {
 				this_data_html="Date: "+this_data_parts[0]+"<br>"+this_data_parts[1]+"<br><br>";
-				this_data_html+='<img style="width:100%; max-width:600px;" src="./content'+this_data_parts[2]+'"><br>';
+				this_data_html+='<img style="width:100%;" src="./content'+this_data_parts[2]+'"><br>';
 				this_data_html+='<audio src="./content'+this_data_parts[3]+'" preload="none"></audio><br>';
-				this_data_html=(this_data_parts[4]=="")? this_data_html : this_data_html+"Comments: "+this_data_parts[4]+"<br>";
+				this_data_html=(this_data_parts[4]=="")? this_data_html : this_data_html+"Comments: "+decodeURIComponent(this_data_parts[4].replace(/\+/g, ' '))+"<br>";
 			}
 			data_html=(data_html=="")? this_data_html : data_html+"<hr>"+this_data_html;
 		}
 	}
-	data_container.innerHTML=msg+data_html;
+	
+	data_html=data_html+"<br><br>";
 
+	var navigation="";
+	if(data_index>0){
+		navigation='<a href="#" onclick="goToPrevPage();" style="text-decoration:none;" class="w3-theme-d2 w3-hover-theme w3-button"><<</a>&nbsp;';
+	}
+	if((data_index+max_items_per_page+1)<this_data.length){
+		navigation=navigation+'<a href="#" onclick="goToNextPage();" style="text-decoration:none;" class="w3-theme-d2 w3-hover-theme w3-button">>></a>';
+	}
+	navigation=navigation+"<br><br>";
+	
+	data_container.innerHTML=msg+data_html+navigation;
 	var as = audiojs.createAll();
-	//TODO: pagination
+	data_container.scrollTop=0;
+}
+
+function goToNextPage(){
+	data_index=data_index+max_items_per_page;
+	displayData();
+}
+
+function goToPrevPage(){
+	data_index=data_index-max_items_per_page;
+	displayData();
 }
 
 </script>
@@ -372,8 +405,8 @@ function displayData(msg){
 
 .grid-container {
   display: grid;
-  grid-template-columns: 170px 170px 170px 170px;
-  grid-template-rows: 100px 100px 100px 100px;
+  grid-template-columns: 150px 150px 150px 150px;
+  grid-template-rows: 108px 108px 108px 108px;
   background-color: #ffffff;
   padding: 5px;
   grid-gap: 2px;
@@ -414,7 +447,7 @@ function displayData(msg){
     font-family: monospace;
     font-size: 10px; /* reduced font size */
 	width:100%; 
-	max-width:600px; 
+	/* max-width:600px; */
 	background: #15420b; 
 }
 </style>
@@ -440,7 +473,7 @@ function displayData(msg){
 	</select>
   </div>
   <span id="farm_name"></span><br><br>
-  <div class="grid-container" id="farm_grid" style="display:none; align:center;">
+  <div class="grid-container" id="farm_grid" style="display:none; width:630px; margin-left:auto; margin-right:auto;">
   </div><br>
   <div id="navigation" style="display:none;">
   <span id="prev" style="display:none;"><a href="#" onclick="goToPrevFarm();" style="text-decoration:none;" class="w3-theme-d2 w3-hover-theme w3-button"><<</a></span>
@@ -451,7 +484,7 @@ function displayData(msg){
 </div> 
 </p></div>
 </div>
-<div class="w3-container w3-card-4 w3-white w3-padding-medium w3-text-black" style="width:48%; max-width:800px; display:inline; position:fixed; left:50%; top:32px; margin-right:10px; height:700px; overflow:auto;" id="data_container"></div>
+<div class="w3-container w3-card-4 w3-white w3-padding-medium w3-text-black" style="width:48%; max-width:800px; display:inline; position:fixed; left:50%; top:32px; margin-right:10px; height:701px; overflow:auto;" id="data_container"></div>
 </div>
 </body>
 </html>
