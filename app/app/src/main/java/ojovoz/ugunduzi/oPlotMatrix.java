@@ -56,7 +56,7 @@ public class oPlotMatrix {
         oPlot plot;
         oCrop crop = new oCrop(c);
         oTreatmentIngredient treatmentIngredient = new oTreatmentIngredient(c);
-        int inc = (matrixItems.length%8==0) ? 8 : 9;
+        int inc = (matrixItems.length%8==0) ? (matrixItems.length%9==0) ? 9 : 8 : 9;
         for(int i=0;i<matrixItems.length;i+=inc){
             plot=new oPlot();
             plot.id=Integer.parseInt(matrixItems[i]);
@@ -64,7 +64,7 @@ public class oPlotMatrix {
             plot.y=Integer.parseInt(matrixItems[i+2])* displayHeight/4;
             plot.w=Integer.parseInt(matrixItems[i+3])* displayWidth/4;
             plot.h=Integer.parseInt(matrixItems[i+4])* displayHeight/4;
-            plot.size = (matrixItems.length%9==0) ? Float.parseFloat(matrixItems[i + 5]) : 0;
+            plot.size = (inc==9) ? Float.parseFloat(matrixItems[i + 5]) : 0;
             String crops=matrixItems[i+inc-3];
             if(!crops.equals("-1")) {
                 String plotCropsList[] = crops.split("\\|");
