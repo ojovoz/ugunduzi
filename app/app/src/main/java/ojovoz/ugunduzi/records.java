@@ -1263,7 +1263,7 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
 
     public void getPlotInfo(oCardData c, oLog l) {
         oFarm f = new oFarm(this);
-        f = f.getFarm(userId, farmId, farmVersion, this);
+        f = f.getFarm(userId, farmId, l.farmVersion, this);
         oPlotMatrix pm = new oPlotMatrix();
         pm.fromString(this, f.plotMatrix, ";");
         oPlot p = (l.plotId!=-1) ? pm.getPlotFromId(l.plotId) : null;
@@ -1329,14 +1329,18 @@ public class records extends AppCompatActivity implements httpConnection.AsyncRe
         if (farmVersion == maxVersion) {
             final int n = (int) v.getTag();
             if (n >= 0) {
-                TextView tv = (TextView) v;
-                tv.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight));
                 editingItem = logList.get(n);
-                if(plot==-1){
-                    currentPlot = (editingItem.plotId!=-1) ? getCurrentPlot(editingItem.plotId) : null;
-                    getDataItemsList();
+                if(editingItem.farmVersion==maxVersion) {
+                    TextView tv = (TextView) v;
+                    tv.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight));
+                    if (plot == -1) {
+                        currentPlot = (editingItem.plotId != -1) ? getCurrentPlot(editingItem.plotId) : null;
+                        getDataItemsList();
+                    }
+                    addItem(v);
+                } else {
+                    editingItem=null;
                 }
-                addItem(v);
             }
         }
     }

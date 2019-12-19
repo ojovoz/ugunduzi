@@ -323,19 +323,23 @@ public class pictureSound extends AppCompatActivity {
                 ImageView thumbnail = (ImageView) this.findViewById(R.id.thumbnail);
                 thumbnail.setImageBitmap(thumb);
                 thumbnail.invalidate();
-            }
 
-            photoDone = true;
-            bChanges = true;
-            if(!prevPhotoFile.isEmpty()){
-                filesToDelete.add(prevPhotoFile);
-            }
-            prevPhotoFile = photoFile;
+                photoDone = true;
+                bChanges = true;
+                if(!prevPhotoFile.isEmpty()){
+                    filesToDelete.add(prevPhotoFile);
+                }
+                prevPhotoFile = photoFile;
 
-            if (recordingDone) {
-                Button saveButton = (Button) findViewById(R.id.saveButton);
-                saveButton.setVisibility(View.VISIBLE);
+                if (recordingDone) {
+                    Button saveButton = (Button) findViewById(R.id.saveButton);
+                    saveButton.setVisibility(View.VISIBLE);
 
+                }
+
+            } else {
+                Toast.makeText(this, R.string.photoFailedTryAgain, Toast.LENGTH_SHORT).show();
+                photoDone=false;
             }
 
         } else if(!prevPhotoFile.isEmpty()) {

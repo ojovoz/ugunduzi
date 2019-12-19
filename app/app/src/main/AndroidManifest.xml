@@ -41,6 +41,7 @@
         <activity
             android:name=".pictureSound"
             android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:label="@string/pictureSoundActivityTitle"
             android:launchMode="singleTop">
         </activity>

@@ -130,7 +130,7 @@ public class oLog {
             int n=0;
             while (iterator.hasNext()) {
                 String[] record = iterator.next();
-                if(Integer.parseInt(record[0])==farmId && Integer.parseInt(record[1])==version && (Integer.parseInt(record[2])==userId || userId==-1)) {
+                if(Integer.parseInt(record[0])==farmId && Integer.parseInt(record[1])<=version && (Integer.parseInt(record[2])==userId || userId==-1)) {
                     oLog l = new oLog();
                     l.line=n;
                     l.farmId = Integer.parseInt(record[0]);

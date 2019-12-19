@@ -114,4 +114,5 @@
     <string name="plotSizeCannotBeZero">Plot size cannot be zero</string>
     <string name="sizeOfPlotsGreaterThanFarmSize">Size of plots is greater than farm size</string>
     <string name="acresWord">Acres</string>
+    <string name="photoFailedTryAgain">Photo failed. Please try again</string>
 </resources>

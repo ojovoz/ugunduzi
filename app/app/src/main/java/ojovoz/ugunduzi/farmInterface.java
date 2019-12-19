@@ -204,7 +204,7 @@ public class farmInterface extends AppCompatActivity implements httpConnection.A
                     }
                 }
                 farmName = currentFarm.name;
-
+                farmSize = currentFarm.size;
             }
         }
 

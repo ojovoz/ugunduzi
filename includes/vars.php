@@ -2,23 +2,24 @@
 
 $root_folder="ugunduzi";
 
-$ugunduzi_email="xxx";
-$ugunduzi_pass="xxx";
+$ugunduzi_email="ugunduzi@sautiyawakulima.net";
+$ugunduzi_pass="hQgfewmGRTW7xOL9";
 
-$data_subject="xxx";
-$multimedia_subject="xxx";
+$data_subject="bIOM9B7pLnf6Ev6m";
+$multimedia_subject="kzJuyyIIXMX9gnIA";
 
-$smtp_server="xxx";
-$smtp_server_port="xxx";
-$mail_server="xxx";
+$smtp_server="smtp.sautiyawakulima.net";
+//$smtp_server_port="578";
+$smtp_server_port="25";
+$mail_server="{134.0.12.74:110/pop3/notls}";
 
-$servpath="xxx";
-$ffmpeg_path="xxx";
+$servpath="/usr/home/sautiyawakulima.net/web/";
+$ffmpeg_path="/usr/local/home/srvcat/local/binaris/sautiyawakulima.net/";
 $sample_rate="22050";
 
 //web/
 
-$max_images_per_page=10;
+$max_items_per_page=10;
 
 //words
 $none_word="hakuna";

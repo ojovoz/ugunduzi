@@ -2,9 +2,9 @@
 //initialize dbConnection
 function initDB() {
 	$host="localhost";
-	$db="database_name";
-	$db_user="user_name";
-	$db_pass="user_password";
+	$db="ugunduzi";
+	$db_user="mysautiyaw";
+	$db_pass="j8bA0y11";
 	$dbh=mysqli_connect($host, $db_user, $db_pass, $db);
 	return $dbh;
 }

@@ -114,4 +114,5 @@
     <string name="plotSizeCannotBeZero">Ukubwa wa sehemu ya shamba isiwe sifuri</string>
     <string name="sizeOfPlotsGreaterThanFarmSize">Ukubwa wa visehemu vya shamba inapaswa kuwa kubwa zaidi ya shamba</string>
     <string name="acresWord">Ekari</string>
+    <string name="photoFailedTryAgain">Picha imegoma. Tafadhali jaribu tena</string>
 </resources>
