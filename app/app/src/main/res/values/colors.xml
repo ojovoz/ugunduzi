@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimaryLight">#22cf16</color>
+    <color name="colorPrimary">#236E12</color>
+    <color name="colorPrimaryDark">#236E12</color>
+    <color name="colorAccent">#FA7000</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorInput">#BABA03</color>
+
+    <color name="colorDraw">#000000</color>
+    <color name="colorDrawFaded">#666666</color>
+    <color name="colorFillDefault">#BBBBBB</color>
+    <color name="colorFillFaded">#EEEEEE</color>
+    <color name="colorDrawGhostRectangle">#FA7000</color>
+
+    <color name="colorFillPestControl">#2196F3</color>
+    <color name="colorFillPestControlFaded">#8FCBF9</color>
+    <color name="colorFillSoilManagement">#FFC107</color>
+    <color name="colorFillSoilManagementFaded">#FFE081</color>
+    <color name="colorFillSoilManagementAndPestControl">#4CAF50</color>
+    <color name="colorFillSoilManagementAndPestControlFaded">#8ECE91</color>
+</resources>
